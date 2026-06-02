@@ -73,7 +73,7 @@ export default function ArchivePage() {
       <PageHero
         eyebrow="Archive"
         title="Results archive"
-        description="Every finished challenge, podium and record across the community. Verified results, kept on the record."
+        description="Finished challenges, podiums, and records."
       />
 
       <div className="container-page py-8">
@@ -140,14 +140,14 @@ export default function ArchivePage() {
               className="mt-8"
               icon={Archive}
               title="No finished events yet"
-              description="Once challenges wrap up, their podiums and records live here."
+              description="Finished challenges will appear here."
             />
           ) : (
           <EmptyState
             className="mt-8"
             icon={Archive}
             title="No archived events match"
-            description="Try a different season, format, or clear your search."
+            description="Clear the search or change the filters."
             action={
               <Button
                 variant="secondary"

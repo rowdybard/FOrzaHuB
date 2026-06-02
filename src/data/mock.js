@@ -57,7 +57,7 @@ export const clubs = [
     accent: '#ff6b2c',
     tagline: 'The home base. More clubs coming.',
     about:
-      'The founding club for Pitwall. Rowdybard and PurpleCone are here. Challenges, leaderboards and verified proof, just getting started.',
+      'The founding club for Pitwall. Rowdybard and PurpleCone are here. Challenges, leaderboards and verified proof.',
     discord: '',
     founded: 'Jun 2025',
     stats: { challenges: 0, podiums: 0, submissions: 0 },

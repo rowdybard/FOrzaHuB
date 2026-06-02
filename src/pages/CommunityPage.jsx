@@ -95,7 +95,7 @@ export default function CommunityPage() {
                 <EmptyState
                   icon={Flag}
                   title="No active challenges"
-                  description="This club doesn’t have any open events right now. Check back soon."
+                  description="This club has no open events."
                 />
               )}
             </Section>

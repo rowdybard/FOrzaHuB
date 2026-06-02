@@ -41,7 +41,7 @@ export default function ChallengesPage() {
       <PageHero
         eyebrow="Challenges"
         title="Find your next event"
-        description="Browse every open, upcoming and finished challenge across the community. Filter by format and status, then jump in."
+        description="Open, upcoming, and finished challenges."
       />
 
       <div className="container-page py-8">
@@ -109,8 +109,8 @@ export default function ChallengesPage() {
             title={(challenges || []).length === 0 ? 'No challenges yet' : 'No challenges match your filters'}
             description={
               (challenges || []).length === 0
-                ? 'The first challenge hasn’t been created yet. Check back soon.'
-                : 'Try clearing the search or switching format and status.'
+                ? 'No challenges have been created yet.'
+                : 'Clear the search or change the filters.'
             }
             action={
               <Button

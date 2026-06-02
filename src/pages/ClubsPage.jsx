@@ -47,7 +47,7 @@ export default function ClubsPage() {
       <PageHero
         eyebrow="Communities"
         title="Clubs on the grid"
-        description="Find a community that fits your style of racing — or start your own and run events with proof and leaderboards built in."
+        description="Forza clubs running events on Pitwall."
       >
         <div className="mt-6 flex flex-wrap gap-3">
           <Button to="/create">

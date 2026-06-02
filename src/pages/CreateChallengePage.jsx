@@ -275,12 +275,12 @@ export default function CreateChallengePage() {
                   ))}
                 </select>
               </Field>
-              <Field label="Description" hint="Sets the tone for racers">
+              <Field label="Description">
                 <textarea
                   value={form.description}
                   onChange={(e) => set('description', e.target.value)}
                   rows={3}
-                  placeholder="Explain the challenge, the vibe and anything racers should know…"
+                  placeholder="Challenge notes, format details, or steward instructions"
                   className={`${inputCls} resize-none`}
                 />
               </Field>
@@ -405,17 +405,17 @@ export default function CreateChallengePage() {
             </Panel>
           </div>
 
-          {/* Live preview */}
+          {/* Preview */}
           <aside className="lg:sticky lg:top-20">
             <div className="mb-3 flex items-center gap-2 text-sm font-medium text-zinc-400">
               <Eye className="h-4 w-4" />
-              Live preview
+              Preview
             </div>
             <div className="pointer-events-none select-none">
               <ChallengeCard challenge={previewChallenge} />
             </div>
             <p className="mt-3 text-center text-xs text-zinc-500">
-              This is how your challenge appears in listings and on Discord.
+              Listings and Discord preview.
             </p>
           </aside>
         </div>

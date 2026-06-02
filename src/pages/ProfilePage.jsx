@@ -122,7 +122,7 @@ export default function ProfilePage() {
       <PageHero
         eyebrow="My profile"
         title={profile?.name || 'Racer profile'}
-        description="Discord account, club presence, and your compact nameplate settings."
+        description="Account details, badges, and display settings."
       />
 
       <div className="container-page py-8">
@@ -166,9 +166,9 @@ export default function ProfilePage() {
               <div>
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Nameplate studio
+                  Nameplate
                 </div>
-                <h2 className="mt-1 text-lg font-semibold text-white">Small flair, clean read</h2>
+                <h2 className="mt-1 text-lg font-semibold text-white">Display settings</h2>
               </div>
               <div className="flex items-center gap-3">
                 {saved && (
@@ -192,7 +192,7 @@ export default function ProfilePage() {
 
             <div className="grid gap-6 p-5 xl:grid-cols-[minmax(0,1fr)_320px]">
               <div className="space-y-6">
-                <Section title="Forum title">
+                <Section title="Title">
                   <input
                     className={inputCls}
                     value={profileTitle}
@@ -304,11 +304,11 @@ export default function ProfilePage() {
                 <div className="rounded-lg border border-white/[0.07] bg-ink-900/60 p-4">
                   <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/[0.06] pb-3">
                     <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-                      Pitwall.bbs
+                      Preview
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                       <Hash className="h-3 w-3" />
-                      Preview
+                      Live
                     </span>
                   </div>
                   <Nameplate user={previewUser} size={48} />

@@ -139,7 +139,7 @@ export default function SubmitScorePage() {
       <PageHero
         eyebrow="Submit"
         title={isGallery ? 'Submit your entry' : 'Submit your result'}
-        description="Add your result and attach proof. A steward will verify it before it appears on the public leaderboard."
+        description="Result, proof, and review status."
       />
 
       <div className="container-page py-8">

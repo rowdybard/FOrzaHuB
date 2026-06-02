@@ -92,9 +92,8 @@ function Hero({ featured, stats }) {
           </h1>
 
           <p className="mt-5 max-w-xl text-balance text-lg leading-relaxed text-zinc-400">
-            Pitwall gives Forza clubs and Discord communities a home for time trials,
-            drift battles and photo contests — with verified proof and clean public
-            leaderboards. No spreadsheets. No plastic.
+            Pitwall gives Forza clubs and Discord communities a place for time trials,
+            drift battles, photo contests, proof, and public leaderboards.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -115,7 +114,7 @@ function Hero({ featured, stats }) {
             </div>
             <p className="text-sm text-zinc-400">
               <span className="font-semibold text-white">{formatNumber(stats.clubs)}</span>{' '}
-              {stats.clubs === 1 ? 'founding club' : 'founding clubs'} on the grid — just getting started.
+              {stats.clubs === 1 ? 'club' : 'clubs'} on the grid.
             </p>
           </div>
         </div>
@@ -132,9 +131,9 @@ function HeroPlaceholder() {
       <div className="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl" />
       <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850 p-8 text-center shadow-pop">
         <Flag className="mx-auto h-8 w-8 text-brand-400" />
-        <h3 className="mt-4 text-lg font-bold text-white">First challenge coming soon</h3>
+        <h3 className="mt-4 text-lg font-bold text-white">No active challenges</h3>
         <p className="mt-2 text-sm text-zinc-400">
-          Leaderboards light up the moment the first event goes live. Create one to kick things off.
+          Create a challenge to start the first leaderboard.
         </p>
         <Button to="/create" size="sm" className="mt-5">
           <PlusCircle className="h-4 w-4" />
@@ -263,7 +262,7 @@ function StatsBar({ stats: s }) {
       {isLaunch && (
         <p className="flex items-center gap-1.5 text-xs text-zinc-600">
           <Rocket className="h-3 w-3" />
-          Week 1 — leaderboards fill as submissions come in
+          Week 1: leaderboards fill as submissions come in
         </p>
       )}
     </section>
@@ -278,7 +277,7 @@ function LiveChallenges({ challenges }) {
       <SectionHeading
         eyebrow="Happening now"
         title="Live challenges"
-        description="Jump into an open event. Set a time, submit your proof, and climb the board."
+        description="Open events accepting submissions now."
         action={
           <Button to="/challenges" variant="outline" size="sm">
             View all
@@ -302,8 +301,8 @@ function TypesShowcase() {
     <section className="container-page mt-24">
       <SectionHeading
         eyebrow="Five formats"
-        title="Built for every kind of event"
-        description="From hot laps to photo mode — Pitwall handles scoring, proof and leaderboards for each format out of the box."
+        title="Event formats"
+        description="Hot laps, drift scores, speed traps, build battles, and photo contests."
       />
       <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {TYPE_LIST.map((t) => {
@@ -360,7 +359,7 @@ function HowItWorks() {
     {
       icon: BarChart3,
       title: 'Leaderboard goes live',
-      text: 'A public, readable board updates instantly — share the link anywhere.',
+      text: 'A public board updates after entries are approved.',
     },
   ]
   return (
@@ -398,7 +397,7 @@ function Communities({ clubs }) {
       <SectionHeading
         eyebrow="Communities"
         title="Founding clubs"
-        description="The clubs running events on Pitwall today. More spots open as the platform grows."
+        description="Clubs running events on Pitwall."
         action={
           <Button to="/clubs" variant="outline" size="sm">
             All clubs
@@ -414,7 +413,7 @@ function Communities({ clubs }) {
         </div>
       )}
 
-      {/* Natural club pitch — not an ad, just honest */}
+      {/* Club pitch */}
       <div className="mt-6 flex items-start gap-5 rounded-2xl border border-white/[0.06] bg-ink-900/40 p-5 sm:items-center">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-ink-850 text-brand-400">
           <PlusCircle className="h-5 w-5" />
@@ -422,7 +421,7 @@ function Communities({ clubs }) {
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-white">Running a Forza club or Discord?</p>
           <p className="mt-0.5 text-sm text-zinc-400">
-            Bring your community here. Create challenges, let your stewards handle the review queue, and give your leaderboards a permanent home.
+            Create challenges, review submissions, and keep leaderboards in one place.
           </p>
         </div>
         <Button to="/create" variant="outline" size="sm" className="shrink-0">
@@ -438,10 +437,10 @@ function Communities({ clubs }) {
 function DiscordTrust({ featured }) {
   const club = featured.club
   const features = [
-    'Verified proof on every podium — clips and screenshots attached',
+    'Verified proof on every podium: clips and screenshots attached',
     'A review queue that flags assists, cuts and missing evidence',
     'Public leaderboards with shareable links for any channel',
-    'Roles for admins, stewards and racers — no spreadsheet chaos',
+    'Roles for admins, stewards and racers',
   ]
   return (
     <section className="container-page mt-24">
@@ -452,12 +451,11 @@ function DiscordTrust({ featured }) {
             Made to live in your server
           </span>
           <h2 className="mt-4 text-3xl font-bold text-balance">
-            Something a Discord admin can actually trust
+            Discord-ready event management
           </h2>
           <p className="mt-3 text-zinc-400">
-            Pitwall is built around proof and clarity, so your results hold up and your
-            members keep coming back. Announce events, collect entries and post results
-            without ever leaving the vibe of your community.
+            Pitwall is built around proof and review. Announce events, collect entries,
+            and post results from the same place.
           </p>
           <ul className="mt-6 space-y-3">
             {features.map((f) => (

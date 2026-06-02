@@ -132,14 +132,25 @@ function getNameStyle(effectId, accent, gradient) {
         textShadow: `1px 1px 0 ${hexToRgba('#000000', 0.45)}`,
       }
     case 'terminal':
-      return {
-        color: '#86efac',
-        textShadow: '0 0 8px rgba(134,239,172,0.32)',
-      }
+      return gradient
+        ? {
+            backgroundImage: `linear-gradient(92deg, #86efac, ${accent} 58%, #d9f99d)`,
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+            textShadow: '0 0 8px rgba(134,239,172,0.24)',
+          }
+        : {
+            color: '#86efac',
+            textShadow: '0 0 8px rgba(134,239,172,0.32)',
+          }
     case 'sticker':
       return {
         color: '#ffffff',
         backgroundColor: hexToRgba(accent, 0.18),
+        backgroundImage: gradient
+          ? `linear-gradient(92deg, ${hexToRgba(accent, 0.48)}, rgba(255,255,255,0.14) 52%, ${hexToRgba(accent, 0.28)})`
+          : undefined,
         boxShadow: `inset 0 0 0 1px ${hexToRgba(accent, 0.36)}`,
         textShadow: `1px 1px 0 ${hexToRgba('#000000', 0.55)}`,
       }
