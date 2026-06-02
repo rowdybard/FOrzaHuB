@@ -11,13 +11,15 @@ import {
   Video,
   ChevronRight,
   CircleAlert,
+  Lock,
+  ClipboardCheck,
 } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
 import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { challenges, liveChallenges, getChallengeBySlug, getClubById } from '../data/mock'
+import { challenges, liveChallenges, getChallengeBySlug, getClubById, getPrerequisite, submissions as allSubmissions } from '../data/mock'
 import { getType } from '../lib/challengeTypes'
 
 const inputCls =
@@ -52,13 +54,30 @@ export default function SubmitScorePage() {
   const club = challenge ? getClubById(challenge.clubId) : null
   const isGallery = t?.gallery
 
+  // Prereq logic — in production this checks the authenticated user's submissions
+  // Here we simulate: maya has an approved prereq, jin has pending, others have none
+  const prereq = challenge ? getPrerequisite(challenge) : null
+  const prereqSubmission = prereq
+    ? allSubmissions.find((s) => s.challengeId === prereq.id)
+    : null
+  // For demo: treat maya's gamertag as the logged-in user
+  const DEMO_USER = 'Vortex_Apex'
+  const userPrereqSub = prereq
+    ? allSubmissions.find((s) => s.challengeId === prereq.id && s.user.tag === DEMO_USER)
+    : null
+  const prereqSubmitted = Boolean(userPrereqSub)
+  const prereqApproved = userPrereqSub?.status === 'approved'
+  // Main entry is held (pending but not in review queue) until prereq is approved
+  const willBeHeld = prereq && prereqSubmitted && !prereqApproved
+
   const set = (k) => (e) => {
     const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setForm((f) => ({ ...f, [k]: v }))
   }
 
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
-  const canSubmit = form.gamertag.trim() && resultFilled && form.agree
+  const prereqGated = prereq && !prereqSubmitted
+  const canSubmit = form.gamertag.trim() && resultFilled && form.agree && !prereqGated
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -73,7 +92,7 @@ export default function SubmitScorePage() {
   }
 
   if (submitted) {
-    return <SuccessView challenge={challenge} club={club} t={t} form={form} onReset={() => setSubmitted(false)} />
+    return <SuccessView challenge={challenge} club={club} t={t} form={form} held={willBeHeld} prereq={prereq} onReset={() => setSubmitted(false)} />
   }
 
   return (
@@ -87,6 +106,15 @@ export default function SubmitScorePage() {
       <div className="container-page py-8">
         <div className="grid items-start gap-8 lg:grid-cols-[1fr_340px]">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Prereq gate banner */}
+            {prereq && (
+              <PrereqGate
+                prereq={prereq}
+                submitted={prereqSubmitted}
+                approved={prereqApproved}
+              />
+            )}
+
             {/* Challenge + identity */}
             <Panel title="Your entry" step="1">
               <Field label="Challenge">
@@ -235,16 +263,21 @@ export default function SubmitScorePage() {
                 Cancel
               </Link>
               <Button type="submit" size="lg" disabled={!canSubmit} className="w-full sm:w-auto">
-                <Upload className="h-4 w-4" />
-                Submit for review
+                {willBeHeld ? <Clock className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+                {willBeHeld ? 'Submit (held pending qualifier)' : 'Submit for review'}
               </Button>
             </div>
-            {!canSubmit && (
+            {prereqGated ? (
+              <p className="flex items-center justify-end gap-1.5 text-xs text-amber-400">
+                <Lock className="h-3.5 w-3.5" />
+                Complete the qualifier sub-challenge first.
+              </p>
+            ) : !canSubmit ? (
               <p className="flex items-center justify-end gap-1.5 text-xs text-zinc-500">
                 <CircleAlert className="h-3.5 w-3.5" />
                 Add your gamertag, result and confirm the rules to submit.
               </p>
-            )}
+            ) : null}
           </form>
 
           <aside className="space-y-5 lg:sticky lg:top-20">
@@ -252,6 +285,52 @@ export default function SubmitScorePage() {
             <Checklist t={t} />
           </aside>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function PrereqGate({ prereq, submitted, approved }) {
+  if (approved) {
+    return (
+      <div className="flex items-center gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.07] p-4">
+        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
+        <div>
+          <div className="text-sm font-semibold text-emerald-200">Qualifier approved</div>
+          <div className="text-sm text-emerald-200/70">You're cleared to submit your result.</div>
+        </div>
+      </div>
+    )
+  }
+  if (submitted) {
+    return (
+      <div className="flex items-center gap-3 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] p-4">
+        <Clock className="h-5 w-5 shrink-0 text-amber-400" />
+        <div>
+          <div className="text-sm font-semibold text-amber-200">Qualifier pending review</div>
+          <div className="text-sm text-amber-200/70">
+            Your submission will be held here until a steward approves your qualifier.
+          </div>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-rose-500/25 bg-rose-500/[0.06] p-4">
+      <Lock className="mt-0.5 h-5 w-5 shrink-0 text-rose-400" />
+      <div className="min-w-0">
+        <div className="text-sm font-semibold text-rose-200">Qualifier required</div>
+        <p className="mt-0.5 text-sm text-rose-200/70">
+          Submit the qualifier first to unlock this form.
+        </p>
+        <Link
+          to={`/c/${prereq.slug}`}
+          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-rose-300 hover:text-rose-200"
+        >
+          <ClipboardCheck className="h-3.5 w-3.5" />
+          {prereq.title}
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   )
@@ -352,7 +431,7 @@ function Checklist({ t }) {
   )
 }
 
-function SuccessView({ challenge, club, t, form, onReset }) {
+function SuccessView({ challenge, club, t, form, held, prereq, onReset }) {
   return (
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="card w-full max-w-md overflow-hidden text-center">
@@ -376,10 +455,26 @@ function SuccessView({ challenge, club, t, form, onReset }) {
               </span>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
-            <Clock className="h-4 w-4" />
-            Pending verification by a steward
-          </div>
+          {held ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
+                <Clock className="h-4 w-4" />
+                Held — waiting for qualifier approval
+              </div>
+              <p className="text-center text-xs text-zinc-500">
+                Once your{' '}
+                <Link to={`/c/${prereq.slug}`} className="text-brand-400 hover:text-brand-300">
+                  {prereq.title}
+                </Link>{' '}
+                is approved, this enters the review queue automatically.
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
+              <Clock className="h-4 w-4" />
+              Pending verification by a steward
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3 pt-1">
             <Button to={`/c/${challenge.slug}`} variant="secondary">
               View challenge

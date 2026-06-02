@@ -153,6 +153,9 @@ export const challenges = [
     clubId: 'apex',
     status: 'live',
     featured: true,
+    round: 1,
+    season: 'Summer 2025',
+    prerequisiteId: 'c1-pre',
     startDate: d(-4),
     endDate: d(3),
     region: 'Festival Circuit',
@@ -190,6 +193,8 @@ export const challenges = [
     title: 'Coastal Cliffs Drift Jam',
     clubId: 'drift-republica',
     status: 'live',
+    round: 1,
+    season: 'Summer 2025',
     startDate: d(-2),
     endDate: d(5),
     region: 'Coastal Cliffs',
@@ -225,6 +230,8 @@ export const challenges = [
     title: 'Airport Half-Mile Shootout',
     clubId: 'quarter-mile',
     status: 'live',
+    round: 1,
+    season: 'Summer 2025',
     startDate: d(-3),
     endDate: d(2),
     region: 'Airfield Strip',
@@ -259,6 +266,8 @@ export const challenges = [
     title: 'Golden Hour',
     clubId: 'lens-livery',
     status: 'live',
+    round: 1,
+    season: 'Summer 2025',
     startDate: d(-5),
     endDate: d(4),
     region: 'Anywhere on the map',
@@ -294,6 +303,8 @@ export const challenges = [
     title: 'Restomod Brief: 80s Icon',
     clubId: 'lens-livery',
     status: 'live',
+    round: 1,
+    season: 'Summer 2025',
     startDate: d(-6),
     endDate: d(6),
     region: 'Build + livery',
@@ -613,6 +624,34 @@ export const challenges = [
 // Admin review queue (submissions awaiting verification)
 export const submissions = [
   {
+    id: 'pre-s1',
+    challengeId: 'c1-pre',
+    challengeTitle: 'Apex Qualifier: Show Your Garage',
+    typeId: 'photo_contest',
+    user: U.maya,
+    value: null,
+    title: 'Full-send Civic — 799 PI',
+    hue: 200,
+    proof: { type: 'photo', url: '#' },
+    status: 'approved',
+    submittedAt: h(-3),
+    note: '',
+  },
+  {
+    id: 'pre-s2',
+    challengeId: 'c1-pre',
+    challengeTitle: 'Apex Qualifier: Show Your Garage',
+    typeId: 'photo_contest',
+    user: U.jin,
+    value: null,
+    title: 'RWD-swapped EK9',
+    hue: 16,
+    proof: { type: 'photo', url: '#' },
+    status: 'pending',
+    submittedAt: h(-2),
+    note: '',
+  },
+  {
     id: 's1',
     challengeId: 'c1',
     challengeTitle: 'Sierra Verde Clean Lap Sprint',
@@ -783,10 +822,53 @@ export const recentActivity = [
 ]
 
 // Selectors
-export const getChallengeBySlug = (slug) => challenges.find((c) => c.slug === slug)
+// Sub-challenges: standalone entries that act as prerequisites for a main weekly
+export const subChallenges = [
+  {
+    id: 'c1-pre',
+    slug: 'apex-garage-qualifier',
+    typeId: 'photo_contest',
+    title: 'Apex Qualifier: Show Your Garage',
+    clubId: 'apex',
+    status: 'live',
+    isSubChallenge: true,
+    parentId: 'c1',
+    round: 1,
+    season: 'Summer 2025',
+    startDate: d(-4),
+    endDate: d(3),
+    region: 'Garage',
+    restriction: 'Any car',
+    location: 'Your garage',
+    prize: 'Unlocks main weekly entry',
+    participants: 61,
+    submissionCount: 61,
+    pendingCount: 8,
+    description:
+      'Before you run the main time trial, show us what you\u2019re bringing. One screenshot of your A-Class build from the garage — tune sheet visible. Required to unlock the Sierra Verde lap submission.',
+    rules: [
+      'One screenshot of your A-Class car in the garage.',
+      'Tune sheet must be visible.',
+      'Submit before the main weekly closes.',
+    ],
+    gallery: gallery([
+      [U.maya, 'Full-send Civic — 799 PI', 0, 200, 3],
+      [U.jin, 'RWD-swapped EK9', 0, 16, 5],
+      [U.ana, 'AWD Supra build', 0, 286, 7],
+      [U.leon, 'Golf R replica', 0, 130, 9],
+    ]),
+  },
+]
+
+export const allChallenges = [...challenges, ...subChallenges]
+
+export const getChallengeBySlug = (slug) => allChallenges.find((c) => c.slug === slug)
 export const getClubBySlug = (slug) => clubs.find((c) => c.slug === slug)
 export const getClubById = (id) => clubs.find((c) => c.id === id)
 export const challengesByClubId = (id) => challenges.filter((c) => c.clubId === id)
+export const getSubChallenge = (id) => subChallenges.find((c) => c.id === id)
+export const getPrerequisite = (challenge) =>
+  challenge.prerequisiteId ? subChallenges.find((c) => c.id === challenge.prerequisiteId) : null
 export const liveChallenges = () => challenges.filter((c) => c.status === 'live')
 export const featuredChallenge = () => challenges.find((c) => c.featured) || challenges[0]
 export const closedChallenges = () =>

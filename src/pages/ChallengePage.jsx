@@ -17,6 +17,8 @@ import {
   Flag,
   Hourglass,
   Vote,
+  Lock,
+  ClipboardCheck,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
@@ -29,7 +31,7 @@ import Gallery from '../components/common/Gallery'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
 import NotFound from './NotFound'
-import { getChallengeBySlug, getClubById, challengesByClubId } from '../data/mock'
+import { getChallengeBySlug, getClubById, challengesByClubId, getPrerequisite } from '../data/mock'
 import { getType } from '../lib/challengeTypes'
 import { formatDate, formatNumber } from '../lib/utils'
 
@@ -41,6 +43,7 @@ export default function ChallengePage() {
   const club = getClubById(challenge.clubId)
   const t = getType(challenge.typeId)
   const isLive = challenge.status === 'live'
+  const prereq = getPrerequisite(challenge)
   const more = challengesByClubId(challenge.clubId).filter((c) => c.id !== challenge.id)
 
   return (
@@ -49,13 +52,14 @@ export default function ChallengePage() {
 
       <div className="container-page mt-8 grid items-start gap-8 lg:grid-cols-[1fr_336px]">
         <div className="space-y-8">
+          {prereq && <PrereqBanner prereq={prereq} />}
           <Standings challenge={challenge} t={t} />
           <Rules challenge={challenge} />
           <About challenge={challenge} />
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-20">
-          <EventDetails challenge={challenge} club={club} t={t} isLive={isLive} />
+          <EventDetails challenge={challenge} club={club} t={t} isLive={isLive} prereq={prereq} />
           <OrganizerCard club={club} />
         </aside>
       </div>
@@ -218,7 +222,28 @@ function FactRow({ icon: Icon, label, children }) {
   )
 }
 
-function EventDetails({ challenge, club, t, isLive }) {
+function PrereqBanner({ prereq }) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] p-4">
+      <ClipboardCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+      <div className="min-w-0">
+        <div className="text-sm font-semibold text-amber-200">Qualifier required</div>
+        <p className="mt-0.5 text-sm text-amber-200/70">
+          Complete the sub-challenge first, then you can submit here.
+        </p>
+        <Link
+          to={`/c/${prereq.slug}`}
+          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-amber-300 hover:text-amber-200"
+        >
+          {prereq.title}
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+function EventDetails({ challenge, club, t, isLive, prereq }) {
   return (
     <div className="card overflow-hidden">
       <div className="border-b border-white/[0.06] p-5">
@@ -273,10 +298,23 @@ function EventDetails({ challenge, club, t, isLive }) {
 
       <div className="space-y-3 border-t border-white/[0.06] p-5">
         {isLive ? (
-          <Button to={`/submit/${challenge.slug}`} size="lg" className="w-full">
-            <Upload className="h-4 w-4" />
-            {t.gallery ? 'Submit your entry' : 'Submit your score'}
-          </Button>
+          prereq ? (
+            <>
+              <Button to={`/submit/${challenge.slug}`} size="lg" className="w-full">
+                <Upload className="h-4 w-4" />
+                {t.gallery ? 'Submit your entry' : 'Submit your score'}
+              </Button>
+              <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-500">
+                <Lock className="h-3 w-3" />
+                Qualifier submission required first
+              </div>
+            </>
+          ) : (
+            <Button to={`/submit/${challenge.slug}`} size="lg" className="w-full">
+              <Upload className="h-4 w-4" />
+              {t.gallery ? 'Submit your entry' : 'Submit your score'}
+            </Button>
+          )
         ) : challenge.status === 'upcoming' ? (
           <Button size="lg" variant="secondary" className="w-full" disabled>
             Submissions open soon
