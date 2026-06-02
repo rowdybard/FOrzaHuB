@@ -13,22 +13,26 @@ import {
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ClubMark from '../components/ui/ClubMark'
-import Avatar from '../components/ui/Avatar'
 import StatTile from '../components/ui/StatTile'
 import { Badge } from '../components/ui/Badge'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
+import MembersCard from '../components/common/MembersCard'
+import Nameplate from '../components/ui/Nameplate'
 import NotFound from './NotFound'
 import Loading from '../components/common/Loading'
-import { getClubBySlug, getChallengesByClub } from '../data/api'
+import { getClubBySlug, getChallengesByClub, getClubMembers } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
-import { formatNumber, formatCompact, hexToRgba, formatDate } from '../lib/utils'
+import { formatNumber, hexToRgba } from '../lib/utils'
 
 async function loadCommunity(slug) {
   const club = await getClubBySlug(slug)
   if (!club) return { club: null }
-  const all = await getChallengesByClub(club.id)
-  return { club, all }
+  const [all, members] = await Promise.all([
+    getChallengesByClub(club.id),
+    getClubMembers(club.id),
+  ])
+  return { club, all, members }
 }
 
 const POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1]
@@ -54,13 +58,14 @@ function clubStandings(cs) {
 
 export default function CommunityPage() {
   const { slug } = useParams()
-  const { data, loading } = useAsync(() => loadCommunity(slug), [slug])
+  const { data, loading, reload } = useAsync(() => loadCommunity(slug), [slug])
 
   if (loading) return <Loading label="Loading club…" className="min-h-[60vh]" />
   if (!data?.club) return <NotFound />
 
   const club = data.club
   const all = data.all || []
+  const members = data.members || []
   const active = all.filter((c) => c.status !== 'closed')
   const past = all.filter((c) => c.status === 'closed')
   const standings = clubStandings(all)
@@ -107,6 +112,7 @@ export default function CommunityPage() {
           </div>
 
           <aside className="space-y-5 lg:sticky lg:top-20">
+            <MembersCard club={club} members={members} loading={loading} onChanged={reload} />
             <AboutCard club={club} />
             <StandingsCard standings={standings} />
           </aside>
@@ -224,11 +230,12 @@ function StandingsCard({ standings }) {
             <span className="w-5 text-center font-num text-sm font-semibold text-zinc-500">
               {i + 1}
             </span>
-            <Avatar name={s.user.name} size={32} />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-white">{s.user.tag}</div>
-              <div className="text-xs text-zinc-500">{s.podiums} podiums · {s.entries} events</div>
-            </div>
+            <Nameplate
+              user={s.user}
+              size={32}
+              showSub={false}
+              className="flex-1"
+            />
             <span className="font-num text-sm font-bold tabular-nums text-white">{s.points}</span>
           </div>
         ))}

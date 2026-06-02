@@ -3,10 +3,40 @@
 // When VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are set, the app reads
 // live data from the database instead (see src/data/api.js).
 
-// Real members
+// Real members (with Option A "Nameplate" cosmetics)
 const U = {
-  rowdy: { name: 'Rowdybard', tag: 'Rowdybard', country: '🏁', platform: 'Xbox' },
-  cone: { name: 'PurpleCone', tag: 'PurpleCone', country: '🏁', platform: 'Xbox' },
+  rowdy: {
+    id: 'u-rowdy',
+    name: 'Rowdybard',
+    tag: 'Rowdybard',
+    country: '🏁',
+    platform: 'Xbox',
+    role: 'admin',
+    accent: '#ff6b2c',
+    nameGradient: true,
+    badges: ['founder', 'verified'],
+    avatarUrl: null,
+  },
+  cone: {
+    id: 'u-cone',
+    name: 'PurpleCone',
+    tag: 'PurpleCone',
+    country: '🏁',
+    platform: 'Xbox',
+    role: 'racer',
+    accent: '#a855f7',
+    nameGradient: false,
+    badges: ['founder'],
+    avatarUrl: null,
+  },
+}
+
+// Club rosters: clubId -> [{ userKey, role }]
+const MEMBERSHIPS = {
+  pitwall: [
+    { user: U.rowdy, role: 'owner' },
+    { user: U.cone, role: 'member' },
+  ],
 }
 
 export const clubs = [
@@ -67,3 +97,13 @@ export const closedChallenges = () =>
   challenges
     .filter((c) => c.status === 'closed')
     .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
+
+// Members / profiles
+const ALL_USERS = Object.values(U)
+export const clubMembers = (clubId) =>
+  (MEMBERSHIPS[clubId] || []).map(({ user, role }) => ({
+    ...user,
+    membershipRole: role,
+    joinedAt: null,
+  }))
+export const getProfileById = (id) => ALL_USERS.find((u) => u.id === id) || null

@@ -9,6 +9,7 @@ import SubmitScorePage from './pages/SubmitScorePage'
 import AdminDashboard from './pages/AdminDashboard'
 import CreateChallengePage from './pages/CreateChallengePage'
 import ArchivePage from './pages/ArchivePage'
+import ProfilePage from './pages/ProfilePage'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/club/:slug" element={<CommunityPage />} />
         <Route path="/submit" element={<SubmitScorePage />} />
         <Route path="/submit/:slug" element={<SubmitScorePage />} />
+        <Route path="/me" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/create" element={<CreateChallengePage />} />
         <Route path="/create/:slug" element={<CreateChallengePage />} />

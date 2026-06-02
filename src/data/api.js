@@ -21,6 +21,11 @@ function normProfile(row) {
     tag: row.gamertag,
     country: row.country || '',
     platform: row.platform || '',
+    role: row.role || 'racer',
+    accent: row.accent || null,
+    nameGradient: !!row.name_gradient,
+    badges: row.badges || [],
+    avatarUrl: row.avatar_url || null,
   }
 }
 
@@ -337,6 +342,71 @@ export async function getSiteStats() {
     racers: submissions, // refined later via distinct user count
     isLaunch: submissions === 0,
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Members + profiles                                                        */
+/* -------------------------------------------------------------------------- */
+
+// Roster for a club: list of { ...profile, membershipRole, joinedAt }.
+export async function getClubMembers(clubId) {
+  if (!isSupabaseEnabled) return mock.clubMembers(clubId)
+  const { data, error } = await supabase
+    .from('club_members')
+    .select('role, joined_at, profiles:user_id(*)')
+    .eq('club_id', clubId)
+    .order('joined_at', { ascending: true })
+  if (error) throw error
+  return (data || []).map((row) => ({
+    ...normProfile(row.profiles),
+    membershipRole: row.role,
+    joinedAt: row.joined_at,
+  }))
+}
+
+export async function joinClub(clubId, userId) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { error } = await supabase
+    .from('club_members')
+    .insert({ club_id: clubId, user_id: userId })
+  if (error) throw error
+  return { ok: true }
+}
+
+export async function leaveClub(clubId, userId) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { error } = await supabase
+    .from('club_members')
+    .delete()
+    .eq('club_id', clubId)
+    .eq('user_id', userId)
+  if (error) throw error
+  return { ok: true }
+}
+
+export async function getProfile(userId) {
+  if (!userId) return null
+  if (!isSupabaseEnabled) return mock.getProfileById(userId) || null
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle()
+  if (error) throw error
+  return data ? normProfile(data) : null
+}
+
+// Save the current user's name cosmetics. `patch` uses camelCase keys.
+export async function updateMyProfile(userId, patch) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const row = {}
+  if ('accent' in patch) row.accent = patch.accent
+  if ('nameGradient' in patch) row.name_gradient = patch.nameGradient
+  if ('badges' in patch) row.badges = patch.badges
+  if ('displayName' in patch) row.display_name = patch.displayName
+  const { error } = await supabase.from('profiles').update(row).eq('id', userId)
+  if (error) throw error
+  return { ok: true }
 }
 
 export { isSupabaseEnabled }
