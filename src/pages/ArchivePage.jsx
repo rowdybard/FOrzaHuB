@@ -8,9 +8,17 @@ import EmptyState from '../components/common/EmptyState'
 import Button from '../components/ui/Button'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { closedChallenges, getClubById } from '../data/mock'
+import Loading from '../components/common/Loading'
+import { getClosedChallenges, getClubs } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { TYPE_LIST, getType } from '../lib/challengeTypes'
 import { cn, hexToRgba, formatNumber, formatDate } from '../lib/utils'
+
+async function loadArchive() {
+  const [events, clubs] = await Promise.all([getClosedChallenges(), getClubs()])
+  const byId = new Map(clubs.map((c) => [c.id, c]))
+  return events.map((e) => ({ ...e, club: byId.get(e.clubId) || null }))
+}
 
 /** Best result per format across every challenge (closed + active). */
 function computeRecords(events) {
@@ -32,7 +40,8 @@ function computeRecords(events) {
 }
 
 export default function ArchivePage() {
-  const events = closedChallenges()
+  const { data, loading } = useAsync(() => loadArchive(), [])
+  const events = data || []
   const records = useMemo(() => computeRecords(events), [events])
   const seasons = useMemo(() => Array.from(new Set(events.map((c) => c.season).filter(Boolean))), [events])
 
@@ -123,7 +132,17 @@ export default function ArchivePage() {
         </section>
 
         {/* Results */}
-        {grouped.length === 0 ? (
+        {loading ? (
+          <Loading label="Loading archive…" />
+        ) : grouped.length === 0 ? (
+          events.length === 0 ? (
+            <EmptyState
+              className="mt-8"
+              icon={Archive}
+              title="No finished events yet"
+              description="Once challenges wrap up, their podiums and records live here."
+            />
+          ) : (
           <EmptyState
             className="mt-8"
             icon={Archive}
@@ -143,6 +162,7 @@ export default function ArchivePage() {
               </Button>
             }
           />
+          )
         ) : (
           <div className="mt-10 space-y-12">
             {grouped.map((group) => (
@@ -168,7 +188,7 @@ export default function ArchivePage() {
 }
 
 function ArchiveEventCard({ challenge }) {
-  const club = getClubById(challenge.clubId)
+  const club = challenge.club
   const t = getType(challenge.typeId)
   const to = `/c/${challenge.slug}`
 

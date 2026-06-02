@@ -14,6 +14,7 @@ import {
   BarChart3,
   PlusCircle,
   MessagesSquare,
+  Rocket,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Avatar from '../components/ui/Avatar'
@@ -24,26 +25,47 @@ import StatTile from '../components/ui/StatTile'
 import ChallengeCard from '../components/common/ChallengeCard'
 import ClubCard from '../components/common/ClubCard'
 import Countdown from '../components/common/Countdown'
-import { clubs, liveChallenges, featuredChallenge, siteStats } from '../data/mock'
-import { getClubById } from '../data/mock'
+import {
+  getClubs,
+  getChallengesWithClubs,
+  getFeaturedChallenge,
+  getChallengeBySlug,
+  getSiteStats,
+} from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { TYPE_LIST, getType, formatMetric } from '../lib/challengeTypes'
 import { formatNumber, formatCompact, hexToRgba } from '../lib/utils'
 
-const TRUST_NAMES = ['Maya Reyes', 'Jin Lee', 'Carolina M.', 'Leon Kraus', 'Yuki Tanaka']
+const TRUST_NAMES = ['Rowdybard', 'PurpleCone']
+
+async function loadLanding() {
+  const [clubs, challenges, featured, stats] = await Promise.all([
+    getClubs(),
+    getChallengesWithClubs(),
+    getFeaturedChallenge(),
+    getSiteStats(),
+  ])
+  const live = challenges.filter((c) => c.status === 'live')
+  const fullFeatured = featured ? await getChallengeBySlug(featured.slug) : null
+  return { clubs, live, featured: fullFeatured, stats }
+}
 
 export default function LandingPage() {
-  const live = liveChallenges()
-  const featured = featuredChallenge()
+  const { data } = useAsync(() => loadLanding(), [])
+  const clubs = data?.clubs || []
+  const live = data?.live || []
+  const featured = data?.featured || null
+  const stats = data?.stats || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
 
   return (
     <>
-      <Hero featured={featured} />
-      <StatsBar />
-      <LiveChallenges challenges={live} />
+      <Hero featured={featured} stats={stats} />
+      <StatsBar stats={stats} />
+      {live.length > 0 && <LiveChallenges challenges={live} />}
       <TypesShowcase />
       <HowItWorks />
-      <Communities />
-      <DiscordTrust featured={featured} />
+      <Communities clubs={clubs} />
+      {featured && <DiscordTrust featured={featured} />}
       <CtaBand />
     </>
   )
@@ -51,7 +73,7 @@ export default function LandingPage() {
 
 /* ----------------------------------- Hero ---------------------------------- */
 
-function Hero({ featured }) {
+function Hero({ featured, stats }) {
   return (
     <section className="relative overflow-hidden bg-festival">
       <div className="absolute inset-0 bg-grid opacity-60 mask-fade-b" />
@@ -92,34 +114,53 @@ function Hero({ featured }) {
               ))}
             </div>
             <p className="text-sm text-zinc-400">
-              Trusted by <span className="font-semibold text-white">240+ clubs</span> running{' '}
-              <span className="font-semibold text-white">1,800+</span> events.
+              <span className="font-semibold text-white">{formatNumber(stats.clubs)}</span>{' '}
+              {stats.clubs === 1 ? 'founding club' : 'founding clubs'} on the grid — just getting started.
             </p>
           </div>
         </div>
 
-        <HeroPreview featured={featured} />
+        {featured ? <HeroPreview featured={featured} /> : <HeroPlaceholder />}
       </div>
     </section>
   )
 }
 
+function HeroPlaceholder() {
+  return (
+    <div className="relative animate-fade-up [animation-delay:120ms]">
+      <div className="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850 p-8 text-center shadow-pop">
+        <Flag className="mx-auto h-8 w-8 text-brand-400" />
+        <h3 className="mt-4 text-lg font-bold text-white">First challenge coming soon</h3>
+        <p className="mt-2 text-sm text-zinc-400">
+          Leaderboards light up the moment the first event goes live. Create one to kick things off.
+        </p>
+        <Button to="/create" size="sm" className="mt-5">
+          <PlusCircle className="h-4 w-4" />
+          Create a challenge
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 function HeroPreview({ featured }) {
-  const club = getClubById(featured.clubId)
-  const top = featured.entries.slice(0, 4)
+  const club = featured.club
+  const top = (featured.entries || []).slice(0, 4)
 
   return (
     <div className="relative animate-fade-up [animation-delay:120ms]">
       <div className="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl" />
 
-      {/* Floating accents (desktop) */}
-      <div className="absolute -left-4 top-10 z-20 hidden animate-fade-up rounded-xl border border-white/10 bg-ink-850/90 px-3 py-2 text-xs shadow-pop backdrop-blur-md lg:block [animation-delay:300ms]">
+      {/* Floating accents (desktop) — solid bg, no backdrop-blur to avoid scroll smear */}
+      <div className="absolute -left-4 top-10 z-10 hidden animate-fade-up rounded-xl border border-white/10 bg-ink-850 px-3 py-2 text-xs shadow-pop lg:block [animation-delay:300ms]">
         <div className="flex items-center gap-2 text-emerald-300">
           <CheckCircle2 className="h-4 w-4" />
           <span className="font-medium">Proof verified</span>
         </div>
       </div>
-      <div className="absolute -right-3 bottom-16 z-20 hidden animate-fade-up rounded-xl border border-white/10 bg-ink-850/90 px-3 py-2 text-xs shadow-pop backdrop-blur-md lg:block [animation-delay:420ms]">
+      <div className="absolute -right-3 bottom-16 z-10 hidden animate-fade-up rounded-xl border border-white/10 bg-ink-850 px-3 py-2 text-xs shadow-pop lg:block [animation-delay:420ms]">
         <div className="text-zinc-400">Top gap</div>
         <div className="font-num font-bold text-white">+0.407s</div>
       </div>
@@ -179,18 +220,52 @@ function HeroPreview({ featured }) {
 
 /* --------------------------------- Stats bar -------------------------------- */
 
-function StatsBar() {
+function StatsBar({ stats: s }) {
+  const isLaunch = s.isLaunch
   const stats = [
-    { icon: Users, value: formatNumber(siteStats.clubs), label: 'Active clubs' },
-    { icon: Flag, value: formatNumber(siteStats.challenges), label: 'Challenges run' },
-    { icon: Upload, value: formatCompact(siteStats.submissions), label: 'Submissions verified' },
-    { icon: Trophy, value: formatCompact(siteStats.racers), label: 'Racers competing' },
+    {
+      icon: Users,
+      value: formatNumber(s.clubs),
+      label: 'Founding clubs',
+    },
+    {
+      icon: Flag,
+      value: formatNumber(s.challenges),
+      label: s.challenges === 1 ? 'Challenge' : 'Challenges',
+      empty: s.challenges === 0,
+    },
+    {
+      icon: Upload,
+      value: s.submissions === 0 ? '—' : formatCompact(s.submissions),
+      label: 'Submissions verified',
+      empty: s.submissions === 0,
+    },
+    {
+      icon: Trophy,
+      value: s.racers === 0 ? '—' : formatCompact(s.racers),
+      label: 'Racers on boards',
+      empty: s.racers === 0,
+    },
   ]
   return (
-    <section className="container-page -mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      {stats.map((s) => (
-        <StatTile key={s.label} icon={s.icon} value={s.value} label={s.label} />
-      ))}
+    <section className="container-page -mt-6 space-y-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {stats.map((s) => (
+          <StatTile
+            key={s.label}
+            icon={s.icon}
+            value={s.value}
+            label={s.label}
+            dim={s.empty}
+          />
+        ))}
+      </div>
+      {isLaunch && (
+        <p className="flex items-center gap-1.5 text-xs text-zinc-600">
+          <Rocket className="h-3 w-3" />
+          Week 1 — leaderboards fill as submissions come in
+        </p>
+      )}
     </section>
   )
 }
@@ -317,24 +392,42 @@ function HowItWorks() {
 
 /* ------------------------------- Communities -------------------------------- */
 
-function Communities() {
+function Communities({ clubs }) {
   return (
     <section className="container-page mt-24">
       <SectionHeading
         eyebrow="Communities"
-        title="Clubs already on the grid"
-        description="Browse active communities or bring your own Discord and start running events."
+        title="Founding clubs"
+        description="The clubs running events on Pitwall today. More spots open as the platform grows."
         action={
           <Button to="/clubs" variant="outline" size="sm">
-            All communities
+            All clubs
             <ArrowRight className="h-4 w-4" />
           </Button>
         }
       />
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {clubs.slice(0, 4).map((club) => (
-          <ClubCard key={club.id} club={club} />
-        ))}
+      {clubs.length > 0 && (
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {clubs.slice(0, 4).map((club) => (
+            <ClubCard key={club.id} club={club} />
+          ))}
+        </div>
+      )}
+
+      {/* Natural club pitch — not an ad, just honest */}
+      <div className="mt-6 flex items-start gap-5 rounded-2xl border border-white/[0.06] bg-ink-900/40 p-5 sm:items-center">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-ink-850 text-brand-400">
+          <PlusCircle className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-white">Running a Forza club or Discord?</p>
+          <p className="mt-0.5 text-sm text-zinc-400">
+            Bring your community here. Create challenges, let your stewards handle the review queue, and give your leaderboards a permanent home.
+          </p>
+        </div>
+        <Button to="/create" variant="outline" size="sm" className="shrink-0">
+          Get started
+        </Button>
       </div>
     </section>
   )
@@ -343,7 +436,7 @@ function Communities() {
 /* ------------------------------ Discord trust ------------------------------- */
 
 function DiscordTrust({ featured }) {
-  const club = getClubById(featured.clubId)
+  const club = featured.club
   const features = [
     'Verified proof on every podium — clips and screenshots attached',
     'A review queue that flags assists, cuts and missing evidence',

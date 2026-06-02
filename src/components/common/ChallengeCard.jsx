@@ -71,8 +71,8 @@ function LeaderStrip({ challenge }) {
   )
 }
 
-export default function ChallengeCard({ challenge }) {
-  const club = getClubById(challenge.clubId)
+export default function ChallengeCard({ challenge, club: clubProp }) {
+  const club = clubProp || challenge.club || getClubById(challenge.clubId)
   const to = `/c/${challenge.slug}`
 
   return (

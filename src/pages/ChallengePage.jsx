@@ -31,20 +31,36 @@ import Gallery from '../components/common/Gallery'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
 import NotFound from './NotFound'
-import { getChallengeBySlug, getClubById, challengesByClubId, getPrerequisite } from '../data/mock'
+import Loading from '../components/common/Loading'
+import { getChallengeBySlug, getPrerequisite, getChallengesByClub } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { getType } from '../lib/challengeTypes'
 import { formatDate, formatNumber } from '../lib/utils'
 
+async function loadChallenge(slug) {
+  const challenge = await getChallengeBySlug(slug)
+  if (!challenge) return { challenge: null }
+  const [prereq, clubChallenges] = await Promise.all([
+    getPrerequisite(challenge),
+    getChallengesByClub(challenge.clubId),
+  ])
+  const more = clubChallenges.filter((c) => c.id !== challenge.id)
+  return { challenge, prereq, more }
+}
+
 export default function ChallengePage() {
   const { slug } = useParams()
-  const challenge = getChallengeBySlug(slug)
-  if (!challenge) return <NotFound />
+  const { data, loading } = useAsync(() => loadChallenge(slug), [slug])
 
-  const club = getClubById(challenge.clubId)
+  if (loading) return <Loading label="Loading challenge…" className="min-h-[60vh]" />
+  if (!data?.challenge) return <NotFound />
+
+  const challenge = data.challenge
+  const club = challenge.club
   const t = getType(challenge.typeId)
   const isLive = challenge.status === 'live'
-  const prereq = getPrerequisite(challenge)
-  const more = challengesByClubId(challenge.clubId).filter((c) => c.id !== challenge.id)
+  const prereq = data.prereq
+  const more = data.more || []
 
   return (
     <>
@@ -77,7 +93,7 @@ export default function ChallengePage() {
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {more.slice(0, 3).map((c) => (
-              <ChallengeCard key={c.id} challenge={c} />
+              <ChallengeCard key={c.id} challenge={c} club={club} />
             ))}
           </div>
         </section>

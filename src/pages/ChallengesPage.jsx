@@ -3,8 +3,10 @@ import { Search, Flag } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
+import Loading from '../components/common/Loading'
 import Button from '../components/ui/Button'
-import { challenges } from '../data/mock'
+import { getChallengesWithClubs } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { TYPE_LIST } from '../lib/challengeTypes'
 import { cn, hexToRgba } from '../lib/utils'
 
@@ -17,12 +19,13 @@ const STATUSES = [
 ]
 
 export default function ChallengesPage() {
+  const { data: challenges, loading } = useAsync(() => getChallengesWithClubs(), [])
   const [type, setType] = useState('all')
   const [status, setStatus] = useState('all')
   const [q, setQ] = useState('')
 
   const filtered = useMemo(() => {
-    return challenges.filter((c) => {
+    return (challenges || []).filter((c) => {
       if (type !== 'all' && c.typeId !== type) return false
       if (status !== 'all' && c.status !== status) return false
       if (q) {
@@ -31,7 +34,7 @@ export default function ChallengesPage() {
       }
       return true
     })
-  }, [type, status, q])
+  }, [challenges, type, status, q])
 
   return (
     <div>
@@ -97,12 +100,18 @@ export default function ChallengesPage() {
           </p>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <Loading label="Loading challenges…" />
+        ) : filtered.length === 0 ? (
           <EmptyState
             className="mt-6"
             icon={Flag}
-            title="No challenges match your filters"
-            description="Try clearing the search or switching format and status."
+            title={(challenges || []).length === 0 ? 'No challenges yet' : 'No challenges match your filters'}
+            description={
+              (challenges || []).length === 0
+                ? 'The first challenge hasn’t been created yet. Check back soon.'
+                : 'Try clearing the search or switching format and status.'
+            }
             action={
               <Button
                 variant="secondary"
@@ -120,7 +129,7 @@ export default function ChallengesPage() {
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((c) => (
-              <ChallengeCard key={c.id} challenge={c} />
+              <ChallengeCard key={c.id} challenge={c} club={c.club} />
             ))}
           </div>
         )}

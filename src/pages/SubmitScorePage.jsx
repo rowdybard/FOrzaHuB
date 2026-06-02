@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   Upload,
@@ -19,23 +19,33 @@ import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { challenges, liveChallenges, getChallengeBySlug, getClubById, getPrerequisite, submissions as allSubmissions } from '../data/mock'
+import { getSubmittableChallenges, createSubmission } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
+import Loading from '../components/common/Loading'
 import { getType } from '../lib/challengeTypes'
 
 const inputCls =
   'w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 transition-colors focus:border-brand-500/50 focus:outline-none'
 
+// Parse a typed result into a numeric value. Times like "1:58.420" become
+// seconds; plain numbers (scores) keep their value.
+function parseResult(raw) {
+  if (!raw) return null
+  const s = String(raw).trim().replace(/,/g, '')
+  if (s.includes(':')) {
+    const [m, rest] = s.split(':')
+    return Number(m) * 60 + Number(rest)
+  }
+  const n = Number(s)
+  return Number.isFinite(n) ? n : null
+}
+
 export default function SubmitScorePage() {
   const { slug } = useParams()
-  const initial = slug ? getChallengeBySlug(slug) : null
+  const { data: options, loading } = useAsync(() => getSubmittableChallenges(), [])
+  const list = options || []
 
-  const options = useMemo(() => {
-    const live = liveChallenges()
-    if (initial && !live.some((c) => c.id === initial.id)) return [initial, ...live]
-    return live
-  }, [initial])
-
-  const [challengeId, setChallengeId] = useState(initial?.id || options[0]?.id)
+  const [challengeId, setChallengeId] = useState(null)
   const [form, setForm] = useState({
     gamertag: '',
     platform: 'Xbox',
@@ -49,26 +59,20 @@ export default function SubmitScorePage() {
   })
   const [submitted, setSubmitted] = useState(false)
 
-  const challenge = challenges.find((c) => c.id === challengeId)
+  // Default selection: URL slug match, else first live challenge.
+  const selectedId = challengeId ?? (list.find((c) => c.slug === slug)?.id || list[0]?.id)
+  const challenge = list.find((c) => c.id === selectedId) || null
   const t = challenge ? getType(challenge.typeId) : null
-  const club = challenge ? getClubById(challenge.clubId) : null
+  const club = challenge?.club || null
   const isGallery = t?.gallery
 
-  // Prereq logic — in production this checks the authenticated user's submissions
-  // Here we simulate: maya has an approved prereq, jin has pending, others have none
-  const prereq = challenge ? getPrerequisite(challenge) : null
-  const prereqSubmission = prereq
-    ? allSubmissions.find((s) => s.challengeId === prereq.id)
-    : null
-  // For demo: treat maya's gamertag as the logged-in user
-  const DEMO_USER = 'Vortex_Apex'
-  const userPrereqSub = prereq
-    ? allSubmissions.find((s) => s.challengeId === prereq.id && s.user.tag === DEMO_USER)
-    : null
-  const prereqSubmitted = Boolean(userPrereqSub)
-  const prereqApproved = userPrereqSub?.status === 'approved'
-  // Main entry is held (pending but not in review queue) until prereq is approved
-  const willBeHeld = prereq && prereqSubmitted && !prereqApproved
+  // Prerequisite challenge (qualifier), attached by the API.
+  // Note: per-user submission state requires auth (not wired yet), so the gate
+  // is informational until login lands. See src/data/api.js.
+  const prereq = challenge?.prereq || null
+  const prereqSubmitted = false
+  const prereqApproved = false
+  const willBeHeld = false
 
   const set = (k) => (e) => {
     const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value
@@ -76,13 +80,31 @@ export default function SubmitScorePage() {
   }
 
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
-  const prereqGated = prereq && !prereqSubmitted
+  const prereqGated = false
   const canSubmit = form.gamertag.trim() && resultFilled && form.agree && !prereqGated
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!canSubmit) return
+    if (!canSubmit || !challenge) return
+    try {
+      await createSubmission({
+        challenge_id: challenge.id,
+        value: isGallery ? null : parseResult(form.result),
+        title: isGallery ? form.title : null,
+        share_code: form.shareCode || null,
+        proof_type: isGallery ? 'photo' : 'video',
+        proof_url: form.link || null,
+        note: form.notes || null,
+        status: 'pending',
+      })
+    } catch (err) {
+      console.error('[submit] createSubmission failed', err)
+    }
     setSubmitted(true)
+  }
+
+  if (loading) {
+    return <Loading label="Loading challenges…" className="min-h-[60vh]" />
   }
 
   if (!challenge) {
@@ -119,11 +141,11 @@ export default function SubmitScorePage() {
             <Panel title="Your entry" step="1">
               <Field label="Challenge">
                 <select
-                  value={challengeId}
+                  value={selectedId}
                   onChange={(e) => setChallengeId(e.target.value)}
                   className={inputCls}
                 >
-                  {options.map((c) => (
+                  {list.map((c) => (
                     <option key={c.id} value={c.id} className="bg-ink-850">
                       {c.title}
                     </option>

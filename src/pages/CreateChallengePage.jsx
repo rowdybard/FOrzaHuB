@@ -15,7 +15,8 @@ import {
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ChallengeCard from '../components/common/ChallengeCard'
-import { clubs, getChallengeBySlug } from '../data/mock'
+import { getClubs, getChallengeBySlug, createChallenge } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { TYPE_LIST, getType } from '../lib/challengeTypes'
 import { cn, hexToRgba } from '../lib/utils'
 
@@ -39,13 +40,19 @@ const RANKING = {
 
 export default function CreateChallengePage() {
   const { slug } = useParams()
-  const existing = slug ? getChallengeBySlug(slug) : null
+  const { data: clubs } = useAsync(() => getClubs(), [])
+  const clubList = clubs || []
+
+  const { data: existing } = useAsync(
+    () => (slug ? getChallengeBySlug(slug) : Promise.resolve(null)),
+    [slug],
+  )
   const isEdit = Boolean(existing)
 
   const [form, setForm] = useState(() => ({
     typeId: existing?.typeId || 'time_trial',
     title: existing?.title || '',
-    clubId: existing?.clubId || clubs[0].id,
+    clubId: existing?.clubId || clubList[0]?.id || '',
     description: existing?.description || '',
     restriction: existing?.restriction || '',
     location: existing?.location || '',
@@ -72,6 +79,7 @@ export default function CreateChallengePage() {
     typeId: form.typeId,
     title: form.title.trim() || 'Your challenge title',
     clubId: form.clubId,
+    club: clubList.find((c) => c.id === form.clubId) || null,
     status: startInFuture ? 'upcoming' : 'live',
     startDate: new Date(form.startDate || todayISO).toISOString(),
     endDate: new Date(form.endDate || plusDays(7)).toISOString(),
@@ -85,6 +93,31 @@ export default function CreateChallengePage() {
   }
 
   const canPublish = form.title.trim() && form.restriction.trim() && form.location.trim()
+
+  const handlePublish = async () => {
+    if (!canPublish) return
+    try {
+      await createChallenge({
+        slug: form.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now(),
+        type_id: form.typeId,
+        title: form.title.trim(),
+        club_id: form.clubId,
+        description: form.description.trim(),
+        restriction: form.restriction.trim(),
+        location: form.location.trim(),
+        region: form.region.trim(),
+        prize: form.prize.trim(),
+        start_date: new Date(form.startDate).toISOString(),
+        end_date: new Date(form.endDate).toISOString(),
+        rules: form.rules.filter(Boolean),
+        visibility: form.visibility,
+        status: 'upcoming',
+      })
+    } catch (err) {
+      console.error('[create] createChallenge failed', err)
+    }
+    setPublished(true)
+  }
 
   if (published) {
     return <PublishedView isEdit={isEdit} title={previewChallenge.title} />
@@ -104,11 +137,11 @@ export default function CreateChallengePage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={() => setPublished(true)}>
+            <Button variant="secondary" onClick={handlePublish}>
               <Save className="h-4 w-4" />
               Save draft
             </Button>
-            <Button onClick={() => canPublish && setPublished(true)} disabled={!canPublish}>
+            <Button onClick={handlePublish} disabled={!canPublish}>
               <Send className="h-4 w-4" />
               {isEdit ? 'Save & publish' : 'Publish'}
             </Button>
@@ -177,7 +210,7 @@ export default function CreateChallengePage() {
               </Field>
               <Field label="Hosting club">
                 <select value={form.clubId} onChange={(e) => set('clubId', e.target.value)} className={inputCls}>
-                  {clubs.map((c) => (
+                  {clubList.map((c) => (
                     <option key={c.id} value={c.id} className="bg-ink-850">
                       {c.name}
                     </option>

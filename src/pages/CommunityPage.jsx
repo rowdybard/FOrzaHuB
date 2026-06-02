@@ -19,13 +19,21 @@ import { Badge } from '../components/ui/Badge'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
 import NotFound from './NotFound'
-import { getClubBySlug, challengesByClubId } from '../data/mock'
+import Loading from '../components/common/Loading'
+import { getClubBySlug, getChallengesByClub } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { formatNumber, formatCompact, hexToRgba, formatDate } from '../lib/utils'
+
+async function loadCommunity(slug) {
+  const club = await getClubBySlug(slug)
+  if (!club) return { club: null }
+  const all = await getChallengesByClub(club.id)
+  return { club, all }
+}
 
 const POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1]
 
-function clubStandings(club) {
-  const cs = challengesByClubId(club.id)
+function clubStandings(cs) {
   const map = new Map()
   const add = (entry) => {
     const key = entry.user.tag
@@ -46,13 +54,16 @@ function clubStandings(club) {
 
 export default function CommunityPage() {
   const { slug } = useParams()
-  const club = getClubBySlug(slug)
-  if (!club) return <NotFound />
+  const { data, loading } = useAsync(() => loadCommunity(slug), [slug])
 
-  const all = challengesByClubId(club.id)
+  if (loading) return <Loading label="Loading club…" className="min-h-[60vh]" />
+  if (!data?.club) return <NotFound />
+
+  const club = data.club
+  const all = data.all || []
   const active = all.filter((c) => c.status !== 'closed')
   const past = all.filter((c) => c.status === 'closed')
-  const standings = clubStandings(club)
+  const standings = clubStandings(all)
 
   return (
     <>
@@ -61,9 +72,9 @@ export default function CommunityPage() {
       <div className="container-page py-8">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatTile icon={Users} value={formatNumber(club.members)} label="Members" />
-          <StatTile icon={Flag} value={club.stats.challenges} label="Events run" />
-          <StatTile icon={Trophy} value={club.stats.podiums} label="Podiums awarded" />
-          <StatTile icon={Upload} value={formatCompact(club.stats.submissions)} label="Submissions" />
+          <StatTile icon={Flag} value={all.length} label="Events run" />
+          <StatTile icon={Trophy} value={past.length} label="Finished events" />
+          <StatTile icon={Upload} value={active.length} label="Live now" />
         </div>
 
         <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1fr_320px]">
@@ -72,7 +83,7 @@ export default function CommunityPage() {
               {active.length ? (
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {active.map((c) => (
-                    <ChallengeCard key={c.id} challenge={c} />
+                    <ChallengeCard key={c.id} challenge={c} club={club} />
                   ))}
                 </div>
               ) : (
@@ -88,7 +99,7 @@ export default function CommunityPage() {
               <Section title="Past challenges" count={past.length}>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {past.map((c) => (
-                    <ChallengeCard key={c.id} challenge={c} />
+                    <ChallengeCard key={c.id} challenge={c} club={club} />
                   ))}
                 </div>
               </Section>

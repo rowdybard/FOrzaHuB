@@ -1,15 +1,42 @@
 import { useState, useMemo } from 'react'
-import { Plus, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Plus, Users, ArrowRight } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
 import ClubCard from '../components/common/ClubCard'
+import Loading from '../components/common/Loading'
 import Button from '../components/ui/Button'
-import { clubs } from '../data/mock'
+import { getClubs } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { cn } from '../lib/utils'
 
+function BringYourClubCard() {
+  return (
+    <Link
+      to="/create"
+      className="group flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/[0.12] bg-transparent p-6 text-center transition-colors hover:border-brand-500/40 hover:bg-brand-500/[0.04]"
+    >
+      <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/[0.08] bg-ink-900 text-zinc-500 transition-colors group-hover:border-brand-500/30 group-hover:text-brand-400">
+        <Plus className="h-5 w-5" />
+      </span>
+      <div>
+        <p className="font-semibold text-zinc-300 group-hover:text-white">Your club here</p>
+        <p className="mt-1 text-sm text-zinc-600 group-hover:text-zinc-400">
+          Bring your Discord community and start running events with real leaderboards.
+        </p>
+      </div>
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 group-hover:text-brand-400">
+        Get started <ArrowRight className="h-3 w-3" />
+      </span>
+    </Link>
+  )
+}
+
 export default function ClubsPage() {
+  const { data, loading } = useAsync(() => getClubs(), [])
+  const clubs = data || []
   const regions = useMemo(
     () => ['All', ...Array.from(new Set(clubs.map((c) => c.region)))],
-    [],
+    [clubs],
   )
   const [region, setRegion] = useState('All')
 
@@ -48,11 +75,16 @@ export default function ClubsPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((club) => (
-            <ClubCard key={club.id} club={club} />
-          ))}
-        </div>
+        {loading ? (
+          <Loading label="Loading clubs…" />
+        ) : (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((club) => (
+              <ClubCard key={club.id} club={club} />
+            ))}
+            {region === 'All' && <BringYourClubCard />}
+          </div>
+        )}
       </div>
     </div>
   )

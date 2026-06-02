@@ -13,9 +13,7 @@ import {
   CircleAlert,
   Trophy,
   ChevronDown,
-  Hourglass,
   CheckCircle2,
-  ClipboardCheck,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Avatar from '../components/ui/Avatar'
@@ -23,13 +21,14 @@ import Cover from '../components/ui/Cover'
 import StatTile from '../components/ui/StatTile'
 import { TypeBadge } from '../components/ui/Badge'
 import EmptyState from '../components/common/EmptyState'
-import { submissions as seed, challenges, allChallenges, getPrerequisite } from '../data/mock'
+import Loading from '../components/common/Loading'
+import { getReviewQueue, reviewSubmission } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
 import { getType, formatMetric } from '../lib/challengeTypes'
 import { cn, timeAgo, formatNumber } from '../lib/utils'
 
 const FILTERS = [
   { id: 'pending', label: 'Pending' },
-  { id: 'held', label: 'Held' },
   { id: 'flagged', label: 'Flagged' },
   { id: 'approved', label: 'Approved' },
   { id: 'rejected', label: 'Rejected' },
@@ -38,7 +37,6 @@ const FILTERS = [
 
 const STATUS_META = {
   pending: { label: 'Pending', cls: 'border-amber-500/30 bg-amber-500/10 text-amber-300', icon: Clock },
-  held: { label: 'Held', cls: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300', icon: ClipboardCheck },
   flagged: { label: 'Flagged', cls: 'border-rose-500/30 bg-rose-500/10 text-rose-300', icon: Flag },
   approved: { label: 'Approved', cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300', icon: Check },
   rejected: { label: 'Rejected', cls: 'border-white/10 bg-white/[0.04] text-zinc-400', icon: X },
@@ -55,82 +53,46 @@ function StatusPill({ status }) {
   )
 }
 
-function provisionalRank(challenge, value, typeId) {
-  const t = getType(typeId)
-  if (t.gallery || !challenge || value == null) return null
-  const vals = (challenge.entries || []).map((e) => e.value).filter((v) => v != null)
-  const all = [...vals, value].sort((a, b) => (t.sort === 'asc' ? a - b : b - a))
-  return all.indexOf(value) + 1
-}
-
-// Determine if a submission is held (main entry waiting on prereq approval)
-function isHeld(submission, allItems) {
-  const challenge = allChallenges.find((c) => c.id === submission.challengeId)
-  if (!challenge) return false
-  const prereq = getPrerequisite(challenge)
-  if (!prereq) return false
-  const prereqSub = allItems.find(
-    (s) => s.challengeId === prereq.id && s.user.tag === submission.user.tag,
-  )
-  return prereqSub ? prereqSub.status !== 'approved' : true
-}
-
 export default function AdminDashboard() {
-  const [items, setItems] = useState(seed)
+  const { data, loading } = useAsync(() => getReviewQueue(), [])
+  const [overrides, setOverrides] = useState({})
   const [filter, setFilter] = useState('pending')
+  const [selectedId, setSelectedId] = useState(null)
 
-  // Annotate items with held flag
-  const annotated = useMemo(
-    () => items.map((i) => ({ ...i, _held: i.status === 'pending' && isHeld(i, items) })),
-    [items],
-  )
-
-  const [selectedId, setSelectedId] = useState(
-    annotated.find((s) => s.status === 'pending' && !s._held)?.id,
+  const items = useMemo(
+    () => (data || []).map((i) => (overrides[i.id] ? { ...i, status: overrides[i.id] } : i)),
+    [data, overrides],
   )
 
   const counts = useMemo(() => {
-    const c = { pending: 0, held: 0, flagged: 0, approved: 0, rejected: 0, all: annotated.length }
-    annotated.forEach((i) => {
-      if (i._held) { c.held += 1 } else { c[i.status] = (c[i.status] || 0) + 1 }
-    })
+    const c = { pending: 0, flagged: 0, approved: 0, rejected: 0, all: items.length }
+    items.forEach((i) => (c[i.status] = (c[i.status] || 0) + 1))
     return c
-  }, [annotated])
+  }, [items])
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return annotated
-    if (filter === 'held') return annotated.filter((i) => i._held)
-    return annotated.filter((i) => i.status === filter && !i._held)
-  }, [annotated, filter])
+    if (filter === 'all') return items
+    return items.filter((i) => i.status === filter)
+  }, [items, filter])
 
   useEffect(() => {
     if (!filtered.some((i) => i.id === selectedId)) {
-      setSelectedId(filtered[0]?.id)
+      setSelectedId(filtered[0]?.id || null)
     }
   }, [filtered, selectedId])
 
   const selected = items.find((i) => i.id === selectedId)
 
-  const decide = (id, status) => {
-    setItems((prev) => {
-      const next = prev.map((i) => (i.id === id ? { ...i, status } : i))
-      // Auto-release held submissions when a prereq sub-challenge is approved
-      if (status === 'approved') {
-        const approvedSub = next.find((i) => i.id === id)
-        const parentChallenge = approvedSub
-          ? allChallenges.find((c) => c.id === approvedSub.challengeId && c.isSubChallenge)
-          : null
-        if (parentChallenge) {
-          return next.map((i) =>
-            i.challengeId === parentChallenge.parentId && i.user.tag === approvedSub.user.tag
-              ? { ...i, status: 'pending' }
-              : i,
-          )
-        }
-      }
-      return next
-    })
+  const decide = async (id, status) => {
+    setOverrides((prev) => ({ ...prev, [id]: status }))
+    try {
+      await reviewSubmission(id, status)
+    } catch (err) {
+      console.error('[admin] reviewSubmission failed', err)
+    }
   }
+
+  if (loading) return <Loading label="Loading queue…" className="min-h-[60vh]" />
 
   return (
     <div className="container-page py-8">
@@ -160,10 +122,10 @@ export default function AdminDashboard() {
 
       {/* Stats */}
       <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatTile icon={Inbox} value={counts.pending} label="Awaiting review" />
-        <StatTile icon={ClipboardCheck} value={counts.held} label="Held (prereq)" />
-        <StatTile icon={Flag} value={counts.flagged} label="Flagged" />
-        <StatTile icon={CheckCircle2} value={counts.approved} label="Approved" />
+        <StatTile icon={Inbox} value={counts.pending ?? 0} label="Awaiting review" />
+        <StatTile icon={Flag} value={counts.flagged ?? 0} label="Flagged" />
+        <StatTile icon={CheckCircle2} value={counts.approved ?? 0} label="Approved" />
+        <StatTile icon={Trophy} value={counts.all ?? 0} label="Total" />
       </div>
 
       {/* Filters */}
@@ -209,11 +171,6 @@ export default function AdminDashboard() {
               />
             ))
           )}
-        {filter === 'held' && filtered.length > 0 && (
-          <p className="px-1 text-xs text-zinc-500">
-            These entries are waiting on a qualifier approval. They'll move to Pending automatically once the sub-challenge is approved.
-          </p>
-        )}
         </div>
 
         <div>
@@ -232,7 +189,7 @@ export default function AdminDashboard() {
 
 function QueueRow({ submission, active, onClick }) {
   const t = getType(submission.typeId)
-  const displayStatus = submission._held ? 'held' : submission.status
+  const displayStatus = submission.status
   return (
     <button
       onClick={onClick}
@@ -319,10 +276,7 @@ function ProofPreview({ submission }) {
 
 function DetailPanel({ submission, onDecide }) {
   const t = getType(submission.typeId)
-  const challenge = allChallenges.find((c) => c.id === submission.challengeId)
-  const rank = provisionalRank(challenge, submission.value, submission.typeId)
   const decided = submission.status === 'approved' || submission.status === 'rejected'
-  const held = submission._held
 
   return (
     <div className="card overflow-hidden">
@@ -330,20 +284,11 @@ function DetailPanel({ submission, onDecide }) {
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <TypeBadge typeId={submission.typeId} size="sm" />
-            <StatusPill status={held ? 'held' : submission.status} />
+            <StatusPill status={submission.status} />
           </div>
-          <Link
-            to={`/c/${challenge?.slug || ''}`}
-            className="mt-2 block truncate font-bold text-white hover:text-brand-300"
-          >
+          <p className="mt-2 truncate font-bold text-white">
             {submission.challengeTitle}
-          </Link>
-          {held && (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-indigo-300">
-              <ClipboardCheck className="h-3.5 w-3.5" />
-              Held — qualifier not yet approved for this racer
-            </div>
-          )}
+          </p>
         </div>
         <div className="shrink-0 text-right text-xs text-zinc-500">
           {timeAgo(submission.submittedAt)}
@@ -372,13 +317,7 @@ function DetailPanel({ submission, onDecide }) {
             <div className="mt-1 font-num text-2xl font-extrabold text-white">
               {t.gallery ? submission.title : formatMetric(submission.typeId, submission.value)}
             </div>
-            {rank && (
-              <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-zinc-400">
-                <Trophy className="h-3.5 w-3.5 text-amber-400" />
-                Would rank <span className="font-semibold text-white">#{rank}</span> on the board
-              </div>
-            )}
-            {submission.shareCode && (
+              {submission.shareCode && (
               <div className="mt-2 text-xs text-zinc-500">Share code: <span className="font-num text-zinc-300">{submission.shareCode}</span></div>
             )}
           </div>
@@ -400,14 +339,7 @@ function DetailPanel({ submission, onDecide }) {
       </div>
 
       <div className="border-t border-white/[0.06] p-5">
-        {held ? (
-          <div className="flex items-center gap-3 rounded-xl border border-indigo-500/20 bg-indigo-500/[0.06] p-3.5">
-            <ClipboardCheck className="h-5 w-5 shrink-0 text-indigo-400" />
-            <p className="text-sm text-indigo-200/80">
-              Review the qualifier sub-challenge for this racer first. Once approved, this entry will move to the Pending queue automatically.
-            </p>
-          </div>
-        ) : decided ? (
+        {decided ? (
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-zinc-400">
               Decision recorded:{' '}
