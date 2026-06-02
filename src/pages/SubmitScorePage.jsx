@@ -19,8 +19,9 @@ import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { getSubmittableChallenges, createSubmission } from '../data/api'
+import { getSubmittableChallenges, createSubmission, uploadProof, isSupabaseEnabled } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
+import { useAuth } from '../hooks/useAuth'
 import Loading from '../components/common/Loading'
 import { getType } from '../lib/challengeTypes'
 
@@ -42,6 +43,7 @@ function parseResult(raw) {
 
 export default function SubmitScorePage() {
   const { slug } = useParams()
+  const { enabled, user, profile, signIn } = useAuth()
   const { data: options, loading } = useAsync(() => getSubmittableChallenges(), [])
   const list = options || []
 
@@ -56,8 +58,11 @@ export default function SubmitScorePage() {
     notes: '',
     agree: false,
     fileName: '',
+    file: null,
   })
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   // Default selection: URL slug match, else first live challenge.
   const selectedId = challengeId ?? (list.find((c) => c.slug === slug)?.id || list[0]?.id)
@@ -80,27 +85,39 @@ export default function SubmitScorePage() {
   }
 
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
+  const hasProof = form.file || form.link.trim()
+  const authReady = !isSupabaseEnabled || !!user
   const prereqGated = false
-  const canSubmit = form.gamertag.trim() && resultFilled && form.agree && !prereqGated
+  const canSubmit = authReady && form.gamertag.trim() && resultFilled && hasProof && form.agree && !prereqGated && !submitting
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!canSubmit || !challenge) return
+    setSubmitting(true)
+    setError('')
     try {
+      const proofUrl = form.file
+        ? await uploadProof({ file: form.file, challengeId: challenge.id, userId: user?.id || 'demo' })
+        : form.link.trim()
+
       await createSubmission({
         challenge_id: challenge.id,
+        user_id: user?.id,
         value: isGallery ? null : parseResult(form.result),
         title: isGallery ? form.title : null,
         share_code: form.shareCode || null,
         proof_type: isGallery ? 'photo' : 'video',
-        proof_url: form.link || null,
+        proof_url: proofUrl || null,
         note: form.notes || null,
         status: 'pending',
       })
+      setSubmitted(true)
     } catch (err) {
       console.error('[submit] createSubmission failed', err)
+      setError(err.message || 'Submission failed. Please try again.')
+    } finally {
+      setSubmitting(false)
     }
-    setSubmitted(true)
   }
 
   if (loading) {
@@ -169,6 +186,11 @@ export default function SubmitScorePage() {
                     <option className="bg-ink-850">Cloud</option>
                   </select>
                 </Field>
+                {profile?.tag && (
+                  <p className="-mt-2 text-xs text-zinc-500 sm:col-span-2">
+                    Signed in as {profile.tag}. Use the gamertag field for the name shown in proof.
+                  </p>
+                )}
               </div>
             </Panel>
 
@@ -237,7 +259,10 @@ export default function SubmitScorePage() {
                 <input
                   type="file"
                   className="hidden"
-                  onChange={(e) => setForm((f) => ({ ...f, fileName: e.target.files?.[0]?.name || '' }))}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null
+                    setForm((f) => ({ ...f, file, fileName: file?.name || '' }))
+                  }}
                 />
               </label>
 
@@ -284,11 +309,27 @@ export default function SubmitScorePage() {
               <Link to={`/c/${challenge.slug}`} className="text-sm text-zinc-400 hover:text-white">
                 Cancel
               </Link>
-              <Button type="submit" size="lg" disabled={!canSubmit} className="w-full sm:w-auto">
-                {willBeHeld ? <Clock className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
-                {willBeHeld ? 'Submit (held pending qualifier)' : 'Submit for review'}
-              </Button>
+              {enabled && !user ? (
+                <Button type="button" size="lg" onClick={signIn} className="w-full sm:w-auto">
+                  Sign in to submit
+                </Button>
+              ) : (
+                <Button type="submit" size="lg" disabled={!canSubmit} className="w-full sm:w-auto">
+                  {willBeHeld ? <Clock className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+                  {submitting
+                    ? 'Submitting...'
+                    : willBeHeld
+                      ? 'Submit (held pending qualifier)'
+                      : 'Submit for review'}
+                </Button>
+              )}
             </div>
+            {error && (
+              <p className="flex items-center justify-end gap-1.5 text-xs text-rose-400">
+                <CircleAlert className="h-3.5 w-3.5" />
+                {error}
+              </p>
+            )}
             {prereqGated ? (
               <p className="flex items-center justify-end gap-1.5 text-xs text-amber-400">
                 <Lock className="h-3.5 w-3.5" />
@@ -297,7 +338,7 @@ export default function SubmitScorePage() {
             ) : !canSubmit ? (
               <p className="flex items-center justify-end gap-1.5 text-xs text-zinc-500">
                 <CircleAlert className="h-3.5 w-3.5" />
-                Add your gamertag, result and confirm the rules to submit.
+                Add your gamertag, result, proof, and confirm the rules to submit.
               </p>
             ) : null}
           </form>

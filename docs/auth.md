@@ -1,41 +1,60 @@
-# Discord login setup
+# Discord Login Setup
 
-Pitwall uses **Supabase Auth with the Discord provider**. No passwords are
-stored — Discord handles identity. Until this is configured the app runs on
-local mock data and the login button stays inert.
+Pitwall uses Supabase Auth with the Discord provider. No passwords are stored in
+the app; Discord handles identity. Without Supabase env vars, the app falls
+back to local mock data.
 
-## 1. Create a Discord application
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
-2. Open **OAuth2** → copy the **Client ID** and **Client Secret**.
-3. Under **OAuth2 → Redirects**, add your Supabase callback URL:
-   ```
-   https://<your-project-ref>.supabase.co/auth/v1/callback
-   ```
+## 1. Create A Discord Application
 
-## 2. Enable the provider in Supabase
-1. Supabase dashboard → **Authentication → Providers → Discord**.
-2. Toggle it on, paste the **Client ID** and **Client Secret**, save.
-3. **Authentication → URL Configuration**: set your **Site URL** (e.g.
-   `https://your-pages-domain.dev`) and add it to the **Redirect URLs** list.
-   Add `http://localhost:5173` too for local dev.
+1. Go to the Discord Developer Portal and create a new application.
+2. Open OAuth2 and copy the Client ID and Client Secret.
+3. Add your Supabase callback URL under OAuth2 redirects:
 
-## 3. Run the database migrations
-In the Supabase SQL editor (or `supabase db push`):
-1. `supabase/migrations/0001_init.sql`
-2. `supabase/migrations/0002_members_and_cosmetics.sql`
-
-The `0002` migration adds the `club_members` table, profile cosmetic columns
-(`accent`, `name_gradient`, `badges`, `avatar_url`), and a trigger that
-auto-creates a `profiles` row from the user's Discord info on first login.
-
-## 4. Set the frontend env vars
-Copy `.env.example` to `.env.local` for dev, and add the same two vars in your
-hosting dashboard (Cloudflare Pages → Settings → Environment variables):
+```text
+https://<your-project-ref>.supabase.co/auth/v1/callback
 ```
+
+## 2. Enable Discord In Supabase
+
+1. Supabase dashboard -> Authentication -> Providers -> Discord.
+2. Enable it and paste the Discord Client ID and Client Secret.
+3. Supabase dashboard -> Authentication -> URL Configuration:
+   - Site URL: your Cloudflare Pages production URL
+   - Redirect URLs: production URL, preview URLs if needed, and `http://localhost:5173`
+
+## 3. Run Migrations
+
+Run these in order from the Supabase SQL Editor:
+
+```text
+supabase/migrations/0001_init.sql
+supabase/migrations/0002_members_and_cosmetics.sql
+supabase/migrations/0003_backend_ready.sql
+```
+
+The final migration hardens RLS, restricts profile updates, adds explicit Data
+API grants, secures proof uploads, and keeps privileged helper functions out of
+the exposed `public` schema.
+
+## 4. Set Frontend Env Vars
+
+Use Cloudflare Pages -> Settings -> Environment variables:
+
+```text
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 ```
 
-That's it — the **Sign in** button in the navbar will now run the Discord flow,
-users get a profile automatically, and they can customize their nameplate at
-`/me` and join clubs from the club page.
+Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
+available. A legacy anon public key also works. Never use a `service_role` or
+`sb_secret_...` key in this frontend.
+
+## 5. Promote Your First Admin
+
+Sign in once, then promote your user from the SQL Editor:
+
+```sql
+update public.profiles
+set role = 'admin'
+where id = 'YOUR_AUTH_USER_ID';
+```

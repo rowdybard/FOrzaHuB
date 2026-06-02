@@ -24,6 +24,7 @@ import EmptyState from '../components/common/EmptyState'
 import Loading from '../components/common/Loading'
 import { getReviewQueue, reviewSubmission } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
+import { useAuth } from '../hooks/useAuth'
 import { getType, formatMetric } from '../lib/challengeTypes'
 import { cn, timeAgo, formatNumber } from '../lib/utils'
 
@@ -54,6 +55,7 @@ function StatusPill({ status }) {
 }
 
 export default function AdminDashboard() {
+  const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
   const { data, loading } = useAsync(() => getReviewQueue(), [])
   const [overrides, setOverrides] = useState({})
   const [filter, setFilter] = useState('pending')
@@ -92,7 +94,34 @@ export default function AdminDashboard() {
     }
   }
 
-  if (loading) return <Loading label="Loading queue…" className="min-h-[60vh]" />
+  if (enabled && authLoading) return <Loading label="Checking access..." className="min-h-[60vh]" />
+
+  if (enabled && !user) {
+    return (
+      <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
+        <div className="max-w-md">
+          <ShieldCheck className="mx-auto h-8 w-8 text-brand-400" />
+          <h1 className="mt-4 text-2xl font-extrabold">Staff sign in required</h1>
+          <p className="mt-2 text-zinc-400">Sign in with Discord to access the review queue.</p>
+          <Button onClick={signIn} className="mt-6">Sign in</Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (enabled && profile && !['admin', 'steward'].includes(profile.role)) {
+    return (
+      <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
+        <div className="max-w-md">
+          <ShieldCheck className="mx-auto h-8 w-8 text-zinc-500" />
+          <h1 className="mt-4 text-2xl font-extrabold">Staff access only</h1>
+          <p className="mt-2 text-zinc-400">Your account is signed in, but it is not a steward or admin.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) return <Loading label="Loading queue..." className="min-h-[60vh]" />
 
   return (
     <div className="container-page py-8">

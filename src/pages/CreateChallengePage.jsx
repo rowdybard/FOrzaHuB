@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   Check,
@@ -15,8 +15,9 @@ import {
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ChallengeCard from '../components/common/ChallengeCard'
-import { getClubs, getChallengeBySlug, createChallenge } from '../data/api'
+import { getClubs, getChallengeBySlug, createChallenge, updateChallenge, isSupabaseEnabled } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
+import { useAuth } from '../hooks/useAuth'
 import { TYPE_LIST, getType } from '../lib/challengeTypes'
 import { cn, hexToRgba } from '../lib/utils'
 
@@ -40,6 +41,7 @@ const RANKING = {
 
 export default function CreateChallengePage() {
   const { slug } = useParams()
+  const { enabled, user, signIn } = useAuth()
   const { data: clubs } = useAsync(() => getClubs(), [])
   const clubList = clubs || []
 
@@ -64,9 +66,34 @@ export default function CreateChallengePage() {
     visibility: 'public',
   }))
   const [published, setPublished] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const t = getType(form.typeId)
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
+
+  useEffect(() => {
+    if (!existing) return
+    setForm({
+      typeId: existing.typeId || 'time_trial',
+      title: existing.title || '',
+      clubId: existing.clubId || clubList[0]?.id || '',
+      description: existing.description || '',
+      restriction: existing.restriction || '',
+      location: existing.location || '',
+      region: existing.region || '',
+      prize: existing.prize || '',
+      startDate: toDateInput(existing.startDate) || todayISO,
+      endDate: toDateInput(existing.endDate) || plusDays(7),
+      rules: existing.rules?.length ? [...existing.rules] : [''],
+      visibility: existing.visibility || 'public',
+    })
+  }, [existing, clubList[0]?.id])
+
+  useEffect(() => {
+    if (form.clubId || clubList.length === 0) return
+    set('clubId', clubList[0].id)
+  }, [clubList[0]?.id, form.clubId])
 
   const setRule = (i, v) => setForm((f) => ({ ...f, rules: f.rules.map((r, idx) => (idx === i ? v : r)) }))
   const addRule = () => setForm((f) => ({ ...f, rules: [...f.rules, ''] }))
@@ -92,13 +119,21 @@ export default function CreateChallengePage() {
     gallery: t.gallery ? [] : undefined,
   }
 
-  const canPublish = form.title.trim() && form.restriction.trim() && form.location.trim()
+  const authReady = !isSupabaseEnabled || !!user
+  const canPublish =
+    authReady &&
+    form.clubId &&
+    form.title.trim() &&
+    form.restriction.trim() &&
+    form.location.trim() &&
+    !submitting
 
   const handlePublish = async () => {
     if (!canPublish) return
+    setSubmitting(true)
+    setError('')
     try {
-      await createChallenge({
-        slug: form.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now(),
+      const payload = {
         type_id: form.typeId,
         title: form.title.trim(),
         club_id: form.clubId,
@@ -111,12 +146,25 @@ export default function CreateChallengePage() {
         end_date: new Date(form.endDate).toISOString(),
         rules: form.rules.filter(Boolean),
         visibility: form.visibility,
-        status: 'upcoming',
-      })
+        status: startInFuture ? 'upcoming' : 'live',
+        created_by: user?.id || null,
+      }
+
+      if (isEdit) {
+        await updateChallenge(existing.id, payload)
+      } else {
+        await createChallenge({
+          ...payload,
+          slug: form.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now(),
+        })
+      }
+      setPublished(true)
     } catch (err) {
       console.error('[create] createChallenge failed', err)
+      setError(err.message || 'Could not save this challenge.')
+    } finally {
+      setSubmitting(false)
     }
-    setPublished(true)
   }
 
   if (published) {
@@ -137,9 +185,14 @@ export default function CreateChallengePage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={handlePublish}>
+            {enabled && !user ? (
+              <Button variant="secondary" onClick={signIn}>
+                Sign in
+              </Button>
+            ) : null}
+            <Button variant="secondary" onClick={handlePublish} disabled={!canPublish}>
               <Save className="h-4 w-4" />
-              Save draft
+              {submitting ? 'Saving...' : 'Save'}
             </Button>
             <Button onClick={handlePublish} disabled={!canPublish}>
               <Send className="h-4 w-4" />
@@ -150,6 +203,11 @@ export default function CreateChallengePage() {
       </div>
 
       <div className="container-page py-8">
+        {error && (
+          <div className="mb-5 rounded-xl border border-rose-500/25 bg-rose-500/[0.07] px-4 py-3 text-sm text-rose-200">
+            {error}
+          </div>
+        )}
         <div className="grid items-start gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6">
             {/* Format */}

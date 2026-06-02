@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Check, MessagesSquare, Sparkles, Save } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Check, Hash, MessagesSquare, Save, ShieldCheck, Sparkles, User } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Nameplate from '../components/ui/Nameplate'
 import PageHero from '../components/common/PageHero'
@@ -8,46 +8,59 @@ import { updateMyProfile } from '../data/api'
 import { cn, hexToRgba } from '../lib/utils'
 import {
   ACCENTS,
-  DEFAULT_ACCENT,
   BADGES,
+  DEFAULT_ACCENT,
+  DEFAULT_NAME_EFFECT,
+  DEFAULT_PLATE_FRAME,
+  NAME_EFFECTS,
+  PLATE_FRAMES,
   SELECTABLE_BADGES,
   resolveBadges,
 } from '../lib/cosmetics'
+
+const inputCls =
+  'w-full rounded-lg border border-white/[0.08] bg-ink-900/70 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-colors focus:border-brand-500/50 focus:outline-none'
 
 export default function ProfilePage() {
   const { enabled, user, profile, loading, signIn, refreshProfile } = useAuth()
 
   const [accent, setAccent] = useState(DEFAULT_ACCENT)
   const [gradient, setGradient] = useState(false)
+  const [nameEffect, setNameEffect] = useState(DEFAULT_NAME_EFFECT)
+  const [plateFrame, setPlateFrame] = useState(DEFAULT_PLATE_FRAME)
+  const [profileTitle, setProfileTitle] = useState('')
   const [badges, setBadges] = useState([])
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     if (profile) {
       setAccent(profile.accent || DEFAULT_ACCENT)
       setGradient(!!profile.nameGradient)
+      setNameEffect(profile.nameEffect || DEFAULT_NAME_EFFECT)
+      setPlateFrame(profile.plateFrame || DEFAULT_PLATE_FRAME)
+      setProfileTitle(profile.profileTitle || '')
       setBadges((profile.badges || []).filter((b) => SELECTABLE_BADGES.includes(b)))
     }
   }, [profile])
 
-  // Signed-out / no-backend states ------------------------------------------
   if (!enabled) {
     return (
       <Centered
         title="Profiles need login"
-        body="Connect Supabase + Discord auth to customize your racer nameplate."
+        body="Connect Supabase and Discord auth to customize your racer profile."
       />
     )
   }
   if (loading) {
-    return <Centered title="Loading…" body="" />
+    return <Centered title="Loading..." body="" />
   }
   if (!user) {
     return (
       <Centered
         title="Sign in to customize"
-        body="Your nameplate — color, style and badges — is tied to your Discord account."
+        body="Your profile is tied to your Discord account."
         action={
           <Button onClick={signIn}>
             <MessagesSquare className="h-4 w-4" />
@@ -58,15 +71,19 @@ export default function ProfilePage() {
     )
   }
 
-  // Live preview user object
   const previewUser = {
     ...profile,
     name: profile?.name || 'Your name',
     accent,
     nameGradient: gradient,
+    nameEffect,
+    plateFrame,
+    profileTitle,
     badges,
   }
   const autoBadges = resolveBadges({ ...profile, badges: [] })
+  const displayTag = profile?.tag || user.user_metadata?.preferred_username || 'Discord'
+  const role = profile?.role || 'racer'
 
   const toggleBadge = (id) =>
     setBadges((cur) => (cur.includes(id) ? cur.filter((b) => b !== id) : [...cur, id]))
@@ -74,13 +91,27 @@ export default function ProfilePage() {
   const save = async () => {
     setSaving(true)
     setSaved(false)
+    setSaveError('')
     try {
-      await updateMyProfile(user.id, { accent, nameGradient: gradient, badges })
+      await updateMyProfile(user.id, {
+        accent,
+        nameGradient: gradient,
+        nameEffect,
+        plateFrame,
+        profileTitle: profileTitle.trim() || null,
+        badges,
+      })
       await refreshProfile()
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } catch (err) {
       console.error('[profile] save failed', err)
+      const message = err?.message || ''
+      setSaveError(
+        /name_effect|plate_frame|profile_title/i.test(message)
+          ? 'Run the profile flair migration, then save again.'
+          : 'Could not save profile changes.',
+      )
     } finally {
       setSaving(false)
     }
@@ -89,136 +120,247 @@ export default function ProfilePage() {
   return (
     <>
       <PageHero
-        eyebrow="Your profile"
-        title="Customize your nameplate"
-        description="Pick an accent color, style and badges. This is how your name appears across leaderboards and club rosters."
+        eyebrow="My profile"
+        title={profile?.name || 'Racer profile'}
+        description="Discord account, club presence, and your compact nameplate settings."
       />
 
       <div className="container-page py-8">
-        <div className="grid items-start gap-8 lg:grid-cols-[1fr_360px]">
-          {/* Editor */}
-          <div className="space-y-8">
-            <Section title="Accent color">
-              <div className="flex flex-wrap gap-2.5">
-                {ACCENTS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setAccent(c)}
-                    className={cn(
-                      'h-10 w-10 rounded-full ring-2 transition-transform hover:scale-110',
-                      accent === c ? 'ring-white' : 'ring-transparent',
-                    )}
-                    style={{ background: c, boxShadow: `0 0 16px -2px ${hexToRgba(c, 0.6)}` }}
-                    aria-label={`Accent ${c}`}
-                  >
-                    {accent === c && <Check className="mx-auto h-4 w-4 text-black/70" />}
-                  </button>
-                ))}
+        <div className="grid items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="space-y-6">
+            <section className="card p-5">
+              <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                <User className="h-3.5 w-3.5" />
+                Account
               </div>
-            </Section>
-
-            <Section title="Name style">
-              <div className="flex gap-2.5">
-                <StyleOption active={!gradient} onClick={() => setGradient(false)} label="Solid">
-                  <span className="font-semibold" style={{ color: accent }}>
-                    Solid
-                  </span>
-                </StyleOption>
-                <StyleOption active={gradient} onClick={() => setGradient(true)} label="Gradient">
-                  <span
-                    className="font-semibold"
-                    style={{
-                      backgroundImage: `linear-gradient(92deg, ${accent}, ${hexToRgba(accent, 0.6)})`,
-                      WebkitBackgroundClip: 'text',
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                    }}
-                  >
-                    Gradient
-                  </span>
-                </StyleOption>
+              <div className="rounded-lg border border-white/[0.06] bg-ink-900/55 p-4">
+                <Nameplate user={previewUser} size={52} />
               </div>
-            </Section>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <InfoTile label="Discord" value={displayTag} />
+                <InfoTile label="Role" value={role} />
+                <InfoTile label="Platform" value={profile?.platform || 'Racer'} />
+                <InfoTile label="Country" value={profile?.country || 'Global'} />
+              </div>
+            </section>
 
-            <Section title="Badges" hint="Role badges are earned automatically.">
-              {autoBadges.length > 0 && (
-                <div className="mb-3 flex flex-wrap gap-2">
+            <section className="card p-5">
+              <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Status
+              </div>
+              {autoBadges.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
                   {autoBadges.map((id) => (
                     <BadgeChip key={id} id={id} locked />
                   ))}
                 </div>
+              ) : (
+                <p className="text-sm text-zinc-500">No automatic badges yet.</p>
               )}
-              <div className="flex flex-wrap gap-2">
-                {SELECTABLE_BADGES.map((id) => (
-                  <BadgeChip
-                    key={id}
-                    id={id}
-                    active={badges.includes(id)}
-                    onClick={() => toggleBadge(id)}
-                  />
-                ))}
-              </div>
-            </Section>
-
-            <div className="flex items-center gap-3">
-              <Button onClick={save} disabled={saving}>
-                <Save className="h-4 w-4" />
-                {saving ? 'Saving…' : 'Save changes'}
-              </Button>
-              {saved && (
-                <span className="inline-flex items-center gap-1.5 text-sm text-emerald-300">
-                  <Check className="h-4 w-4" />
-                  Saved
-                </span>
-              )}
-            </div>
+            </section>
           </div>
 
-          {/* Live preview */}
-          <aside className="lg:sticky lg:top-20">
-            <div className="card p-6">
-              <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                <Sparkles className="h-3.5 w-3.5" />
-                Live preview
+          <section className="card overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Nameplate studio
+                </div>
+                <h2 className="mt-1 text-lg font-semibold text-white">Small flair, clean read</h2>
               </div>
-              <div className="rounded-xl border border-white/[0.06] bg-ink-900/50 p-5">
-                <Nameplate user={previewUser} size={48} />
+              <div className="flex items-center gap-3">
+                {saved && (
+                  <span className="inline-flex items-center gap-1.5 text-sm text-emerald-300">
+                    <Check className="h-4 w-4" />
+                    Saved
+                  </span>
+                )}
+                <Button onClick={save} disabled={saving} size="sm">
+                  <Save className="h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save'}
+                </Button>
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-zinc-500">
-                This is exactly how your name renders in club rosters, standings and leaderboards.
-              </p>
             </div>
-          </aside>
+
+            {saveError && (
+              <div className="border-b border-rose-500/15 bg-rose-500/[0.06] px-5 py-3 text-sm text-rose-200">
+                {saveError}
+              </div>
+            )}
+
+            <div className="grid gap-6 p-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="space-y-6">
+                <Section title="Forum title">
+                  <input
+                    className={inputCls}
+                    value={profileTitle}
+                    onChange={(e) => setProfileTitle(e.target.value.slice(0, 28))}
+                    maxLength={28}
+                    placeholder="Clean Racer"
+                  />
+                </Section>
+
+                <Section title="Accent">
+                  <div className="flex flex-wrap gap-2">
+                    {ACCENTS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setAccent(color)}
+                        aria-label={`Accent ${color}`}
+                        className={cn(
+                          'grid h-9 w-9 place-items-center rounded-full ring-2 transition-transform hover:scale-105',
+                          accent === color ? 'ring-white' : 'ring-transparent',
+                        )}
+                        style={{
+                          background: color,
+                          boxShadow: `0 0 14px -4px ${hexToRgba(color, 0.72)}`,
+                        }}
+                      >
+                        {accent === color && <Check className="h-4 w-4 text-black/70" />}
+                      </button>
+                    ))}
+                  </div>
+                </Section>
+
+                <Section title="Fill">
+                  <div className="grid grid-cols-2 gap-2">
+                    <ModeButton active={!gradient} onClick={() => setGradient(false)}>
+                      Solid
+                    </ModeButton>
+                    <ModeButton active={gradient} onClick={() => setGradient(true)}>
+                      Duotone
+                    </ModeButton>
+                  </div>
+                </Section>
+
+                <Section title="Effect">
+                  <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    {NAME_EFFECTS.map((effect) => (
+                      <OptionCard
+                        key={effect.id}
+                        active={nameEffect === effect.id}
+                        onClick={() => setNameEffect(effect.id)}
+                        label={effect.label}
+                      >
+                        <Nameplate
+                          user={{
+                            ...previewUser,
+                            name: effect.label,
+                            nameEffect: effect.id,
+                            plateFrame: DEFAULT_PLATE_FRAME,
+                          }}
+                          size={24}
+                          showBadges={false}
+                          showSub={false}
+                        />
+                      </OptionCard>
+                    ))}
+                  </div>
+                </Section>
+
+                <Section title="Frame">
+                  <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    {PLATE_FRAMES.map((frame) => (
+                      <OptionCard
+                        key={frame.id}
+                        active={plateFrame === frame.id}
+                        onClick={() => setPlateFrame(frame.id)}
+                        label={frame.label}
+                      >
+                        <Nameplate
+                          user={{
+                            ...previewUser,
+                            name: frame.label,
+                            nameEffect: DEFAULT_NAME_EFFECT,
+                            plateFrame: frame.id,
+                          }}
+                          size={24}
+                          showBadges={false}
+                          showSub={false}
+                        />
+                      </OptionCard>
+                    ))}
+                  </div>
+                </Section>
+
+                <Section title="Flair badges">
+                  <div className="flex flex-wrap gap-2">
+                    {SELECTABLE_BADGES.map((id) => (
+                      <BadgeChip
+                        key={id}
+                        id={id}
+                        active={badges.includes(id)}
+                        onClick={() => toggleBadge(id)}
+                      />
+                    ))}
+                  </div>
+                </Section>
+              </div>
+
+              <aside className="xl:sticky xl:top-20">
+                <div className="rounded-lg border border-white/[0.07] bg-ink-900/60 p-4">
+                  <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/[0.06] pb-3">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+                      Pitwall.bbs
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                      <Hash className="h-3 w-3" />
+                      Preview
+                    </span>
+                  </div>
+                  <Nameplate user={previewUser} size={48} />
+                </div>
+              </aside>
+            </div>
+          </section>
         </div>
       </div>
     </>
   )
 }
 
-function Section({ title, hint, children }) {
+function Section({ title, children }) {
   return (
     <section>
-      <div className="mb-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">{title}</h2>
-        {hint && <p className="mt-0.5 text-xs text-zinc-500">{hint}</p>}
-      </div>
+      <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+        {title}
+      </h3>
       {children}
     </section>
   )
 }
 
-function StyleOption({ active, onClick, label, children }) {
+function OptionCard({ active, onClick, label, children }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
       className={cn(
-        'grid h-16 flex-1 place-items-center rounded-xl border text-lg transition-colors',
+        'flex h-16 min-w-0 items-center overflow-hidden rounded-lg border px-3 text-left transition-colors',
         active
-          ? 'border-brand-500/50 bg-brand-500/[0.06]'
-          : 'border-white/[0.08] bg-ink-900/40 hover:border-white/20',
+          ? 'border-brand-500/45 bg-brand-500/[0.07]'
+          : 'border-white/[0.08] bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.05]',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+function ModeButton({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'h-10 rounded-lg border px-3 text-sm font-semibold transition-colors',
+        active
+          ? 'border-brand-500/45 bg-brand-500/[0.07] text-white'
+          : 'border-white/[0.08] bg-white/[0.025] text-zinc-400 hover:text-white',
       )}
     >
       {children}
@@ -227,9 +369,9 @@ function StyleOption({ active, onClick, label, children }) {
 }
 
 function BadgeChip({ id, active, locked, onClick }) {
-  const b = BADGES[id]
-  if (!b) return null
-  const Icon = b.icon
+  const badge = BADGES[id]
+  if (!badge) return null
+  const Icon = badge.icon
   return (
     <button
       type="button"
@@ -245,17 +387,26 @@ function BadgeChip({ id, active, locked, onClick }) {
       style={
         active || locked
           ? {
-              color: b.color,
-              backgroundColor: hexToRgba(b.color, 0.12),
-              borderColor: hexToRgba(b.color, 0.3),
+              color: badge.color,
+              backgroundColor: hexToRgba(badge.color, 0.12),
+              borderColor: hexToRgba(badge.color, 0.3),
             }
           : undefined
       }
     >
       <Icon className="h-3.5 w-3.5" strokeWidth={2.2} />
-      {b.label}
+      {badge.label}
       {locked && <span className="ml-0.5 text-[10px] uppercase tracking-wide opacity-70">auto</span>}
     </button>
+  )
+}
+
+function InfoTile({ label, value }) {
+  return (
+    <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">{label}</div>
+      <div className="mt-1 truncate text-sm font-semibold text-zinc-200">{value}</div>
+    </div>
   )
 }
 

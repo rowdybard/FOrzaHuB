@@ -7,6 +7,7 @@
 
 import { supabase, isSupabaseEnabled } from '../lib/supabase'
 import { getType } from '../lib/challengeTypes'
+import { slugify } from '../lib/utils'
 import * as mock from './mock'
 
 /* -------------------------------------------------------------------------- */
@@ -24,6 +25,9 @@ function normProfile(row) {
     role: row.role || 'racer',
     accent: row.accent || null,
     nameGradient: !!row.name_gradient,
+    nameEffect: row.name_effect || 'clean',
+    plateFrame: row.plate_frame || 'none',
+    profileTitle: row.profile_title || '',
     badges: row.badges || [],
     avatarUrl: row.avatar_url || null,
   }
@@ -274,11 +278,31 @@ export async function createSubmission(payload) {
   return { ok: true }
 }
 
+export async function uploadProof({ file, challengeId, userId }) {
+  if (!file || !isSupabaseEnabled) return null
+  if (!challengeId || !userId) throw new Error('Missing challenge or user for proof upload')
+
+  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'upload'
+  const safeName = slugify(file.name.replace(/\.[^.]+$/, '')) || 'proof'
+  const path = `${challengeId}/${userId}/${crypto.randomUUID()}-${safeName}.${ext}`
+  const { error } = await supabase.storage.from('proofs').upload(path, file, {
+    contentType: file.type || undefined,
+  })
+  if (error) throw error
+
+  const { data } = supabase.storage.from('proofs').getPublicUrl(path)
+  return data.publicUrl
+}
+
 export async function reviewSubmission(id, status) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
   const { error } = await supabase
     .from('submissions')
-    .update({ status, reviewed_at: new Date().toISOString() })
+    .update({
+      status,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: (await supabase.auth.getUser()).data.user?.id ?? null,
+    })
     .eq('id', id)
   if (error) throw error
   return { ok: true }
@@ -287,6 +311,18 @@ export async function reviewSubmission(id, status) {
 export async function createChallenge(payload) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
   const { data, error } = await supabase.from('challenges').insert(payload).select().maybeSingle()
+  if (error) throw error
+  return { ok: true, challenge: data ? normChallenge(data) : null }
+}
+
+export async function updateChallenge(id, payload) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { data, error } = await supabase
+    .from('challenges')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .maybeSingle()
   if (error) throw error
   return { ok: true, challenge: data ? normChallenge(data) : null }
 }
@@ -402,6 +438,9 @@ export async function updateMyProfile(userId, patch) {
   const row = {}
   if ('accent' in patch) row.accent = patch.accent
   if ('nameGradient' in patch) row.name_gradient = patch.nameGradient
+  if ('nameEffect' in patch) row.name_effect = patch.nameEffect
+  if ('plateFrame' in patch) row.plate_frame = patch.plateFrame
+  if ('profileTitle' in patch) row.profile_title = patch.profileTitle
   if ('badges' in patch) row.badges = patch.badges
   if ('displayName' in patch) row.display_name = patch.displayName
   const { error } = await supabase.from('profiles').update(row).eq('id', userId)

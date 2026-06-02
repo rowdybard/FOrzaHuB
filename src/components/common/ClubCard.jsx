@@ -17,7 +17,7 @@ export default function ClubCard({ club }) {
       </div>
       <div className="px-5 pb-5">
         <div className="-mt-8 flex items-end justify-between">
-          <ClubMark club size={56} className="ring-4 ring-ink-850" />
+          <ClubMark club={club} size={56} className="ring-4 ring-ink-850" />
           <span className="chip">{club.region}</span>
         </div>
         <div className="mt-3 flex items-center gap-1.5">
