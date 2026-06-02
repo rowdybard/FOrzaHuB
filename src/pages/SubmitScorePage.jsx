@@ -28,13 +28,11 @@ import { getType } from '../lib/challengeTypes'
 const inputCls =
   'w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 transition-colors focus:border-brand-500/50 focus:outline-none'
 
-const ALLOWED_PROOF_EXTS = new Set(['png', 'jpg', 'jpeg', 'webp', 'mp4', 'mov'])
+const ALLOWED_PROOF_EXTS = new Set(['png', 'jpg', 'jpeg', 'webp'])
 const ALLOWED_PROOF_TYPES = new Set([
   'image/png',
   'image/jpeg',
   'image/webp',
-  'video/mp4',
-  'video/quicktime',
 ])
 const DEFAULT_MAX_PROOF_MB = 50
 const configuredMaxProofMb = Number(import.meta.env.VITE_MAX_PROOF_UPLOAD_MB)
@@ -113,7 +111,7 @@ export default function SubmitScorePage() {
 
     if (!extAllowed || (file.type && !typeAllowed)) {
       setForm((f) => ({ ...f, file: null, fileName: '' }))
-      setError('Proof file must be PNG, JPG, WEBP, MP4, or MOV.')
+      setError('Proof file must be PNG, JPG, or WEBP.')
       return
     }
 
@@ -307,11 +305,11 @@ export default function SubmitScorePage() {
                   {form.fileName || (isGallery ? 'Upload your photo' : 'Upload your clip or screenshot')}
                 </span>
                 <span className="mt-1 text-xs text-zinc-500">
-                  PNG, JPG, WEBP, MP4, or MOV. Max {MAX_PROOF_MB}MB.
+                  PNG, JPG, or WEBP. Max {MAX_PROOF_MB}MB.
                 </span>
                 <input
                   type="file"
-                  accept=".png,.jpg,.jpeg,.webp,.mp4,.mov,image/png,image/jpeg,image/webp,video/mp4,video/quicktime"
+                  accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null
@@ -332,7 +330,7 @@ export default function SubmitScorePage() {
                 <input
                   value={form.link}
                   onChange={set('link')}
-                  placeholder="https://youtu.be/…  or a clip / image link"
+                  placeholder="YouTube, Xbox clip, Medal, TikTok, Streamable, or image link"
                   className={`${inputCls} pl-10`}
                 />
               </div>
