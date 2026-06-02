@@ -7,6 +7,7 @@ import { cn } from '../../lib/utils'
 
 const links = [
   { to: '/challenges', label: 'Challenges' },
+  { to: '/archive', label: 'Archive' },
   { to: '/clubs', label: 'Communities' },
   { to: '/submit', label: 'Submit' },
   { to: '/admin', label: 'Admin' },

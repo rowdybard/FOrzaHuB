@@ -9,7 +9,7 @@ const columns = [
       { label: 'Challenges', to: '/challenges' },
       { label: 'Communities', to: '/clubs' },
       { label: 'Submit a score', to: '/submit' },
-      { label: 'Leaderboards', to: '/challenges' },
+      { label: 'Results archive', to: '/archive' },
     ],
   },
   {
