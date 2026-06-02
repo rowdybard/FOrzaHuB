@@ -40,8 +40,8 @@ const U = {
 // Club rosters: clubId -> [{ userKey, role }]
 const MEMBERSHIPS = {
   pitwall: [
-    { user: U.rowdy, role: 'owner' },
-    { user: U.cone, role: 'member' },
+    { user: U.rowdy, role: 'owner', isPrimary: true },
+    { user: U.cone, role: 'member', isPrimary: true },
   ],
 }
 
@@ -60,6 +60,7 @@ export const clubs = [
       'The founding club for Pitwall. Rowdybard and PurpleCone are here. Challenges, leaderboards and verified proof.',
     discord: '',
     founded: 'Jun 2025',
+    ownerId: 'u-rowdy',
     stats: { challenges: 0, podiums: 0, submissions: 0 },
   },
 ]
@@ -107,9 +108,27 @@ export const closedChallenges = () =>
 // Members / profiles
 const ALL_USERS = Object.values(U)
 export const clubMembers = (clubId) =>
-  (MEMBERSHIPS[clubId] || []).map(({ user, role }) => ({
+  (MEMBERSHIPS[clubId] || []).map(({ user, role, isPrimary }) => ({
     ...user,
     membershipRole: role,
+    isPrimary: !!isPrimary,
     joinedAt: null,
   }))
 export const getProfileById = (id) => ALL_USERS.find((u) => u.id === id) || null
+export const getClubsForUser = (userId) =>
+  Object.entries(MEMBERSHIPS).flatMap(([clubId, rows]) =>
+    rows
+      .filter(({ user }) => user.id === userId)
+      .map(({ role, isPrimary }) => ({
+        ...getClubById(clubId),
+        membershipRole: role,
+        joinedAt: null,
+        isPrimary: !!isPrimary,
+      })),
+  )
+export const getPrimaryClubForUser = (userId) => {
+  const memberships = getClubsForUser(userId)
+  return memberships.find((club) => club.isPrimary) || memberships[0] || null
+}
+export const getOwnedClubForUser = (userId) =>
+  clubs.find((club) => club.ownerId === userId) || null

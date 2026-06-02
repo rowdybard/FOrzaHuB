@@ -56,10 +56,12 @@ function StatusPill({ status }) {
 
 export default function AdminDashboard() {
   const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
-  const { data, loading } = useAsync(() => getReviewQueue(), [])
+  const { data, loading, error: queueError } = useAsync(() => getReviewQueue(), [])
   const [overrides, setOverrides] = useState({})
   const [filter, setFilter] = useState('pending')
   const [selectedId, setSelectedId] = useState(null)
+  const [actionError, setActionError] = useState('')
+  const [decidingId, setDecidingId] = useState(null)
 
   const items = useMemo(
     () => (data || []).map((i) => (overrides[i.id] ? { ...i, status: overrides[i.id] } : i)),
@@ -86,11 +88,23 @@ export default function AdminDashboard() {
   const selected = items.find((i) => i.id === selectedId)
 
   const decide = async (id, status) => {
+    setActionError('')
+    setDecidingId(id)
+    const previous = items.find((i) => i.id === id)?.status
     setOverrides((prev) => ({ ...prev, [id]: status }))
     try {
       await reviewSubmission(id, status)
     } catch (err) {
       console.error('[admin] reviewSubmission failed', err)
+      setOverrides((prev) => {
+        const next = { ...prev }
+        if (previous) next[id] = previous
+        else delete next[id]
+        return next
+      })
+      setActionError(err?.message || 'Review action failed. Check staff access and try again.')
+    } finally {
+      setDecidingId(null)
     }
   }
 
@@ -122,6 +136,20 @@ export default function AdminDashboard() {
   }
 
   if (loading) return <Loading label="Loading queue..." className="min-h-[60vh]" />
+
+  if (queueError) {
+    return (
+      <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
+        <div className="max-w-md">
+          <CircleAlert className="mx-auto h-8 w-8 text-rose-400" />
+          <h1 className="mt-4 text-2xl font-extrabold">Could not load review queue</h1>
+          <p className="mt-2 text-zinc-400">
+            Check staff access and RLS policies, then try again.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container-page py-8">
@@ -204,7 +232,12 @@ export default function AdminDashboard() {
 
         <div>
           {selected ? (
-            <DetailPanel submission={selected} onDecide={decide} />
+            <DetailPanel
+              submission={selected}
+              onDecide={decide}
+              actionError={actionError}
+              deciding={decidingId === selected.id}
+            />
           ) : (
             <div className="card grid min-h-[400px] place-items-center p-10 text-center text-sm text-zinc-500">
               Select a submission to review
@@ -303,7 +336,7 @@ function ProofPreview({ submission }) {
   )
 }
 
-function DetailPanel({ submission, onDecide }) {
+function DetailPanel({ submission, onDecide, actionError, deciding }) {
   const t = getType(submission.typeId)
   const decided = submission.status === 'approved' || submission.status === 'rejected'
 
@@ -368,6 +401,12 @@ function DetailPanel({ submission, onDecide }) {
       </div>
 
       <div className="border-t border-white/[0.06] p-5">
+        {actionError && (
+          <div className="mb-4 flex gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/[0.06] p-3 text-sm text-rose-200/90">
+            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-rose-400" />
+            {actionError}
+          </div>
+        )}
         {decided ? (
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-zinc-400">
@@ -376,21 +415,26 @@ function DetailPanel({ submission, onDecide }) {
                 {submission.status}
               </span>
             </p>
-            <Button variant="ghost" size="sm" onClick={() => onDecide(submission.id, 'pending')}>
-              Reopen
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={deciding}
+              onClick={() => onDecide(submission.id, 'pending')}
+            >
+              {deciding ? 'Saving...' : 'Reopen'}
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Button variant="success" onClick={() => onDecide(submission.id, 'approved')}>
+            <Button variant="success" disabled={deciding} onClick={() => onDecide(submission.id, 'approved')}>
               <Check className="h-4 w-4" />
-              Approve
+              {deciding ? 'Saving...' : 'Approve'}
             </Button>
-            <Button variant="secondary" onClick={() => onDecide(submission.id, 'flagged')}>
+            <Button variant="secondary" disabled={deciding} onClick={() => onDecide(submission.id, 'flagged')}>
               <Flag className="h-4 w-4" />
               Flag
             </Button>
-            <Button variant="danger" onClick={() => onDecide(submission.id, 'rejected')}>
+            <Button variant="danger" disabled={deciding} onClick={() => onDecide(submission.id, 'rejected')}>
               <X className="h-4 w-4" />
               Reject
             </Button>

@@ -1,32 +1,61 @@
-import { useState } from 'react'
-import { Users, ChevronDown, UserPlus, UserMinus, LogIn } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Users, ChevronDown, UserPlus, UserMinus, LogIn, Star } from 'lucide-react'
 import Avatar from '../ui/Avatar'
 import Nameplate from '../ui/Nameplate'
 import Button from '../ui/Button'
 import { cn, hexToRgba } from '../../lib/utils'
 import { useAuth } from '../../hooks/useAuth'
-import { joinClub, leaveClub } from '../../data/api'
+import { getMyClubMemberships, joinClub, leaveClub, setPrimaryClub } from '../../data/api'
 
 // Expandable members card for the club aside. Collapsed by default (quiet
 // avatar stack + count); click to reveal a height-capped, scrollable roster.
 export default function MembersCard({ club, members = [], loading, onChanged }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [memberships, setMemberships] = useState([])
   const { user, enabled, signIn } = useAuth()
 
   const count = members.length || club.members || 0
   const preview = members.slice(0, 5)
   const extra = Math.max(0, count - preview.length)
-  const isMember = user ? members.some((m) => m.id === user.id) : false
+  const rosterMembership = user ? members.find((m) => m.id === user.id) : null
+  const currentMembership = user
+    ? memberships.find((m) => m.id === club.id) || rosterMembership
+    : null
+  const isMember = !!currentMembership
+  const isOwner = currentMembership?.membershipRole === 'owner'
+  const isPrimary = !!currentMembership?.isPrimary
+  const atClubLimit = memberships.length >= 5 && !isMember
+
+  const refreshMemberships = async () => {
+    if (!user || !enabled) {
+      setMemberships([])
+      return
+    }
+    try {
+      setMemberships(await getMyClubMemberships(user.id))
+    } catch (err) {
+      console.error('[members] membership lookup failed', err)
+    }
+  }
+
+  useEffect(() => {
+    refreshMemberships()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, enabled])
 
   const handleJoin = async () => {
     if (!user) return signIn()
     setBusy(true)
+    setError('')
     try {
       await joinClub(club.id, user.id)
+      await refreshMemberships()
       onChanged?.()
     } catch (err) {
       console.error('[members] join failed', err)
+      setError(err?.message || 'Could not join club.')
     } finally {
       setBusy(false)
     }
@@ -35,11 +64,30 @@ export default function MembersCard({ club, members = [], loading, onChanged }) 
   const handleLeave = async () => {
     if (!user) return
     setBusy(true)
+    setError('')
     try {
       await leaveClub(club.id, user.id)
+      await refreshMemberships()
       onChanged?.()
     } catch (err) {
       console.error('[members] leave failed', err)
+      setError(err?.message || 'Could not leave club.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleSetPrimary = async () => {
+    if (!user) return
+    setBusy(true)
+    setError('')
+    try {
+      await setPrimaryClub(user.id, club.id)
+      await refreshMemberships()
+      onChanged?.()
+    } catch (err) {
+      console.error('[members] primary club failed', err)
+      setError(err?.message || 'Could not set primary club.')
     } finally {
       setBusy(false)
     }
@@ -127,15 +175,38 @@ export default function MembersCard({ club, members = [], loading, onChanged }) 
                 Sign in to join
               </Button>
             ) : isMember ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full"
-                onClick={handleLeave}
-                disabled={busy}
-              >
-                <UserMinus className="h-4 w-4" />
-                Leave club
+              <div className="space-y-2">
+                <Button
+                  variant={isPrimary ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="w-full"
+                  onClick={isPrimary ? undefined : handleSetPrimary}
+                  disabled={busy || isPrimary}
+                >
+                  <Star className="h-4 w-4" />
+                  {isPrimary ? 'Primary club' : 'Set primary'}
+                </Button>
+                {isOwner ? (
+                  <p className="px-1 text-center text-xs text-zinc-500">
+                    Club owners cannot leave their owned club during beta.
+                  </p>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full"
+                    onClick={handleLeave}
+                    disabled={busy}
+                  >
+                    <UserMinus className="h-4 w-4" />
+                    Leave club
+                  </Button>
+                )}
+              </div>
+            ) : atClubLimit ? (
+              <Button size="sm" className="w-full" disabled>
+                <UserPlus className="h-4 w-4" />
+                Club limit reached
               </Button>
             ) : (
               <Button size="sm" className="w-full" onClick={handleJoin} disabled={busy}>
@@ -143,6 +214,7 @@ export default function MembersCard({ club, members = [], loading, onChanged }) 
                 Join this club
               </Button>
             )}
+            {error && <p className="mt-2 px-1 text-center text-xs text-rose-300">{error}</p>}
           </div>
         </div>
       )}

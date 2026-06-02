@@ -30,6 +30,8 @@ Run these in order from the Supabase SQL Editor:
 supabase/migrations/0001_init.sql
 supabase/migrations/0002_members_and_cosmetics.sql
 supabase/migrations/0003_backend_ready.sql
+supabase/migrations/0004_profile_flair.sql
+supabase/migrations/0005_club_beta_limits.sql
 ```
 
 The final migration hardens RLS, restricts profile updates, adds explicit Data
@@ -48,6 +50,12 @@ VITE_SUPABASE_ANON_KEY=...
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
 available. A legacy anon public key also works. Never use a `service_role` or
 `sb_secret_...` key in this frontend.
+
+Keep RLS enabled before production. The app depends on RLS for staff-only
+challenge/admin writes and submission review.
+
+The V1 `proofs` Storage bucket is public. Uploaded proof files may be viewable
+by anyone with the file URL.
 
 ## 5. Promote Your First Admin
 

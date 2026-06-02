@@ -4,7 +4,7 @@ import Button from '../components/ui/Button'
 import Nameplate from '../components/ui/Nameplate'
 import PageHero from '../components/common/PageHero'
 import { useAuth } from '../hooks/useAuth'
-import { updateMyProfile } from '../data/api'
+import { getMyClub, updateMyProfile } from '../data/api'
 import { cn, hexToRgba } from '../lib/utils'
 import {
   ACCENTS,
@@ -33,6 +33,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [primaryClub, setPrimaryClub] = useState(null)
 
   useEffect(() => {
     if (profile) {
@@ -44,6 +45,22 @@ export default function ProfilePage() {
       setBadges((profile.badges || []).filter((b) => SELECTABLE_BADGES.includes(b)))
     }
   }, [profile])
+
+  useEffect(() => {
+    if (!user) {
+      setPrimaryClub(null)
+      return
+    }
+    let active = true
+    getMyClub(user.id)
+      .then((club) => {
+        if (active) setPrimaryClub(club)
+      })
+      .catch((err) => console.error('[profile] primary club lookup failed', err))
+    return () => {
+      active = false
+    }
+  }, [user?.id])
 
   if (!enabled) {
     return (
@@ -140,7 +157,7 @@ export default function ProfilePage() {
                 <InfoTile label="Discord" value={displayTag} />
                 <InfoTile label="Role" value={role} />
                 <InfoTile label="Platform" value={profile?.platform || 'Racer'} />
-                <InfoTile label="Country" value={profile?.country || 'Global'} />
+                <InfoTile label="Primary" value={primaryClub?.name || 'None'} />
               </div>
             </section>
 

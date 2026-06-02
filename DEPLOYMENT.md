@@ -17,6 +17,7 @@ local mock data in `src/data/mock.js`.
 4. Add these Cloudflare Pages environment variables for Production and Preview:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_MAX_PROOF_UPLOAD_MB` (optional, defaults to `50`)
 
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
 available. A legacy anon public key also works. Do not use or share a
@@ -29,6 +30,8 @@ available. A legacy anon public key also works. Do not use or share a
    - `supabase/migrations/0001_init.sql`
    - `supabase/migrations/0002_members_and_cosmetics.sql`
    - `supabase/migrations/0003_backend_ready.sql`
+   - `supabase/migrations/0004_profile_flair.sql`
+   - `supabase/migrations/0005_club_beta_limits.sql`
 3. Optionally run `supabase/seed.sql` for starter clubs and one challenge.
 4. Enable Authentication -> Providers -> Discord.
 5. Add the Supabase callback URL to the Discord app:
@@ -49,6 +52,16 @@ where id = 'YOUR_AUTH_USER_ID';
 
 You can find your auth user ID in Authentication -> Users. Do this from the SQL
 Editor only; browser users cannot update their own `role`.
+
+## Security Notes
+
+- Never expose a Supabase `service_role` key or `sb_secret_...` key in the
+  frontend or Cloudflare Pages environment variables.
+- RLS must be enabled before production. The migrations enable RLS and add
+  policies for profile, club, challenge, submission, membership, and review
+  access.
+- The V1 `proofs` Storage bucket is public. Uploaded proof files may be
+  viewable by anyone with the file URL.
 
 ## What Is Wired
 

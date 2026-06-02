@@ -12,7 +12,7 @@ import { cn } from '../lib/utils'
 function BringYourClubCard() {
   return (
     <Link
-      to="/create"
+      to="/clubs/new"
       className="group flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/[0.12] bg-transparent p-6 text-center transition-colors hover:border-brand-500/40 hover:bg-brand-500/[0.04]"
     >
       <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/[0.08] bg-ink-900 text-zinc-500 transition-colors group-hover:border-brand-500/30 group-hover:text-brand-400">
@@ -21,7 +21,7 @@ function BringYourClubCard() {
       <div>
         <p className="font-semibold text-zinc-300 group-hover:text-white">Your club here</p>
         <p className="mt-1 text-sm text-zinc-600 group-hover:text-zinc-400">
-          Bring your Discord community and start running events with real leaderboards.
+          Create a club for your Discord or racing group.
         </p>
       </div>
       <span className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 group-hover:text-brand-400">
@@ -50,7 +50,7 @@ export default function ClubsPage() {
         description="Forza clubs running events on Pitwall."
       >
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button to="/create">
+          <Button to="/clubs/new">
             <Plus className="h-4 w-4" />
             Start a community
           </Button>

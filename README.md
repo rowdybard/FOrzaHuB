@@ -34,6 +34,7 @@ Copy `.env.example` to `.env.local` when wiring Supabase locally.
 ```text
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
+VITE_MAX_PROOF_UPLOAD_MB=50
 ```
 
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
@@ -63,6 +64,16 @@ Run migrations in order:
 supabase/migrations/0001_init.sql
 supabase/migrations/0002_members_and_cosmetics.sql
 supabase/migrations/0003_backend_ready.sql
+supabase/migrations/0004_profile_flair.sql
+supabase/migrations/0005_club_beta_limits.sql
 ```
 
 See `DEPLOYMENT.md` and `docs/auth.md` for Cloudflare Pages and Discord setup.
+
+## Security Notes
+
+- Never expose a Supabase `service_role` key or `sb_secret_...` key in Vite,
+  Cloudflare Pages, browser code, or screenshots.
+- RLS must be enabled and the migrations must be applied before production.
+- The V1 `proofs` Storage bucket is public. Uploaded proof files may be
+  viewable by anyone with the file URL.

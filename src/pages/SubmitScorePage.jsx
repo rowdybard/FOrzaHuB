@@ -28,6 +28,22 @@ import { getType } from '../lib/challengeTypes'
 const inputCls =
   'w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 transition-colors focus:border-brand-500/50 focus:outline-none'
 
+const ALLOWED_PROOF_EXTS = new Set(['png', 'jpg', 'jpeg', 'webp', 'mp4', 'mov'])
+const ALLOWED_PROOF_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'video/mp4',
+  'video/quicktime',
+])
+const DEFAULT_MAX_PROOF_MB = 50
+const configuredMaxProofMb = Number(import.meta.env.VITE_MAX_PROOF_UPLOAD_MB)
+const MAX_PROOF_MB =
+  Number.isFinite(configuredMaxProofMb) && configuredMaxProofMb > 0
+    ? configuredMaxProofMb
+    : DEFAULT_MAX_PROOF_MB
+const MAX_PROOF_BYTES = MAX_PROOF_MB * 1024 * 1024
+
 // Parse a typed result into a numeric value. Times like "1:58.420" become
 // seconds; plain numbers (scores) keep their value.
 function parseResult(raw) {
@@ -84,6 +100,32 @@ export default function SubmitScorePage() {
     setForm((f) => ({ ...f, [k]: v }))
   }
 
+  const setProofFile = (file) => {
+    setError('')
+    if (!file) {
+      setForm((f) => ({ ...f, file: null, fileName: '' }))
+      return
+    }
+
+    const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : ''
+    const typeAllowed = ALLOWED_PROOF_TYPES.has(file.type)
+    const extAllowed = ALLOWED_PROOF_EXTS.has(ext)
+
+    if (!extAllowed || (file.type && !typeAllowed)) {
+      setForm((f) => ({ ...f, file: null, fileName: '' }))
+      setError('Proof file must be PNG, JPG, WEBP, MP4, or MOV.')
+      return
+    }
+
+    if (file.size > MAX_PROOF_BYTES) {
+      setForm((f) => ({ ...f, file: null, fileName: '' }))
+      setError(`Proof file must be ${MAX_PROOF_MB}MB or smaller.`)
+      return
+    }
+
+    setForm((f) => ({ ...f, file, fileName: file.name }))
+  }
+
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
   const hasProof = form.file || form.link.trim()
   const authReady = !isSupabaseEnabled || !!user
@@ -92,13 +134,22 @@ export default function SubmitScorePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (isSupabaseEnabled && !user) {
+      setError('Sign in with Discord before submitting.')
+      return
+    }
     if (!canSubmit || !challenge) return
     setSubmitting(true)
     setError('')
     try {
-      const proofUrl = form.file
-        ? await uploadProof({ file: form.file, challengeId: challenge.id, userId: user?.id || 'demo' })
-        : form.link.trim()
+      let proofUrl = form.link.trim()
+      if (form.file) {
+        try {
+          proofUrl = await uploadProof({ file: form.file, challengeId: challenge.id, userId: user?.id || 'demo' })
+        } catch (uploadErr) {
+          throw new Error(uploadErr?.message || 'Proof upload failed. Try another file or paste a link.')
+        }
+      }
 
       await createSubmission({
         challenge_id: challenge.id,
@@ -114,7 +165,7 @@ export default function SubmitScorePage() {
       setSubmitted(true)
     } catch (err) {
       console.error('[submit] createSubmission failed', err)
-      setError(err.message || 'Submission failed. Please try again.')
+      setError(err.message || 'Submission failed. Try again.')
     } finally {
       setSubmitting(false)
     }
@@ -255,13 +306,17 @@ export default function SubmitScorePage() {
                 <span className="mt-3 text-sm font-medium text-white">
                   {form.fileName || (isGallery ? 'Upload your photo' : 'Upload your clip or screenshot')}
                 </span>
-                <span className="mt-1 text-xs text-zinc-500">Drag & drop or click to browse · PNG, JPG, MP4</span>
+                <span className="mt-1 text-xs text-zinc-500">
+                  PNG, JPG, WEBP, MP4, or MOV. Max {MAX_PROOF_MB}MB.
+                </span>
                 <input
                   type="file"
+                  accept=".png,.jpg,.jpeg,.webp,.mp4,.mov,image/png,image/jpeg,image/webp,video/mp4,video/quicktime"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null
-                    setForm((f) => ({ ...f, file, fileName: file?.name || '' }))
+                    setProofFile(file)
+                    e.target.value = ''
                   }}
                 />
               </label>
@@ -291,6 +346,9 @@ export default function SubmitScorePage() {
                   className={`${inputCls} resize-none`}
                 />
               </Field>
+              <p className="text-xs leading-relaxed text-zinc-500">
+                Uploaded proof is stored in the public proofs bucket for V1 and may be viewable by anyone with the file URL.
+              </p>
             </Panel>
 
             <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">

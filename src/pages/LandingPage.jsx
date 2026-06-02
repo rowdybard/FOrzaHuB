@@ -424,8 +424,8 @@ function Communities({ clubs }) {
             Create challenges, review submissions, and keep leaderboards in one place.
           </p>
         </div>
-        <Button to="/create" variant="outline" size="sm" className="shrink-0">
-          Get started
+        <Button to="/clubs/new" variant="outline" size="sm" className="shrink-0">
+          Start a community
         </Button>
       </div>
     </section>

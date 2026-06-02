@@ -52,6 +52,16 @@ function normClub(row) {
   }
 }
 
+function normClubMembership(row) {
+  const club = row.clubs ? normClub(row.clubs) : normClub(row)
+  return {
+    ...club,
+    membershipRole: row.role || 'member',
+    joinedAt: row.joined_at || null,
+    isPrimary: !!row.is_primary,
+  }
+}
+
 function normChallenge(row) {
   return {
     id: row.id,
@@ -156,6 +166,87 @@ export async function getClubBySlug(slug) {
   const { data, error } = await supabase.from('clubs').select('*').eq('slug', slug).maybeSingle()
   if (error) throw error
   return data ? normClub(data) : null
+}
+
+export async function getMyClub(userId) {
+  if (!userId) return null
+  if (!isSupabaseEnabled) return mock.getPrimaryClubForUser(userId) || null
+  const memberships = await getMyClubMemberships(userId)
+  return memberships.find((club) => club.isPrimary) || memberships[0] || null
+}
+
+export async function getMyOwnedClub(userId) {
+  if (!userId) return null
+  if (!isSupabaseEnabled) return mock.getOwnedClubForUser(userId) || null
+  const { data, error } = await supabase
+    .from('clubs')
+    .select('*')
+    .eq('owner_id', userId)
+    .maybeSingle()
+  if (error) throw error
+  return data ? normClub(data) : null
+}
+
+export async function getMyClubMemberships(userId) {
+  if (!userId) return []
+  if (!isSupabaseEnabled) return mock.getClubsForUser(userId) || []
+  const { data, error } = await supabase
+    .from('club_members')
+    .select('role, joined_at, is_primary, clubs:club_id(*)')
+    .eq('user_id', userId)
+    .order('is_primary', { ascending: false })
+    .order('joined_at', { ascending: true })
+  if (error) throw error
+  return (data || []).map(normClubMembership)
+}
+
+export async function setPrimaryClub(userId, clubId) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const clear = await supabase
+    .from('club_members')
+    .update({ is_primary: false })
+    .eq('user_id', userId)
+  if (clear.error) throw clear.error
+
+  const set = await supabase
+    .from('club_members')
+    .update({ is_primary: true })
+    .eq('user_id', userId)
+    .eq('club_id', clubId)
+  if (set.error) throw set.error
+  return { ok: true }
+}
+
+export async function createClub(payload) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const name = payload.name.trim()
+  const tag = payload.tag.trim().toUpperCase()
+  const slug = slugify(name)
+  if (!slug) throw new Error('Club name is required')
+
+  const { data, error } = await supabase
+    .from('clubs')
+    .insert({
+      slug,
+      name,
+      tag,
+      region: payload.region.trim() || 'Global',
+      accent: payload.accent,
+      tagline: payload.tagline.trim() || null,
+      about: payload.about.trim() || null,
+      discord: payload.discord.trim() || null,
+      owner_id: payload.ownerId,
+    })
+    .select()
+    .maybeSingle()
+
+  if (error) {
+    if (error.code === '23505') {
+      throw new Error('You can own one club during beta, and club names must be unique.')
+    }
+    throw error
+  }
+  return { ok: true, club: data ? normClub(data) : null }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -389,13 +480,14 @@ export async function getClubMembers(clubId) {
   if (!isSupabaseEnabled) return mock.clubMembers(clubId)
   const { data, error } = await supabase
     .from('club_members')
-    .select('role, joined_at, profiles:user_id(*)')
+    .select('role, joined_at, is_primary, profiles:user_id(*)')
     .eq('club_id', clubId)
     .order('joined_at', { ascending: true })
   if (error) throw error
   return (data || []).map((row) => ({
     ...normProfile(row.profiles),
     membershipRole: row.role,
+    isPrimary: !!row.is_primary,
     joinedAt: row.joined_at,
   }))
 }
@@ -405,7 +497,13 @@ export async function joinClub(clubId, userId) {
   const { error } = await supabase
     .from('club_members')
     .insert({ club_id: clubId, user_id: userId })
-  if (error) throw error
+  if (error) {
+    if (error.code === '23505') throw new Error('You are already in this club.')
+    if (/five clubs|club_members_beta_limit/i.test(error.message || '')) {
+      throw new Error('You can join up to five clubs during beta.')
+    }
+    throw error
+  }
   return { ok: true }
 }
 
