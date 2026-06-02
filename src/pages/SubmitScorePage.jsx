@@ -34,7 +34,7 @@ const ALLOWED_PROOF_TYPES = new Set([
   'image/jpeg',
   'image/webp',
 ])
-const DEFAULT_MAX_PROOF_MB = 50
+const DEFAULT_MAX_PROOF_MB = 10
 const configuredMaxProofMb = Number(import.meta.env.VITE_MAX_PROOF_UPLOAD_MB)
 const MAX_PROOF_MB =
   Number.isFinite(configuredMaxProofMb) && configuredMaxProofMb > 0
