@@ -205,7 +205,7 @@ export default function SubmitScorePage() {
 
             {/* Challenge + identity */}
             <Panel title="Your entry" step="1">
-              <Field label="Challenge">
+              <Field label="Challenge" required>
                 <select
                   value={selectedId}
                   onChange={(e) => setChallengeId(e.target.value)}
@@ -228,7 +228,7 @@ export default function SubmitScorePage() {
                     className={inputCls}
                   />
                 </Field>
-                <Field label="Platform">
+                <Field label="Platform" required>
                   <select value={form.platform} onChange={set('platform')} className={inputCls}>
                     <option className="bg-ink-850">Xbox</option>
                     <option className="bg-ink-850">PC</option>
@@ -290,6 +290,12 @@ export default function SubmitScorePage() {
 
             {/* Proof */}
             <Panel title="Proof" step="3">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-300">
+                  Proof
+                  <span className="ml-1 text-rose-500">*</span>
+                </span>
+              </div>
               <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3.5">
                 <div className="flex gap-2.5 text-sm text-amber-200/90">
                   <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
@@ -325,15 +331,17 @@ export default function SubmitScorePage() {
                 <span className="h-px flex-1 bg-white/[0.06]" />
               </div>
 
-              <div className="relative">
-                <Link2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-                <input
-                  value={form.link}
-                  onChange={set('link')}
-                  placeholder="YouTube, Xbox clip, Medal, TikTok, Streamable, or image link"
-                  className={`${inputCls} pl-10`}
-                />
-              </div>
+              <Field label="Link" required>
+                <div className="relative">
+                  <Link2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <input
+                    value={form.link}
+                    onChange={set('link')}
+                    placeholder="YouTube, Xbox clip, Medal, TikTok, Streamable, or image link"
+                    className={`${inputCls} pl-10`}
+                  />
+                </div>
+              </Field>
 
               <Field label="Notes for the steward" className="mt-4" hint="Optional">
                 <textarea
@@ -475,7 +483,7 @@ function Field({ label, required, hint, children, className = '' }) {
       <div className="mb-1.5 flex items-center justify-between">
         <span className="text-sm font-medium text-zinc-300">
           {label}
-          {required && <span className="ml-1 text-brand-400">*</span>}
+          {required && <span className="ml-1 text-rose-500">*</span>}
         </span>
         {hint && <span className="text-xs text-zinc-500">{hint}</span>}
       </div>

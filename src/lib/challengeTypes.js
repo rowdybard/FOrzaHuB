@@ -16,7 +16,7 @@ export const CHALLENGE_TYPES = {
     summary: 'Fastest clean lap on a fixed route and car restriction.',
     entryLabel: 'lap time',
     placeholder: '1:58.420',
-    proofHint: 'Link a clip of the full lap ending on the results screen. Assists must match the rules.',
+    proofHint: 'Link a video (YouTube, Xbox clip, Medal, TikTok, Streamable) of the full lap ending on the results screen. Assists must match the rules.',
   },
   drift_score: {
     id: 'drift_score',
@@ -32,7 +32,7 @@ export const CHALLENGE_TYPES = {
     summary: 'Biggest drift score in a single run through the zone.',
     entryLabel: 'drift score',
     placeholder: '1,284,500',
-    proofHint: 'Link a clip of the full run ending on the score tally screen. No rewind.',
+    proofHint: 'Link a video (YouTube, Xbox clip, Medal, TikTok, Streamable) of the full run ending on the score tally screen. No rewind.',
   },
   drag_time: {
     id: 'drag_time',
@@ -48,7 +48,7 @@ export const CHALLENGE_TYPES = {
     summary: 'Lowest elapsed time over a set distance from a standing start.',
     entryLabel: 'elapsed time',
     placeholder: '13.842',
-    proofHint: 'Link a clip showing the start line and the trap time at the finish.',
+    proofHint: 'Link a video (YouTube, Xbox clip, Medal, TikTok, Streamable) showing the start line and the trap time at the finish.',
   },
   photo_contest: {
     id: 'photo_contest',
