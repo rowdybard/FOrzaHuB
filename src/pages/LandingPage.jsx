@@ -37,6 +37,11 @@ import { TYPE_LIST, getType, formatMetric } from '../lib/challengeTypes'
 import { formatNumber, formatCompact, hexToRgba } from '../lib/utils'
 
 const TRUST_NAMES = ['Rowdybard', 'PurpleCone']
+const HERO_VIDEO = {
+  webm: '/media/landing-drift-loop.webm',
+  mp4: '/media/landing-drift-loop.mp4',
+  poster: '/media/landing-drift-poster.jpg',
+}
 
 async function loadLanding() {
   const [clubs, challenges, featured, stats] = await Promise.all([
@@ -76,8 +81,7 @@ export default function LandingPage() {
 function Hero({ featured, stats }) {
   return (
     <section className="relative overflow-hidden bg-festival">
-      <div className="absolute inset-0 bg-grid opacity-60 mask-fade-b" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ink-950/30 to-ink-950" />
+      <HeroVideoBackground />
       <div className="container-page relative grid items-center gap-14 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
         <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-sm">
@@ -122,6 +126,29 @@ function Hero({ featured, stats }) {
         {featured ? <HeroPreview featured={featured} /> : <HeroPlaceholder />}
       </div>
     </section>
+  )
+}
+
+function HeroVideoBackground() {
+  return (
+    <div aria-hidden="true" className="absolute inset-0">
+      <video
+        className="absolute inset-0 h-full w-full object-cover opacity-60 saturate-110 contrast-105 motion-reduce:hidden"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        poster={HERO_VIDEO.poster}
+      >
+        <source src={HERO_VIDEO.webm} type="video/webm" />
+        <source src={HERO_VIDEO.mp4} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-festival opacity-65 mix-blend-multiply" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/80 to-ink-950/25" />
+      <div className="absolute inset-0 bg-gradient-to-b from-ink-950/20 via-ink-950/35 to-ink-950" />
+      <div className="absolute inset-0 bg-grid opacity-35 mask-fade-b" />
+    </div>
   )
 }
 
@@ -483,6 +510,9 @@ function DiscordTrust({ featured }) {
 function DiscordEmbed({ featured, club }) {
   const t = getType(featured.typeId)
   const top = featured.entries[0]
+  const leaderLine = top
+    ? `${top.user.tag} - ${formatMetric(featured.typeId, top.value)}`
+    : 'No approved entries yet'
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#313338] p-4 shadow-pop">
       <div className="flex items-start gap-3">
@@ -514,9 +544,7 @@ function DiscordEmbed({ featured, club }) {
               <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <div className="font-semibold text-zinc-300">Current leader</div>
-                  <div className="mt-0.5 text-zinc-400">
-                    {top.user.tag} — {formatMetric(featured.typeId, top.value)}
-                  </div>
+                  <div className="mt-0.5 text-zinc-400">{leaderLine}</div>
                 </div>
                 <div>
                   <div className="font-semibold text-zinc-300">Ends in</div>

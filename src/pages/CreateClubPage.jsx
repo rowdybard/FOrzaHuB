@@ -13,6 +13,27 @@ import { cn, hexToRgba } from '../lib/utils'
 const inputCls =
   'w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 transition-colors focus:border-brand-500/50 focus:outline-none'
 
+function cleanDiscordUrl(value) {
+  const raw = value.trim()
+  if (!raw) return ''
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+  try {
+    const url = new URL(withProtocol)
+    const host = url.hostname.toLowerCase().replace(/^www\./, '')
+    const isDiscord =
+      host === 'discord.gg' ||
+      host === 'discord.com' ||
+      host.endsWith('.discord.com') ||
+      host === 'discordapp.com' ||
+      host.endsWith('.discordapp.com')
+    return (url.protocol === 'https:' || url.protocol === 'http:') && isDiscord
+      ? url.toString()
+      : ''
+  } catch {
+    return ''
+  }
+}
+
 export default function CreateClubPage() {
   const navigate = useNavigate()
   const { enabled, user, loading: authLoading, signIn } = useAuth()
@@ -91,12 +112,18 @@ export default function CreateClubPage() {
       setError('Add a club name, tag, and region.')
       return
     }
+    const discord = cleanDiscordUrl(form.discord)
+    if (form.discord.trim() && !discord) {
+      setError('Use a valid Discord invite link.')
+      return
+    }
 
     setSaving(true)
     setError('')
     try {
       const result = await createClub({
         ...form,
+        discord,
         ownerId: user.id,
       })
       const slug = result.club?.slug

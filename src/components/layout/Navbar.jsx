@@ -12,8 +12,9 @@ const links = [
   { to: '/archive', label: 'Archive' },
   { to: '/clubs', label: 'Communities' },
   { to: '/submit', label: 'Submit' },
-  { to: '/admin', label: 'Admin' },
 ]
+
+const staffLinks = [{ to: '/admin', label: 'Admin' }]
 
 function navClass({ isActive }) {
   return cn(
@@ -25,6 +26,9 @@ function navClass({ isActive }) {
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const location = useLocation()
+  const { enabled, profile } = useAuth()
+  const isStaff = !enabled || ['admin', 'steward'].includes(profile?.role)
+  const visibleLinks = isStaff ? [...links, ...staffLinks] : links
 
   useEffect(() => {
     setOpen(false)
@@ -49,7 +53,7 @@ export default function Navbar() {
           </div>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {links.map((l) => (
+            {visibleLinks.map((l) => (
               <NavLink key={l.to} to={l.to} className={navClass}>
                 {({ isActive }) => (
                   <>
@@ -90,7 +94,7 @@ export default function Navbar() {
           />
           <div className="relative mx-3 mt-3 animate-fade-up rounded-2xl border border-white/[0.08] bg-ink-850 p-3 shadow-pop">
             <nav className="flex flex-col">
-              {links.map((l) => (
+              {visibleLinks.map((l) => (
                 <NavLink
                   key={l.to}
                   to={l.to}

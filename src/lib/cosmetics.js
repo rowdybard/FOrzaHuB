@@ -56,29 +56,35 @@ export const PLATE_FRAMES = [
 // Badge registry. `auto` badges are derived from role/membership and can't be
 // toggled by the user; the rest are selectable cosmetics.
 export const BADGES = {
+  member: { label: 'Club Member', icon: Flag, color: '#ff6b2c', auto: true },
   owner: { label: 'Owner', icon: Crown, color: '#fbbf24', auto: true },
   steward: { label: 'Steward', icon: ShieldCheck, color: '#38bdf8', auto: true },
-  verified: { label: 'Verified', icon: BadgeCheck, color: '#ff6b2c', auto: true },
-  founder: { label: 'Founder', icon: Rocket, color: '#f472b6' },
-  veteran: { label: 'Veteran', icon: Star, color: '#a855f7' },
-  champion: { label: 'Champion', icon: Trophy, color: '#fbbf24' },
+  verified: { label: 'Verified', icon: BadgeCheck, color: '#ff6b2c', auto: true, exclusive: true },
+  founder: { label: 'Founder', icon: Rocket, color: '#f472b6', exclusive: true },
+  veteran: { label: 'Veteran', icon: Star, color: '#a855f7', exclusive: true },
+  champion: { label: 'Champion', icon: Trophy, color: '#fbbf24', exclusive: true },
   tuner: { label: 'Tuner', icon: Wrench, color: '#22d3ee' },
   media: { label: 'Media', icon: Camera, color: '#84cc16' },
   pace: { label: 'Pace', icon: Gauge, color: '#38bdf8' },
   clean: { label: 'Clean', icon: Heart, color: '#10b981' },
-  marshal: { label: 'Marshal', icon: Flag, color: '#ef4444' },
+  marshal: { label: 'Marshal', icon: ShieldCheck, color: '#ef4444', exclusive: true },
   bbs: { label: 'BBS', icon: Hash, color: '#e5e7eb' },
 }
 
 // Badges a user can pick in their profile editor.
 export const SELECTABLE_BADGES = Object.entries(BADGES)
-  .filter(([, b]) => !b.auto)
+  .filter(([, b]) => !b.auto && !b.exclusive)
+  .map(([id]) => id)
+
+export const EXCLUSIVE_BADGES = Object.entries(BADGES)
+  .filter(([, b]) => b.exclusive)
   .map(([id]) => id)
 
 // Merge a user's stored cosmetic badges with badges derived from their role /
 // club membership, de-duplicated, in a sensible display order.
 export function resolveBadges(user = {}) {
   const out = []
+  if (user.membershipRole === 'member') out.push('member')
   if (user.membershipRole === 'owner') out.push('owner')
   if (user.membershipRole === 'steward' || user.role === 'steward') out.push('steward')
   if (user.role === 'admin') out.push('verified')

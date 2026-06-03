@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ShieldCheck,
@@ -7,9 +8,16 @@ import {
   Upload,
   MessagesSquare,
   CalendarDays,
+  Check,
   ChevronRight,
+  Copy,
   Plus,
   Medal,
+  Edit3,
+  Trash2,
+  CircleAlert,
+  LogIn,
+  UserPlus,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ClubMark from '../components/ui/ClubMark'
@@ -21,8 +29,16 @@ import MembersCard from '../components/common/MembersCard'
 import Nameplate from '../components/ui/Nameplate'
 import NotFound from './NotFound'
 import Loading from '../components/common/Loading'
-import { getClubBySlug, getChallengesByClub, getClubMembers } from '../data/api'
+import {
+  deleteChallenge,
+  getClubBySlug,
+  getChallengesByClub,
+  getClubMembers,
+  getMyClubMemberships,
+  joinClub,
+} from '../data/api'
 import { useAsync } from '../hooks/useAsync'
+import { useAuth } from '../hooks/useAuth'
 import { formatNumber, hexToRgba } from '../lib/utils'
 
 async function loadCommunity(slug) {
@@ -58,6 +74,7 @@ function clubStandings(cs) {
 
 export default function CommunityPage() {
   const { slug } = useParams()
+  const { user, profile } = useAuth()
   const { data, loading, reload } = useAsync(() => loadCommunity(slug), [slug])
 
   if (loading) return <Loading label="Loading club…" className="min-h-[60vh]" />
@@ -69,10 +86,12 @@ export default function CommunityPage() {
   const active = all.filter((c) => c.status !== 'closed')
   const past = all.filter((c) => c.status === 'closed')
   const standings = clubStandings(all)
+  const isStaff = profile?.role === 'admin' || profile?.role === 'steward'
+  const canManage = isStaff || (!!user && user.id === club.ownerId)
 
   return (
     <>
-      <ClubHeader club={club} />
+      <ClubHeader club={club} canManage={canManage} onChanged={reload} />
 
       <div className="container-page py-8">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -81,6 +100,15 @@ export default function CommunityPage() {
           <StatTile icon={Trophy} value={past.length} label="Finished events" />
           <StatTile icon={Upload} value={active.length} label="Live now" />
         </div>
+
+        {canManage && (
+          <AdminTools
+            club={club}
+            challenges={all}
+            isStaff={isStaff}
+            onChanged={reload}
+          />
+        )}
 
         <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1fr_320px]">
           <div className="space-y-10">
@@ -112,7 +140,13 @@ export default function CommunityPage() {
           </div>
 
           <aside className="space-y-5 lg:sticky lg:top-20">
-            <MembersCard club={club} members={members} loading={loading} onChanged={reload} />
+            <MembersCard
+              club={club}
+              members={members}
+              loading={loading}
+              onChanged={reload}
+              canManage={canManage}
+            />
             <AboutCard club={club} />
             <StandingsCard standings={standings} />
           </aside>
@@ -122,7 +156,8 @@ export default function CommunityPage() {
   )
 }
 
-function ClubHeader({ club }) {
+function ClubHeader({ club, canManage, onChanged }) {
+  const hasDiscord = !!club.discord
   return (
     <section className="relative overflow-hidden border-b border-white/[0.06]">
       <div
@@ -152,25 +187,230 @@ function ClubHeader({ club }) {
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
                 <span className="chip">[{club.tag}]</span>
                 <span>{club.region}</span>
-                <span className="text-zinc-600">·</span>
-                <span>Since {club.founded}</span>
+                {club.founded && (
+                  <>
+                    <span className="text-zinc-600">·</span>
+                    <span>Since {club.founded}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button href="#">
-              <MessagesSquare className="h-4 w-4" />
-              Join on Discord
-            </Button>
-            <Button to="/create" variant="secondary">
-              <Plus className="h-4 w-4" />
-              New challenge
-            </Button>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            <ClubInviteActions club={club} onChanged={onChanged} />
+            {hasDiscord && (
+              <Button href={club.discord} target="_blank" rel="noreferrer">
+                <MessagesSquare className="h-4 w-4" />
+                Join on Discord
+              </Button>
+            )}
+            {canManage && (
+              <Button to="/create" variant="secondary">
+                <Plus className="h-4 w-4" />
+                New challenge
+              </Button>
+            )}
           </div>
         </div>
 
-        <p className="mt-5 max-w-2xl text-balance text-zinc-300">{club.tagline}</p>
+        <p className="mt-5 max-w-2xl text-balance text-zinc-300">{club.tagline || club.about}</p>
+      </div>
+    </section>
+  )
+}
+
+function ClubInviteActions({ club, onChanged }) {
+  const { enabled, user, signIn } = useAuth()
+  const [memberships, setMemberships] = useState([])
+  const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
+
+  const refreshMemberships = async () => {
+    if (!enabled || !user) {
+      setMemberships([])
+      return
+    }
+    try {
+      setMemberships(await getMyClubMemberships(user.id))
+    } catch (err) {
+      console.error('[club] invite membership lookup failed', err)
+    }
+  }
+
+  useEffect(() => {
+    refreshMemberships()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, user?.id, club.id])
+
+  const currentMembership = memberships.find((membership) => membership.id === club.id)
+  const isMember = !!currentMembership
+  const atClubLimit = memberships.length >= 5 && !isMember
+  const inviteUrl = `${window.location.origin}/club/${club.slug}`
+
+  const copyInvite = async () => {
+    setError('')
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteUrl)
+      } else {
+        const input = document.createElement('textarea')
+        input.value = inviteUrl
+        input.setAttribute('readonly', '')
+        input.style.position = 'fixed'
+        input.style.opacity = '0'
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    } catch {
+      setCopied(false)
+      setError('Copy was blocked. Use the invite link below.')
+    }
+  }
+
+  const join = async () => {
+    if (!user) {
+      signIn()
+      return
+    }
+    setBusy(true)
+    setError('')
+    try {
+      await joinClub(club.id, user.id)
+      await refreshMemberships()
+      onChanged?.()
+    } catch (err) {
+      console.error('[club] join from invite failed', err)
+      setError(err?.message || 'Could not join this club.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-stretch gap-2 sm:items-end">
+      <div className="flex flex-wrap gap-2 sm:justify-end">
+        <Button type="button" variant="secondary" onClick={copyInvite}>
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? 'Copied' : 'Copy invite'}
+        </Button>
+        {enabled && !user ? (
+          <Button type="button" onClick={signIn}>
+            <LogIn className="h-4 w-4" />
+            Sign in to join
+          </Button>
+        ) : enabled && isMember ? (
+          <Button type="button" variant="success" disabled>
+            <Check className="h-4 w-4" />
+            Joined
+          </Button>
+        ) : enabled && atClubLimit ? (
+          <Button type="button" disabled>
+            <UserPlus className="h-4 w-4" />
+            Club limit reached
+          </Button>
+        ) : enabled ? (
+          <Button type="button" onClick={join} disabled={busy}>
+            <UserPlus className="h-4 w-4" />
+            {busy ? 'Joining...' : `Join ${club.tag}`}
+          </Button>
+        ) : null}
+      </div>
+      <p className="max-w-sm truncate text-right font-mono text-[11px] text-zinc-400">
+        {inviteUrl}
+      </p>
+      {error && <p className="max-w-sm text-right text-xs text-rose-300">{error}</p>}
+    </div>
+  )
+}
+
+function AdminTools({ club, challenges, isStaff, onChanged }) {
+  const [busyId, setBusyId] = useState(null)
+  const [error, setError] = useState('')
+
+  const remove = async (challenge) => {
+    const label = challenge.title || 'this event'
+    if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) return
+    setBusyId(challenge.id)
+    setError('')
+    try {
+      await deleteChallenge(challenge.id)
+      onChanged?.()
+    } catch (err) {
+      console.error('[community] delete challenge failed', err)
+      setError(err?.message || 'Could not delete this event.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-2xl border border-brand-500/15 bg-brand-500/[0.04] p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Club admin
+          </div>
+          <h2 className="mt-1 text-lg font-bold text-white">{club.name} tools</h2>
+        </div>
+        <Button to="/create" size="sm" variant="secondary">
+          <Plus className="h-4 w-4" />
+          New challenge
+        </Button>
+      </div>
+
+      {error && (
+        <div className="mt-4 flex gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/[0.07] p-3 text-sm text-rose-200">
+          <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          {error}
+        </div>
+      )}
+
+      <div className="mt-4 divide-y divide-white/[0.06] overflow-hidden rounded-xl border border-white/[0.07] bg-ink-950/35">
+        {challenges.length === 0 ? (
+          <div className="p-4 text-sm text-zinc-500">No events to manage yet.</div>
+        ) : (
+          challenges.map((challenge) => (
+            <div key={challenge.id} className="flex items-center gap-3 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-semibold text-white">{challenge.title}</div>
+                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                  <span className="capitalize text-zinc-400">{challenge.status}</span>
+                  <span>{formatNumber(challenge.submissionCount || 0)} submissions</span>
+                </div>
+              </div>
+              <Button
+                to={`/create/${challenge.slug}`}
+                size="icon"
+                variant="ghost"
+                title={isStaff ? 'Edit event' : 'Correct title'}
+                aria-label={isStaff ? 'Edit event' : 'Correct title'}
+              >
+                <Edit3 className="h-4 w-4" />
+              </Button>
+              <button
+                type="button"
+                title="Delete event"
+                aria-label="Delete event"
+                onClick={() => remove(challenge)}
+                disabled={busyId === challenge.id}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-rose-500/25 bg-rose-500/10 text-rose-300 transition-colors hover:bg-rose-500/20 disabled:opacity-50"
+              >
+                {busyId === challenge.id ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </section>
   )
@@ -189,17 +429,20 @@ function Section({ title, count, children }) {
 }
 
 function AboutCard({ club }) {
+  const hasDiscord = !!club.discord
   return (
     <div className="card p-5">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">About</h3>
-      <p className="mt-3 text-sm leading-relaxed text-zinc-400">{club.about}</p>
+      <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+        {club.about || 'No community profile has been added yet.'}
+      </p>
       <div className="mt-4 space-y-2.5 border-t border-white/[0.06] pt-4 text-sm">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-2 text-zinc-400">
             <CalendarDays className="h-4 w-4 text-zinc-500" />
             Founded
           </span>
-          <span className="font-medium text-white">{club.founded}</span>
+          <span className="font-medium text-white">{club.founded || 'Not set'}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-2 text-zinc-400">
@@ -209,10 +452,23 @@ function AboutCard({ club }) {
           <span className="font-medium text-white">{formatNumber(club.members)}</span>
         </div>
       </div>
-      <Button href="#" variant="secondary" size="sm" className="mt-4 w-full">
-        <MessagesSquare className="h-4 w-4" />
-        {club.discord}
-      </Button>
+      {hasDiscord ? (
+        <Button
+          href={club.discord}
+          target="_blank"
+          rel="noreferrer"
+          variant="secondary"
+          size="sm"
+          className="mt-4 w-full"
+        >
+          <MessagesSquare className="h-4 w-4" />
+          Discord
+        </Button>
+      ) : (
+        <div className="mt-4 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-center text-xs text-zinc-500">
+          Discord link not set
+        </div>
+      )}
     </div>
   )
 }
@@ -225,7 +481,9 @@ function StandingsCard({ standings }) {
         <h3 className="font-bold">Season standings</h3>
       </div>
       <div className="divide-y divide-white/[0.05]">
-        {standings.map((s, i) => (
+        {standings.length === 0 ? (
+          <div className="px-5 py-4 text-sm text-zinc-500">No verified results yet.</div>
+        ) : standings.map((s, i) => (
           <div key={s.user.tag} className="flex items-center gap-3 px-5 py-3">
             <span className="w-5 text-center font-num text-sm font-semibold text-zinc-500">
               {i + 1}

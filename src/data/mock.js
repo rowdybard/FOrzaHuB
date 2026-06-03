@@ -37,6 +37,8 @@ const U = {
   },
 }
 
+export const profiles = Object.values(U)
+
 // Club rosters: clubId -> [{ userKey, role }]
 const MEMBERSHIPS = {
   pitwall: [

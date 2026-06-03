@@ -12,6 +12,7 @@ import {
   DEFAULT_ACCENT,
   DEFAULT_NAME_EFFECT,
   DEFAULT_PLATE_FRAME,
+  EXCLUSIVE_BADGES,
   NAME_EFFECTS,
   PLATE_FRAMES,
   SELECTABLE_BADGES,
@@ -88,17 +89,23 @@ export default function ProfilePage() {
     )
   }
 
+  const exclusiveBadges = (profile?.badges || []).filter((id) => EXCLUSIVE_BADGES.includes(id))
   const previewUser = {
     ...profile,
     name: profile?.name || 'Your name',
+    membershipRole: primaryClub?.membershipRole,
     accent,
     nameGradient: gradient,
     nameEffect,
     plateFrame,
     profileTitle,
-    badges,
+    badges: [...exclusiveBadges, ...badges],
   }
-  const autoBadges = resolveBadges({ ...profile, badges: [] })
+  const autoBadges = resolveBadges({
+    ...profile,
+    membershipRole: primaryClub?.membershipRole,
+    badges: exclusiveBadges,
+  })
   const displayTag = profile?.tag || user.user_metadata?.preferred_username || 'Discord'
   const role = profile?.role || 'racer'
 

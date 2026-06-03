@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { MessagesSquare, Github, Twitter } from 'lucide-react'
 import Logo from '../ui/Logo'
+import { useAuth } from '../../hooks/useAuth'
 
 const columns = [
   {
@@ -33,6 +34,13 @@ const columns = [
 ]
 
 export default function Footer() {
+  const { enabled, profile } = useAuth()
+  const isStaff = !enabled || ['admin', 'steward'].includes(profile?.role)
+  const visibleColumns = columns.map((col) => ({
+    ...col,
+    links: col.links.filter((link) => isStaff || link.to !== '/admin'),
+  }))
+
   return (
     <footer className="mt-24 border-t border-white/[0.06] bg-ink-900/60">
       <div className="container-page py-14">
@@ -68,7 +76,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {columns.map((col) => (
+          {visibleColumns.map((col) => (
             <div key={col.title}>
               <h4 className="text-sm font-semibold text-white">{col.title}</h4>
               <ul className="mt-4 space-y-3">

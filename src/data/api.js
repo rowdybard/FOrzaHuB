@@ -10,6 +10,9 @@ import { getType } from '../lib/challengeTypes'
 import { slugify } from '../lib/utils'
 import * as mock from './mock'
 
+const SELF_SERVICE_BADGES = new Set(['tuner', 'media', 'pace', 'clean', 'bbs'])
+const EXCLUSIVE_BADGES = new Set(['verified', 'founder', 'veteran', 'champion', 'marshal'])
+
 /* -------------------------------------------------------------------------- */
 /*  Normalizers                                                               */
 /* -------------------------------------------------------------------------- */
@@ -33,6 +36,27 @@ function normProfile(row) {
   }
 }
 
+function cleanExternalUrl(value) {
+  const raw = typeof value === 'string' ? value.trim() : ''
+  if (!raw) return ''
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+  try {
+    const url = new URL(withProtocol)
+    const host = url.hostname.toLowerCase().replace(/^www\./, '')
+    const isDiscord =
+      host === 'discord.gg' ||
+      host === 'discord.com' ||
+      host.endsWith('.discord.com') ||
+      host === 'discordapp.com' ||
+      host.endsWith('.discordapp.com')
+    return (url.protocol === 'https:' || url.protocol === 'http:') && isDiscord
+      ? url.toString()
+      : ''
+  } catch {
+    return ''
+  }
+}
+
 function normClub(row) {
   return {
     id: row.id,
@@ -45,7 +69,7 @@ function normClub(row) {
     accent: row.accent || '#ff6b2c',
     tagline: row.tagline || '',
     about: row.about || '',
-    discord: row.discord || '',
+    discord: cleanExternalUrl(row.discord),
     founded: row.founded || '',
     ownerId: row.owner_id || null,
     stats: { challenges: 0, podiums: 0, submissions: 0 },
@@ -150,6 +174,39 @@ function buildBoard(challenge, approvedSubs) {
   return { entries, gallery: [] }
 }
 
+async function hydrateChallengeBoards(challenges) {
+  if (!isSupabaseEnabled || challenges.length === 0) return challenges
+
+  const byId = new Map(challenges.map((challenge) => [challenge.id, challenge]))
+  const grouped = new Map(challenges.map((challenge) => [challenge.id, []]))
+  const { data, error } = await supabase
+    .from('submissions')
+    .select('*, profiles:user_id(*)')
+    .in('challenge_id', challenges.map((challenge) => challenge.id))
+
+  if (error) throw error
+
+  ;(data || []).forEach((row) => {
+    const challenge = byId.get(row.challenge_id)
+    if (!challenge) return
+    grouped.get(challenge.id).push(normSubmission({ ...row, type_id: challenge.typeId }))
+  })
+
+  return challenges.map((challenge) => {
+    const submissions = grouped.get(challenge.id) || []
+    const approved = submissions.filter((submission) => submission.status === 'approved')
+    const { entries, gallery } = buildBoard(challenge, approved)
+    return {
+      ...challenge,
+      entries,
+      gallery,
+      submissionCount: submissions.length,
+      participants: new Set(submissions.map((submission) => submission.user?.tag).filter(Boolean)).size,
+      pendingCount: submissions.filter((submission) => submission.status === 'pending').length,
+    }
+  })
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Clubs                                                                     */
 /* -------------------------------------------------------------------------- */
@@ -185,6 +242,14 @@ export async function getMyOwnedClub(userId) {
     .maybeSingle()
   if (error) throw error
   return data ? normClub(data) : null
+}
+
+export async function getManageableClubs(userId, role) {
+  if (!isSupabaseEnabled) return mock.clubs
+  if (!userId) return []
+  if (role === 'admin' || role === 'steward') return getClubs()
+  const owned = await getMyOwnedClub(userId)
+  return owned ? [owned] : []
 }
 
 export async function getMyClubMemberships(userId) {
@@ -234,7 +299,7 @@ export async function createClub(payload) {
       accent: payload.accent,
       tagline: payload.tagline.trim() || null,
       about: payload.about.trim() || null,
-      discord: payload.discord.trim() || null,
+      discord: cleanExternalUrl(payload.discord) || null,
       owner_id: payload.ownerId,
     })
     .select()
@@ -279,7 +344,7 @@ export async function getChallengesByClub(clubId) {
     .eq('club_id', clubId)
     .order('end_date', { ascending: false })
   if (error) throw error
-  return (data || []).map(normChallenge)
+  return hydrateChallengeBoards((data || []).map(normChallenge))
 }
 
 export async function getChallengeBySlug(slug) {
@@ -418,6 +483,27 @@ export async function updateChallenge(id, payload) {
   return { ok: true, challenge: data ? normChallenge(data) : null }
 }
 
+export async function updateChallengeTitle(id, title) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const cleanTitle = title.trim()
+  if (!cleanTitle) throw new Error('Challenge title is required.')
+  const { data, error } = await supabase
+    .from('challenges')
+    .update({ title: cleanTitle })
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+  if (error) throw error
+  return { ok: true, challenge: data ? normChallenge(data) : null }
+}
+
+export async function deleteChallenge(id) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { error } = await supabase.from('challenges').delete().eq('id', id)
+  if (error) throw error
+  return { ok: true }
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Derived collections + stats                                               */
 /* -------------------------------------------------------------------------- */
@@ -518,6 +604,17 @@ export async function leaveClub(clubId, userId) {
   return { ok: true }
 }
 
+export async function kickClubMember(clubId, userId) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { error } = await supabase
+    .from('club_members')
+    .delete()
+    .eq('club_id', clubId)
+    .eq('user_id', userId)
+  if (error) throw error
+  return { ok: true }
+}
+
 export async function getProfile(userId) {
   if (!userId) return null
   if (!isSupabaseEnabled) return mock.getProfileById(userId) || null
@@ -530,6 +627,29 @@ export async function getProfile(userId) {
   return data ? normProfile(data) : null
 }
 
+export async function getProfiles() {
+  if (!isSupabaseEnabled) return Object.values(mock.profiles || {})
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map(normProfile)
+}
+
+export async function updateProfileRole(userId, role) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  if (!['racer', 'steward', 'admin'].includes(role)) throw new Error('Invalid access role.')
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ role })
+    .eq('id', userId)
+    .select()
+    .maybeSingle()
+  if (error) throw error
+  return { ok: true, profile: data ? normProfile(data) : null }
+}
+
 // Save the current user's name cosmetics. `patch` uses camelCase keys.
 export async function updateMyProfile(userId, patch) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
@@ -539,7 +659,17 @@ export async function updateMyProfile(userId, patch) {
   if ('nameEffect' in patch) row.name_effect = patch.nameEffect
   if ('plateFrame' in patch) row.plate_frame = patch.plateFrame
   if ('profileTitle' in patch) row.profile_title = patch.profileTitle
-  if ('badges' in patch) row.badges = patch.badges
+  if ('badges' in patch) {
+    const requested = (patch.badges || []).filter((badge) => SELF_SERVICE_BADGES.has(badge))
+    const { data: current, error: currentError } = await supabase
+      .from('profiles')
+      .select('badges')
+      .eq('id', userId)
+      .maybeSingle()
+    if (currentError) throw currentError
+    const preserved = (current?.badges || []).filter((badge) => EXCLUSIVE_BADGES.has(badge))
+    row.badges = Array.from(new Set([...preserved, ...requested]))
+  }
   if ('displayName' in patch) row.display_name = patch.displayName
   const { error } = await supabase.from('profiles').update(row).eq('id', userId)
   if (error) throw error

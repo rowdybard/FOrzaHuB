@@ -5,13 +5,14 @@ import Nameplate from '../ui/Nameplate'
 import Button from '../ui/Button'
 import { cn, hexToRgba } from '../../lib/utils'
 import { useAuth } from '../../hooks/useAuth'
-import { getMyClubMemberships, joinClub, leaveClub, setPrimaryClub } from '../../data/api'
+import { getMyClubMemberships, joinClub, kickClubMember, leaveClub, setPrimaryClub } from '../../data/api'
 
 // Expandable members card for the club aside. Collapsed by default (quiet
 // avatar stack + count); click to reveal a height-capped, scrollable roster.
-export default function MembersCard({ club, members = [], loading, onChanged }) {
+export default function MembersCard({ club, members = [], loading, onChanged, canManage = false }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [kickingId, setKickingId] = useState(null)
   const [error, setError] = useState('')
   const [memberships, setMemberships] = useState([])
   const { user, enabled, signIn } = useAuth()
@@ -93,6 +94,25 @@ export default function MembersCard({ club, members = [], loading, onChanged }) 
     }
   }
 
+  const handleKick = async (member) => {
+    if (!member || member.membershipRole === 'owner' || member.id === user?.id) return
+    if (!window.confirm(`Remove ${member.tag || member.name} from ${club.name}?`)) return
+    setBusy(true)
+    setKickingId(member.id)
+    setError('')
+    try {
+      await kickClubMember(club.id, member.id)
+      await refreshMemberships()
+      onChanged?.()
+    } catch (err) {
+      console.error('[members] kick failed', err)
+      setError(err?.message || 'Could not remove this member.')
+    } finally {
+      setKickingId(null)
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="card overflow-hidden">
       {/* Header — the whole thing is the expand toggle */}
@@ -155,11 +175,33 @@ export default function MembersCard({ club, members = [], loading, onChanged }) 
             </div>
           ) : (
             <div className="no-scrollbar max-h-[320px] divide-y divide-white/[0.05] overflow-y-auto">
-              {members.map((m) => (
-                <div key={m.id} className="px-4 py-2.5">
-                  <Nameplate user={m} size={34} />
-                </div>
-              ))}
+              {members.map((m) => {
+                const canKick =
+                  canManage &&
+                  m.id !== user?.id &&
+                  m.membershipRole !== 'owner' &&
+                  !['admin', 'steward'].includes(m.role)
+                return (
+                  <div key={m.id} className="flex items-center gap-2 px-4 py-2.5">
+                    <Nameplate user={m} size={34} className="flex-1" />
+                    {canKick && (
+                      <button
+                        type="button"
+                        title="Remove member"
+                        onClick={() => handleKick(m)}
+                        disabled={busy}
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 text-zinc-500 transition-colors hover:border-rose-400/30 hover:bg-rose-500/10 hover:text-rose-300 disabled:opacity-40"
+                      >
+                        {kickingId === m.id ? (
+                          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : (
+                          <UserMinus className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
 

@@ -14,6 +14,7 @@ import {
   Trophy,
   ChevronDown,
   CheckCircle2,
+  UserCog,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Avatar from '../components/ui/Avatar'
@@ -22,7 +23,7 @@ import StatTile from '../components/ui/StatTile'
 import { TypeBadge } from '../components/ui/Badge'
 import EmptyState from '../components/common/EmptyState'
 import Loading from '../components/common/Loading'
-import { getReviewQueue, reviewSubmission } from '../data/api'
+import { getProfiles, getReviewQueue, reviewSubmission, updateProfileRole } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
 import { getType, formatMetric } from '../lib/challengeTypes'
@@ -56,7 +57,12 @@ function StatusPill({ status }) {
 
 export default function AdminDashboard() {
   const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
-  const { data, loading, error: queueError } = useAsync(() => getReviewQueue(), [])
+  const isStaff = !enabled || ['admin', 'steward'].includes(profile?.role)
+  const isAdmin = !enabled || profile?.role === 'admin'
+  const { data, loading, error: queueError } = useAsync(
+    () => (isStaff ? getReviewQueue() : Promise.resolve([])),
+    [isStaff],
+  )
   const [overrides, setOverrides] = useState({})
   const [filter, setFilter] = useState('pending')
   const [selectedId, setSelectedId] = useState(null)
@@ -123,7 +129,7 @@ export default function AdminDashboard() {
     )
   }
 
-  if (enabled && profile && !['admin', 'steward'].includes(profile.role)) {
+  if (enabled && user && !isStaff) {
     return (
       <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
         <div className="max-w-md">
@@ -160,7 +166,7 @@ export default function AdminDashboard() {
             <ShieldCheck className="h-3.5 w-3.5" />
             Admin
           </div>
-          <h1 className="mt-1.5 text-2xl font-extrabold sm:text-3xl">Review queue</h1>
+          <h1 className="mt-1.5 text-2xl font-extrabold sm:text-3xl">Admin tools</h1>
           <p className="mt-1 text-sm text-zinc-400">
             Verify submissions before they hit the public leaderboard.
           </p>
@@ -184,6 +190,8 @@ export default function AdminDashboard() {
         <StatTile icon={CheckCircle2} value={counts.approved ?? 0} label="Approved" />
         <StatTile icon={Trophy} value={counts.all ?? 0} label="Total" />
       </div>
+
+      {isAdmin && <AccessPanel currentUserId={user?.id} />}
 
       {/* Filters */}
       <div className="no-scrollbar mt-8 flex gap-1.5 overflow-x-auto rounded-xl border border-white/[0.06] bg-ink-900/60 p-1">
@@ -246,6 +254,78 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
+  )
+}
+
+function AccessPanel({ currentUserId }) {
+  const { data, loading, error, reload } = useAsync(() => getProfiles(), [])
+  const [updatingId, setUpdatingId] = useState(null)
+  const [message, setMessage] = useState('')
+  const profiles = data || []
+
+  const changeRole = async (target, role) => {
+    if (!target || target.id === currentUserId) return
+    setUpdatingId(target.id)
+    setMessage('')
+    try {
+      await updateProfileRole(target.id, role)
+      setMessage(`${target.tag || target.name} access updated.`)
+      reload()
+    } catch (err) {
+      console.error('[admin] updateProfileRole failed', err)
+      setMessage(err?.message || 'Could not update access.')
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-2xl border border-white/[0.07] bg-ink-900/60 p-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand-400">
+            <UserCog className="h-3.5 w-3.5" />
+            Access
+          </div>
+          <h2 className="mt-1 text-lg font-bold text-white">Staff access settings</h2>
+        </div>
+        {message && <p className="text-sm text-zinc-400">{message}</p>}
+      </div>
+
+      {loading ? (
+        <div className="mt-4 text-sm text-zinc-500">Loading profiles...</div>
+      ) : error ? (
+        <div className="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/[0.06] px-3 py-2 text-sm text-rose-200">
+          Could not load profiles.
+        </div>
+      ) : profiles.length === 0 ? (
+        <div className="mt-4 text-sm text-zinc-500">No profiles yet.</div>
+      ) : (
+        <div className="mt-4 divide-y divide-white/[0.06] overflow-hidden rounded-xl border border-white/[0.07] bg-ink-950/30">
+          {profiles.map((p) => (
+            <div key={p.id} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <Avatar name={p.name} size={34} />
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-white">{p.name}</div>
+                  <div className="truncate text-xs text-zinc-500">{p.tag}</div>
+                </div>
+              </div>
+              <select
+                value={p.role}
+                disabled={p.id === currentUserId || updatingId === p.id}
+                onChange={(event) => changeRole(p, event.target.value)}
+                className="h-10 rounded-lg border border-white/[0.08] bg-ink-900 px-3 text-sm text-white focus:border-brand-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="racer" className="bg-ink-900">Racer</option>
+                <option value="steward" className="bg-ink-900">Steward</option>
+                <option value="admin" className="bg-ink-900">Admin</option>
+              </select>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   )
 }
 

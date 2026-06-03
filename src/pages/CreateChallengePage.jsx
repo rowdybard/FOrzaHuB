@@ -15,7 +15,15 @@ import {
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ChallengeCard from '../components/common/ChallengeCard'
-import { getClubs, getChallengeBySlug, createChallenge, updateChallenge, isSupabaseEnabled } from '../data/api'
+import Loading from '../components/common/Loading'
+import NotFound from './NotFound'
+import {
+  getChallengeBySlug,
+  createChallenge,
+  getManageableClubs,
+  updateChallenge,
+  updateChallengeTitle,
+} from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
 import { TYPE_LIST, getType } from '../lib/challengeTypes'
@@ -41,15 +49,23 @@ const RANKING = {
 
 export default function CreateChallengePage() {
   const { slug } = useParams()
-  const { enabled, user, signIn } = useAuth()
-  const { data: clubs } = useAsync(() => getClubs(), [])
+  const isEditingRoute = Boolean(slug)
+  const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
+  const { data: clubs, loading: clubsLoading } = useAsync(
+    () => (enabled && user ? getManageableClubs(user.id, profile?.role) : Promise.resolve([])),
+    [enabled, user?.id, profile?.role],
+  )
   const clubList = clubs || []
 
-  const { data: existing } = useAsync(
-    () => (slug ? getChallengeBySlug(slug) : Promise.resolve(null)),
-    [slug],
+  const { data: existing, loading: existingLoading } = useAsync(
+    () => (enabled && user && slug ? getChallengeBySlug(slug) : Promise.resolve(null)),
+    [enabled, user?.id, slug],
   )
-  const isEdit = Boolean(existing)
+  const isEdit = isEditingRoute && Boolean(existing)
+  const editorClubList =
+    existing?.club && !clubList.some((club) => club.id === existing.club.id)
+      ? [existing.club, ...clubList]
+      : clubList
 
   const [form, setForm] = useState(() => ({
     typeId: existing?.typeId || 'time_trial',
@@ -70,6 +86,11 @@ export default function CreateChallengePage() {
   const [error, setError] = useState('')
 
   const t = getType(form.typeId)
+  const isStaff = profile?.role === 'admin' || profile?.role === 'steward'
+  const isOwningClubEdit = isEdit && !!user && existing?.club?.ownerId === user.id
+  const canEditExisting = !isEdit || isStaff || isOwningClubEdit
+  const canEditMaterial = !isEdit || isStaff
+  const canUseSelectedClub = isStaff || clubList.some((club) => club.id === form.clubId)
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
 
   useEffect(() => {
@@ -106,7 +127,7 @@ export default function CreateChallengePage() {
     typeId: form.typeId,
     title: form.title.trim() || 'Your challenge title',
     clubId: form.clubId,
-    club: clubList.find((c) => c.id === form.clubId) || null,
+    club: editorClubList.find((c) => c.id === form.clubId) || null,
     status: startInFuture ? 'upcoming' : 'live',
     startDate: new Date(form.startDate || todayISO).toISOString(),
     endDate: new Date(form.endDate || plusDays(7)).toISOString(),
@@ -119,13 +140,13 @@ export default function CreateChallengePage() {
     gallery: t.gallery ? [] : undefined,
   }
 
-  const authReady = !isSupabaseEnabled || !!user
+  const authReady = !!user
+  const materialReady = form.clubId && canUseSelectedClub && form.restriction.trim() && form.location.trim()
   const canPublish =
     authReady &&
-    form.clubId &&
+    canEditExisting &&
     form.title.trim() &&
-    form.restriction.trim() &&
-    form.location.trim() &&
+    (canEditMaterial ? materialReady : true) &&
     !submitting
 
   const handlePublish = async () => {
@@ -133,6 +154,20 @@ export default function CreateChallengePage() {
     setSubmitting(true)
     setError('')
     try {
+      if (isEdit && !canEditMaterial) {
+        await updateChallengeTitle(existing.id, form.title)
+        setPublished(true)
+        return
+      }
+
+      if (new Date(form.endDate).getTime() <= new Date(form.startDate).getTime()) {
+        throw new Error('Close date must be after the open date.')
+      }
+
+      if (!canUseSelectedClub) {
+        throw new Error('Pick a club you own.')
+      }
+
       const payload = {
         type_id: form.typeId,
         title: form.title.trim(),
@@ -167,6 +202,49 @@ export default function CreateChallengePage() {
     }
   }
 
+  if (!enabled) {
+    return (
+      <Centered
+        title="Supabase required"
+        body="Challenge creation needs Discord login and the database backend."
+      />
+    )
+  }
+
+  if (authLoading) return <Loading label="Checking access..." className="min-h-[60vh]" />
+  if (isEditingRoute && existingLoading) return <Loading label="Loading challenge..." className="min-h-[60vh]" />
+  if (isEditingRoute && !existingLoading && !existing) return <NotFound />
+
+  if (!user) {
+    return (
+      <Centered
+        title="Sign in required"
+        body="Sign in before creating or editing community challenges."
+        action={<Button onClick={signIn}>Sign in</Button>}
+      />
+    )
+  }
+
+  if (!isEditingRoute && !clubsLoading && clubList.length === 0) {
+    return (
+      <Centered
+        title="Create a community first"
+        body="Challenges can only be created for communities you own."
+        action={<Button to="/clubs/new">Start a community</Button>}
+      />
+    )
+  }
+
+  if (isEdit && !canEditExisting) {
+    return (
+      <Centered
+        title="No edit access"
+        body="Only site staff or the owning club can edit this challenge."
+        action={<Button to={`/c/${existing.slug}`}>View challenge</Button>}
+      />
+    )
+  }
+
   if (published) {
     return <PublishedView isEdit={isEdit} title={previewChallenge.title} />
   }
@@ -183,6 +261,11 @@ export default function CreateChallengePage() {
             <h1 className="mt-2 text-2xl font-extrabold sm:text-3xl">
               {isEdit ? 'Edit challenge' : 'Create a challenge'}
             </h1>
+            {isEdit && !canEditMaterial && (
+              <p className="mt-1 text-sm text-zinc-400">
+                Club owners can correct title typos. Rules, schedule, and event details are locked.
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {enabled && !user ? (
@@ -192,11 +275,11 @@ export default function CreateChallengePage() {
             ) : null}
             <Button variant="secondary" onClick={handlePublish} disabled={!canPublish}>
               <Save className="h-4 w-4" />
-              {submitting ? 'Saving...' : 'Save'}
+              {submitting ? 'Saving...' : isEdit && !canEditMaterial ? 'Save correction' : 'Save'}
             </Button>
             <Button onClick={handlePublish} disabled={!canPublish}>
               <Send className="h-4 w-4" />
-              {isEdit ? 'Save & publish' : 'Publish'}
+              {isEdit ? (canEditMaterial ? 'Save & publish' : 'Save correction') : 'Publish'}
             </Button>
           </div>
         </div>
@@ -220,10 +303,12 @@ export default function CreateChallengePage() {
                     <button
                       type="button"
                       key={type.id}
-                      onClick={() => set('typeId', type.id)}
+                      onClick={() => canEditMaterial && set('typeId', type.id)}
+                      disabled={!canEditMaterial}
                       className={cn(
                         'relative rounded-xl border p-3.5 text-left transition-all',
                         !active && 'border-white/[0.06] bg-ink-850/60 hover:border-white/[0.15]',
+                        !canEditMaterial && 'cursor-not-allowed opacity-60',
                       )}
                       style={
                         active
@@ -267,8 +352,13 @@ export default function CreateChallengePage() {
                 />
               </Field>
               <Field label="Hosting club">
-                <select value={form.clubId} onChange={(e) => set('clubId', e.target.value)} className={inputCls}>
-                  {clubList.map((c) => (
+                <select
+                  value={form.clubId}
+                  onChange={(e) => set('clubId', e.target.value)}
+                  disabled={!canEditMaterial}
+                  className={inputCls}
+                >
+                  {editorClubList.map((c) => (
                     <option key={c.id} value={c.id} className="bg-ink-850">
                       {c.name}
                     </option>
@@ -279,6 +369,7 @@ export default function CreateChallengePage() {
                 <textarea
                   value={form.description}
                   onChange={(e) => set('description', e.target.value)}
+                  disabled={!canEditMaterial}
                   rows={3}
                   placeholder="Challenge notes, format details, or steward instructions"
                   className={`${inputCls} resize-none`}
@@ -293,6 +384,7 @@ export default function CreateChallengePage() {
                   <input
                     value={form.restriction}
                     onChange={(e) => set('restriction', e.target.value)}
+                    disabled={!canEditMaterial}
                     placeholder="e.g. A-Class (800 PI) · AWD"
                     className={inputCls}
                   />
@@ -301,6 +393,7 @@ export default function CreateChallengePage() {
                   <input
                     value={form.location}
                     onChange={(e) => set('location', e.target.value)}
+                    disabled={!canEditMaterial}
                     placeholder="e.g. Sierra Verde Circuit"
                     className={inputCls}
                   />
@@ -310,6 +403,7 @@ export default function CreateChallengePage() {
                 <input
                   value={form.region}
                   onChange={(e) => set('region', e.target.value)}
+                  disabled={!canEditMaterial}
                   placeholder="e.g. Festival Circuit"
                   className={inputCls}
                 />
@@ -329,13 +423,14 @@ export default function CreateChallengePage() {
                       <input
                         value={rule}
                         onChange={(e) => setRule(i, e.target.value)}
+                        disabled={!canEditMaterial}
                         placeholder="Add a rule…"
                         className={inputCls}
                       />
                       <button
                         type="button"
                         onClick={() => removeRule(i)}
-                        disabled={form.rules.length === 1}
+                        disabled={!canEditMaterial || form.rules.length === 1}
                         className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/10 text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-rose-300 disabled:opacity-40"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -346,6 +441,7 @@ export default function CreateChallengePage() {
                 <button
                   type="button"
                   onClick={addRule}
+                  disabled={!canEditMaterial}
                   className="mt-2.5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-300 hover:text-brand-200"
                 >
                   <Plus className="h-4 w-4" />
@@ -362,6 +458,7 @@ export default function CreateChallengePage() {
                     type="date"
                     value={form.startDate}
                     onChange={(e) => set('startDate', e.target.value)}
+                    disabled={!canEditMaterial}
                     className={`${inputCls} [color-scheme:dark]`}
                   />
                 </Field>
@@ -370,6 +467,7 @@ export default function CreateChallengePage() {
                     type="date"
                     value={form.endDate}
                     onChange={(e) => set('endDate', e.target.value)}
+                    disabled={!canEditMaterial}
                     className={`${inputCls} [color-scheme:dark]`}
                   />
                 </Field>
@@ -378,6 +476,7 @@ export default function CreateChallengePage() {
                 <input
                   value={form.prize}
                   onChange={(e) => set('prize', e.target.value)}
+                  disabled={!canEditMaterial}
                   placeholder="e.g. Winner livery feature + season points"
                   className={inputCls}
                 />
@@ -389,14 +488,16 @@ export default function CreateChallengePage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <VisibilityOption
                   active={form.visibility === 'public'}
-                  onClick={() => set('visibility', 'public')}
+                  onClick={() => canEditMaterial && set('visibility', 'public')}
+                  disabled={!canEditMaterial}
                   icon={Globe}
                   title="Public"
                   desc="Anyone with the link can view and submit."
                 />
                 <VisibilityOption
                   active={form.visibility === 'club'}
-                  onClick={() => set('visibility', 'club')}
+                  onClick={() => canEditMaterial && set('visibility', 'club')}
+                  disabled={!canEditMaterial}
                   icon={Lock}
                   title="Club only"
                   desc="Only verified club members can enter."
@@ -456,14 +557,16 @@ function Field({ label, required, hint, children }) {
   )
 }
 
-function VisibilityOption({ active, onClick, icon: Icon, title, desc }) {
+function VisibilityOption({ active, onClick, disabled, icon: Icon, title, desc }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         'flex items-start gap-3 rounded-xl border p-4 text-left transition-all',
         active ? 'border-brand-500/40 bg-brand-500/[0.06]' : 'border-white/[0.06] hover:border-white/[0.15]',
+        disabled && 'cursor-not-allowed opacity-60',
       )}
     >
       <span className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-lg', active ? 'bg-brand-500/15 text-brand-300' : 'bg-white/[0.05] text-zinc-400')}>
@@ -501,6 +604,18 @@ function PublishedView({ isEdit, title }) {
             <Button to="/admin">Open review queue</Button>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function Centered({ title, body, action }) {
+  return (
+    <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
+      <div className="max-w-md">
+        <h1 className="text-2xl font-extrabold">{title}</h1>
+        {body && <p className="mt-2 text-zinc-400">{body}</p>}
+        {action && <div className="mt-6 flex justify-center">{action}</div>}
       </div>
     </div>
   )
