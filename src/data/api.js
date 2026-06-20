@@ -13,6 +13,15 @@ import * as mock from './mock'
 const SELF_SERVICE_BADGES = new Set(['tuner', 'media', 'pace', 'clean', 'bbs'])
 const EXCLUSIVE_BADGES = new Set(['verified', 'founder', 'veteran', 'champion', 'marshal'])
 
+async function requireCurrentUserId() {
+  if (!isSupabaseEnabled) return null
+  const { data, error } = await supabase.auth.getUser()
+  if (error) throw error
+  const id = data.user?.id
+  if (!id) throw new Error('Sign in required.')
+  return id
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Normalizers                                                               */
 /* -------------------------------------------------------------------------- */
@@ -267,16 +276,17 @@ export async function getMyClubMemberships(userId) {
 
 export async function setPrimaryClub(userId, clubId) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const currentUserId = await requireCurrentUserId()
   const clear = await supabase
     .from('club_members')
     .update({ is_primary: false })
-    .eq('user_id', userId)
+    .eq('user_id', currentUserId)
   if (clear.error) throw clear.error
 
   const set = await supabase
     .from('club_members')
     .update({ is_primary: true })
-    .eq('user_id', userId)
+    .eq('user_id', currentUserId)
     .eq('club_id', clubId)
   if (set.error) throw set.error
   return { ok: true }
@@ -284,6 +294,7 @@ export async function setPrimaryClub(userId, clubId) {
 
 export async function createClub(payload) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const ownerId = await requireCurrentUserId()
   const name = payload.name.trim()
   const tag = payload.tag.trim().toUpperCase()
   const slug = slugify(name)
@@ -300,7 +311,7 @@ export async function createClub(payload) {
       tagline: payload.tagline.trim() || null,
       about: payload.about.trim() || null,
       discord: cleanExternalUrl(payload.discord) || null,
-      owner_id: payload.ownerId,
+      owner_id: ownerId,
     })
     .select()
     .maybeSingle()
@@ -429,18 +440,24 @@ export async function createSubmission(payload) {
     // No backend: pretend success so the UI flow works in demo mode.
     return { ok: true, demo: true }
   }
-  const { error } = await supabase.from('submissions').insert(payload)
+  const userId = await requireCurrentUserId()
+  const { error } = await supabase.from('submissions').insert({
+    ...payload,
+    user_id: userId,
+    status: 'pending',
+  })
   if (error) throw error
   return { ok: true }
 }
 
 export async function uploadProof({ file, challengeId, userId }) {
   if (!file || !isSupabaseEnabled) return null
-  if (!challengeId || !userId) throw new Error('Missing challenge or user for proof upload')
+  const currentUserId = await requireCurrentUserId()
+  if (!challengeId) throw new Error('Missing challenge for proof upload')
 
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'upload'
   const safeName = slugify(file.name.replace(/\.[^.]+$/, '')) || 'proof'
-  const path = `${challengeId}/${userId}/${crypto.randomUUID()}-${safeName}.${ext}`
+  const path = `${challengeId}/${currentUserId}/${crypto.randomUUID()}-${safeName}.${ext}`
   const { error } = await supabase.storage.from('proofs').upload(path, file, {
     contentType: file.type || undefined,
   })
@@ -580,9 +597,10 @@ export async function getClubMembers(clubId) {
 
 export async function joinClub(clubId, userId) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const currentUserId = await requireCurrentUserId()
   const { error } = await supabase
     .from('club_members')
-    .insert({ club_id: clubId, user_id: userId })
+    .insert({ club_id: clubId, user_id: currentUserId })
   if (error) {
     if (error.code === '23505') throw new Error('You are already in this club.')
     if (/five clubs|club_members_beta_limit/i.test(error.message || '')) {
@@ -595,11 +613,12 @@ export async function joinClub(clubId, userId) {
 
 export async function leaveClub(clubId, userId) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const currentUserId = await requireCurrentUserId()
   const { error } = await supabase
     .from('club_members')
     .delete()
     .eq('club_id', clubId)
-    .eq('user_id', userId)
+    .eq('user_id', currentUserId)
   if (error) throw error
   return { ok: true }
 }
@@ -653,6 +672,7 @@ export async function updateProfileRole(userId, role) {
 // Save the current user's name cosmetics. `patch` uses camelCase keys.
 export async function updateMyProfile(userId, patch) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const currentUserId = await requireCurrentUserId()
   const row = {}
   if ('accent' in patch) row.accent = patch.accent
   if ('nameGradient' in patch) row.name_gradient = patch.nameGradient
@@ -664,14 +684,14 @@ export async function updateMyProfile(userId, patch) {
     const { data: current, error: currentError } = await supabase
       .from('profiles')
       .select('badges')
-      .eq('id', userId)
+      .eq('id', currentUserId)
       .maybeSingle()
     if (currentError) throw currentError
     const preserved = (current?.badges || []).filter((badge) => EXCLUSIVE_BADGES.has(badge))
     row.badges = Array.from(new Set([...preserved, ...requested]))
   }
   if ('displayName' in patch) row.display_name = patch.displayName
-  const { error } = await supabase.from('profiles').update(row).eq('id', userId)
+  const { error } = await supabase.from('profiles').update(row).eq('id', currentUserId)
   if (error) throw error
   return { ok: true }
 }

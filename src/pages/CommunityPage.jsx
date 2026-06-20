@@ -74,7 +74,7 @@ function clubStandings(cs) {
 
 export default function CommunityPage() {
   const { slug } = useParams()
-  const { user, profile } = useAuth()
+  const { enabled, user, profile, signIn } = useAuth()
   const { data, loading, reload } = useAsync(() => loadCommunity(slug), [slug])
 
   if (loading) return <Loading label="Loading club…" className="min-h-[60vh]" />
@@ -83,11 +83,13 @@ export default function CommunityPage() {
   const club = data.club
   const all = data.all || []
   const members = data.members || []
+  const live = all.filter((c) => c.status === 'live')
   const active = all.filter((c) => c.status !== 'closed')
   const past = all.filter((c) => c.status === 'closed')
   const standings = clubStandings(all)
   const isStaff = profile?.role === 'admin' || profile?.role === 'steward'
   const canManage = isStaff || (!!user && user.id === club.ownerId)
+  const isMember = !!user && members.some((member) => member.id === user.id)
 
   return (
     <>
@@ -98,8 +100,19 @@ export default function CommunityPage() {
           <StatTile icon={Users} value={formatNumber(club.members)} label="Members" />
           <StatTile icon={Flag} value={all.length} label="Events run" />
           <StatTile icon={Trophy} value={past.length} label="Finished events" />
-          <StatTile icon={Upload} value={active.length} label="Live now" />
+          <StatTile icon={Upload} value={live.length} label="Live now" />
         </div>
+
+        <ClubStartPanel
+          club={club}
+          enabled={enabled}
+          user={user}
+          signIn={signIn}
+          isMember={isMember}
+          liveChallenge={live[0] || null}
+          nextChallenge={active[0] || null}
+          onChanged={reload}
+        />
 
         {canManage && (
           <AdminTools
@@ -124,6 +137,18 @@ export default function CommunityPage() {
                   icon={Flag}
                   title="No active challenges"
                   description="This club has no open events."
+                  action={
+                    canManage ? (
+                      <Button to="/create">
+                        <Plus className="h-4 w-4" />
+                        Create first event
+                      </Button>
+                    ) : (
+                      <Button to="/challenges" variant="secondary">
+                        Browse events
+                      </Button>
+                    )
+                  }
                 />
               )}
             </Section>
@@ -326,6 +351,140 @@ function ClubInviteActions({ club, onChanged }) {
       </p>
       {error && <p className="max-w-sm text-right text-xs text-rose-300">{error}</p>}
     </div>
+  )
+}
+
+function ClubStartPanel({ club, enabled, user, signIn, isMember, liveChallenge, nextChallenge, onChanged }) {
+  const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
+  const inviteUrl = `${window.location.origin}/club/${club.slug}`
+
+  const copyInvite = async () => {
+    setError('')
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteUrl)
+      } else {
+        const input = document.createElement('textarea')
+        input.value = inviteUrl
+        input.setAttribute('readonly', '')
+        input.style.position = 'fixed'
+        input.style.opacity = '0'
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    } catch {
+      setCopied(false)
+      setError('Copy was blocked. Use the invite link in the header.')
+    }
+  }
+
+  const join = async () => {
+    if (!user) {
+      signIn()
+      return
+    }
+    setBusy(true)
+    setError('')
+    try {
+      await joinClub(club.id, user.id)
+      onChanged?.()
+    } catch (err) {
+      console.error('[club] start panel join failed', err)
+      setError(err?.message || 'Could not join this club.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const primaryAction = (() => {
+    if (enabled && !user) {
+      return (
+        <Button type="button" onClick={signIn}>
+          <LogIn className="h-4 w-4" />
+          Sign in
+        </Button>
+      )
+    }
+    if (enabled && !isMember) {
+      return (
+        <Button type="button" onClick={join} disabled={busy}>
+          <UserPlus className="h-4 w-4" />
+          {busy ? 'Joining...' : 'Join club'}
+        </Button>
+      )
+    }
+    if (liveChallenge) {
+      return (
+        <Button to={`/submit/${liveChallenge.slug}`}>
+          <Upload className="h-4 w-4" />
+          Submit run
+        </Button>
+      )
+    }
+    if (nextChallenge) {
+      return (
+        <Button to={`/c/${nextChallenge.slug}`} variant="secondary">
+          <Flag className="h-4 w-4" />
+          View event
+        </Button>
+      )
+    }
+    return (
+      <Button to="/challenges" variant="secondary">
+        <Flag className="h-4 w-4" />
+        Watch events
+      </Button>
+    )
+  })()
+
+  const steps = [
+    { label: copied ? 'Invite copied' : 'Invite link', done: copied, icon: Copy },
+    { label: isMember ? 'Member access' : 'Membership', done: isMember, icon: UserPlus },
+    { label: liveChallenge ? 'Submissions open' : 'No live event', done: false, icon: Upload },
+  ]
+
+  return (
+    <section className="mt-5 overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-500/[0.045] p-4 sm:p-5">
+      <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
+            <Trophy className="h-3.5 w-3.5" />
+            Club board
+          </div>
+          <h2 className="mt-1.5 text-lg font-bold text-white">
+            {liveChallenge ? liveChallenge.title : 'Proof-backed runs. Clean standings.'}
+          </h2>
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            {steps.map((step) => {
+              const Icon = step.icon
+              return (
+                <div
+                  key={step.label}
+                  className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-ink-950/35 px-3 py-2 text-sm text-zinc-300"
+                >
+                  {step.done ? <Check className="h-4 w-4 text-emerald-300" /> : <Icon className="h-4 w-4 text-brand-300" />}
+                  {step.label}
+                </div>
+              )
+            })}
+          </div>
+          {error && <p className="mt-3 text-sm text-rose-300">{error}</p>}
+        </div>
+        <div className="flex flex-wrap gap-2 lg:justify-end">
+          <Button type="button" variant="secondary" onClick={copyInvite}>
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? 'Copied' : 'Copy invite'}
+          </Button>
+          {primaryAction}
+        </div>
+      </div>
+    </section>
   )
 }
 

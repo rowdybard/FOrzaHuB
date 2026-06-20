@@ -61,11 +61,13 @@ export default function LandingPage() {
   const live = data?.live || []
   const featured = data?.featured || null
   const stats = data?.stats || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
+  const firstClub = clubs[0] || null
 
   return (
     <>
-      <Hero featured={featured} stats={stats} />
+      <Hero featured={featured} stats={stats} firstClub={firstClub} />
       <StatsBar stats={stats} />
+      <AlphaRun firstClub={firstClub} liveCount={live.length} />
       {live.length > 0 && <LiveChallenges challenges={live} />}
       <TypesShowcase />
       <HowItWorks />
@@ -78,7 +80,8 @@ export default function LandingPage() {
 
 /* ----------------------------------- Hero ---------------------------------- */
 
-function Hero({ featured, stats }) {
+function Hero({ featured, stats, firstClub }) {
+  const primaryTarget = firstClub ? `/club/${firstClub.slug}` : '/clubs'
   return (
     <section className="relative overflow-hidden bg-festival">
       <HeroVideoBackground />
@@ -92,21 +95,21 @@ function Hero({ featured, stats }) {
           </span>
 
           <h1 className="mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Run weekly challenges your <span className="text-gradient">community trusts</span>.
+            Give tonight's run a <span className="text-gradient">real leaderboard</span>.
           </h1>
 
           <p className="mt-5 max-w-xl text-balance text-lg leading-relaxed text-zinc-400">
-            Pitwall gives Forza clubs and Discord communities a place for time trials,
-            drift battles, photo contests, proof, and public leaderboards.
+            Pitwall turns one Discord invite into a clean club page, proof-backed
+            submissions, and a board worth sharing after the session.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button to="/challenges" size="lg">
-              Browse challenges
+            <Button to={primaryTarget} size="lg">
+              {firstClub ? `Join ${firstClub.tag}` : 'Find a club'}
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button to="/create" size="lg" variant="outline">
-              Create a challenge
+            <Button to="/challenges" size="lg" variant="outline">
+              See events
             </Button>
           </div>
 
@@ -123,7 +126,7 @@ function Hero({ featured, stats }) {
           </div>
         </div>
 
-        {featured ? <HeroPreview featured={featured} /> : <HeroPlaceholder />}
+        {featured ? <HeroPreview featured={featured} /> : <HeroPlaceholder firstClub={firstClub} />}
       </div>
     </section>
   )
@@ -152,19 +155,19 @@ function HeroVideoBackground() {
   )
 }
 
-function HeroPlaceholder() {
+function HeroPlaceholder({ firstClub }) {
   return (
     <div className="relative animate-fade-up [animation-delay:120ms]">
       <div className="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl" />
       <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850 p-8 text-center shadow-pop">
         <Flag className="mx-auto h-8 w-8 text-brand-400" />
-        <h3 className="mt-4 text-lg font-bold text-white">No active challenges</h3>
+        <h3 className="mt-4 text-lg font-bold text-white">Founding board</h3>
         <p className="mt-2 text-sm text-zinc-400">
-          Create a challenge to start the first leaderboard.
+          A clean place for the first verified runs.
         </p>
-        <Button to="/create" size="sm" className="mt-5">
-          <PlusCircle className="h-4 w-4" />
-          Create a challenge
+        <Button to={firstClub ? `/club/${firstClub.slug}` : '/clubs'} size="sm" className="mt-5">
+          <ArrowRight className="h-4 w-4" />
+          {firstClub ? `Open ${firstClub.tag}` : 'Find a club'}
         </Button>
       </div>
     </div>
@@ -292,6 +295,53 @@ function StatsBar({ stats: s }) {
           Week 1: leaderboards fill as submissions come in
         </p>
       )}
+    </section>
+  )
+}
+
+function AlphaRun({ firstClub, liveCount }) {
+  const clubTarget = firstClub ? `/club/${firstClub.slug}` : '/clubs'
+  const steps = [
+    { icon: Users, label: 'Club link' },
+    { icon: Upload, label: 'Proof-backed entries' },
+    { icon: Trophy, label: 'Public standings' },
+  ]
+
+  return (
+    <section className="container-page mt-10">
+      <div className="overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-500/[0.045]">
+        <div className="grid gap-5 p-5 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
+              <Rocket className="h-3.5 w-3.5" />
+              Founding board
+            </div>
+            <h2 className="mt-2 text-xl font-bold text-white">
+              {liveCount > 0 ? 'Live events with proof-backed standings.' : 'A cleaner home for the next club run.'}
+            </h2>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {steps.map((step) => {
+                const Icon = step.icon
+                return (
+                  <div key={step.label} className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-ink-950/35 px-3 py-2 text-sm text-zinc-300">
+                    <Icon className="h-4 w-4 text-brand-300" />
+                    {step.label}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 md:justify-end">
+            <Button to={clubTarget}>
+              {firstClub ? `Open ${firstClub.tag}` : 'Browse clubs'}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button to="/submit" variant="secondary">
+              Entries
+            </Button>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

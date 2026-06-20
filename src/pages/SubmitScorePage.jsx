@@ -19,7 +19,7 @@ import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { getSubmittableChallenges, createSubmission, uploadProof, isSupabaseEnabled } from '../data/api'
+import { getSubmittableChallenges, createSubmission, uploadProof } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
 import Loading from '../components/common/Loading'
@@ -57,7 +57,7 @@ function parseResult(raw) {
 
 export default function SubmitScorePage() {
   const { slug } = useParams()
-  const { enabled, user, profile, signIn } = useAuth()
+  const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
   const { data: options, loading } = useAsync(() => getSubmittableChallenges(), [])
   const list = options || []
 
@@ -126,13 +126,13 @@ export default function SubmitScorePage() {
 
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
   const hasProof = form.file || form.link.trim()
-  const authReady = !isSupabaseEnabled || !!user
+  const authReady = !!user
   const prereqGated = false
   const canSubmit = authReady && form.gamertag.trim() && resultFilled && hasProof && form.agree && !prereqGated && !submitting
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (isSupabaseEnabled && !user) {
+    if (!user) {
       setError('Sign in with Discord before submitting.')
       return
     }
@@ -169,13 +169,45 @@ export default function SubmitScorePage() {
     }
   }
 
+  if (!enabled) {
+    return (
+      <Centered
+        title="Supabase required"
+        body="Submissions need Discord login and the database backend."
+      />
+    )
+  }
+
+  if (authLoading) {
+    return <Loading label="Checking account..." className="min-h-[60vh]" />
+  }
+
+  if (!user) {
+    return (
+      <Centered
+        title="Sign in required"
+        body="Sign in with Discord before submitting results or proof."
+        action={<Button onClick={signIn}>Sign in with Discord</Button>}
+      />
+    )
+  }
+
   if (loading) {
     return <Loading label="Loading challenges…" className="min-h-[60vh]" />
   }
 
   if (!challenge) {
     return (
-      <PageHero title="No open challenges" description="There are no challenges accepting submissions right now." />
+      <Centered
+        title="No open events yet"
+        body="Join a club first, then come back when a live event is accepting proof."
+        action={
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button to="/clubs">Find a club</Button>
+            <Button to="/challenges" variant="secondary">View events</Button>
+          </div>
+        }
+      />
     )
   }
 
@@ -373,20 +405,14 @@ export default function SubmitScorePage() {
               <Link to={`/c/${challenge.slug}`} className="text-sm text-zinc-400 hover:text-white">
                 Cancel
               </Link>
-              {enabled && !user ? (
-                <Button type="button" size="lg" onClick={signIn} className="w-full sm:w-auto">
-                  Sign in to submit
-                </Button>
-              ) : (
-                <Button type="submit" size="lg" disabled={!canSubmit} className="w-full sm:w-auto">
-                  {willBeHeld ? <Clock className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
-                  {submitting
-                    ? 'Submitting...'
-                    : willBeHeld
-                      ? 'Submit (held pending qualifier)'
-                      : 'Submit for review'}
-                </Button>
-              )}
+              <Button type="submit" size="lg" disabled={!canSubmit} className="w-full sm:w-auto">
+                {willBeHeld ? <Clock className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+                {submitting
+                  ? 'Submitting...'
+                  : willBeHeld
+                    ? 'Submit (held pending qualifier)'
+                    : 'Submit for review'}
+              </Button>
             </div>
             {error && (
               <p className="flex items-center justify-end gap-1.5 text-xs text-rose-400">
@@ -412,6 +438,18 @@ export default function SubmitScorePage() {
             <Checklist t={t} />
           </aside>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function Centered({ title, body, action }) {
+  return (
+    <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
+      <div className="max-w-md">
+        <h1 className="text-2xl font-extrabold">{title}</h1>
+        {body && <p className="mt-2 text-zinc-400">{body}</p>}
+        {action && <div className="mt-6 flex justify-center">{action}</div>}
       </div>
     </div>
   )
