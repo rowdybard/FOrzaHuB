@@ -4,289 +4,387 @@ import {
   Trophy,
   Users,
   Flag,
-  ListChecks,
   ShieldCheck,
   Clock,
-  Hash,
   CheckCircle2,
-  Sparkles,
   Upload,
-  BarChart3,
   PlusCircle,
-  MessagesSquare,
   Rocket,
+  Gift,
+  Calendar,
+  Flame,
+  Medal,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Avatar from '../components/ui/Avatar'
-import Cover from '../components/ui/Cover'
 import { TypeBadge, StatusBadge } from '../components/ui/Badge'
 import SectionHeading from '../components/ui/SectionHeading'
 import StatTile from '../components/ui/StatTile'
-import ChallengeCard from '../components/common/ChallengeCard'
-import ClubCard from '../components/common/ClubCard'
 import Countdown from '../components/common/Countdown'
 import {
   getClubs,
   getChallengesWithClubs,
-  getFeaturedChallenge,
-  getChallengeBySlug,
   getSiteStats,
 } from '../data/api'
+import {
+  sponsoredEvent,
+  eventSchedule,
+  sponsors,
+  eventLeaderboard,
+} from '../data/mock'
 import { useAsync } from '../hooks/useAsync'
-import { TYPE_LIST, getType, formatMetric } from '../lib/challengeTypes'
-import { formatNumber, formatCompact, hexToRgba } from '../lib/utils'
-
-const TRUST_NAMES = ['Rowdybard', 'PurpleCone']
-const HERO_VIDEO = {
-  webm: '/media/landing-drift-loop.webm',
-  mp4: '/media/landing-drift-loop.mp4',
-  poster: '/media/landing-drift-poster.jpg',
-}
-
-async function loadLanding() {
-  const [clubs, challenges, featured, stats] = await Promise.all([
-    getClubs(),
-    getChallengesWithClubs(),
-    getFeaturedChallenge(),
-    getSiteStats(),
-  ])
-  const live = challenges.filter((c) => c.status === 'live')
-  const fullFeatured = featured ? await getChallengeBySlug(featured.slug) : null
-  return { clubs, live, featured: fullFeatured, stats }
-}
+import { getType } from '../lib/challengeTypes'
+import { formatNumber, hexToRgba, formatDate } from '../lib/utils'
 
 export default function LandingPage() {
-  const { data } = useAsync(() => loadLanding(), [])
-  const clubs = data?.clubs || []
-  const live = data?.live || []
-  const featured = data?.featured || null
-  const stats = data?.stats || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
-  const firstClub = clubs[0] || null
+  const { data } = useAsync(
+    () => Promise.all([getClubs(), getChallengesWithClubs(), getSiteStats()]),
+    [],
+  )
+  const clubs = data?.[0] || []
+  const live = (data?.[1] || []).filter((c) => c.status === 'live')
+  const stats = data?.[2] || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
 
   return (
     <>
-      <Hero featured={featured} stats={stats} firstClub={firstClub} />
+      <EventHero event={sponsoredEvent} stats={stats} />
+      <SponsorBar sponsors={sponsors} />
+      <PrizeShowcase event={sponsoredEvent} />
+      <ScheduleSection event={sponsoredEvent} />
+      <LeaderboardPreview event={sponsoredEvent} />
       <StatsBar stats={stats} />
-      <AlphaRun firstClub={firstClub} liveCount={live.length} />
       {live.length > 0 && <LiveChallenges challenges={live} />}
-      <TypesShowcase />
       <HowItWorks />
-      <Communities clubs={clubs} />
-      {featured && <DiscordTrust featured={featured} />}
-      <CtaBand />
+      <EventCTA event={sponsoredEvent} />
     </>
   )
 }
 
-/* ----------------------------------- Hero ---------------------------------- */
+/* ------------------------------- Event Hero ------------------------------- */
 
-function Hero({ featured, stats, firstClub }) {
-  const primaryTarget = firstClub ? `/club/${firstClub.slug}` : '/clubs'
+function EventHero({ event, stats }) {
   return (
-    <section className="relative overflow-hidden bg-festival">
-      <HeroVideoBackground />
-      <div className="container-page relative grid items-center gap-14 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
-        <div className="animate-fade-up">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-sm">
-            <span className="grid h-4 w-4 place-items-center rounded-full bg-brand-500/20 text-brand-300">
-              <Flag className="h-2.5 w-2.5" />
-            </span>
-            Unofficial community hub · Forza Horizon 6
-          </span>
+    <section className="relative overflow-hidden bg-heatwave">
+      <div className="absolute inset-0 bg-grid opacity-30 mask-fade-b" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ink-950/40 to-ink-950" />
 
-          <h1 className="mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Give tonight's run a <span className="text-gradient">real leaderboard</span>.
+      <div className="container-page relative py-16 lg:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="animate-fade-up">
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-300">
+              <Flame className="h-4 w-4" />
+              Sponsored Community Event
+            </span>
+          </div>
+
+          <h1 className="mt-6 animate-fade-up text-balance text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [animation-delay:60ms]">
+            <span className="text-gradient">{event.title}</span>
           </h1>
 
-          <p className="mt-5 max-w-xl text-balance text-lg leading-relaxed text-zinc-400">
-            Pitwall turns one Discord invite into a clean club page, proof-backed
-            submissions, and a board worth sharing after the session.
+          <p className="mt-4 animate-fade-up text-balance text-xl text-zinc-300 [animation-delay:120ms]">
+            {event.tagline}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button to={primaryTarget} size="lg">
-              {firstClub ? `Join ${firstClub.tag}` : 'Find a club'}
-              <ArrowRight className="h-4 w-4" />
+          <div className="mt-6 flex animate-fade-up items-center justify-center gap-3 text-sm text-zinc-400 [animation-delay:180ms]">
+            <Calendar className="h-4 w-4 text-brand-400" />
+            <span className="font-medium text-white">
+              {formatDate(event.startDate, { month: 'short', day: 'numeric' })}
+            </span>
+            <span className="text-zinc-600">—</span>
+            <span className="font-medium text-white">
+              {formatDate(event.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
+            <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-2.5 py-0.5 text-xs font-semibold text-sky-300">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-400" />
+              </span>
+              Upcoming
+            </span>
+          </div>
+
+          <div className="mt-8 animate-fade-up [animation-delay:240ms]">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Event starts in
+            </p>
+            <Countdown to={event.startDate} variant="blocks" className="justify-center" />
+          </div>
+
+          <div className="mt-8 flex animate-fade-up flex-wrap justify-center gap-3 [animation-delay:300ms]">
+            <Button to="/challenges" size="lg">
+              <Flag className="h-4 w-4" />
+              View Events
             </Button>
-            <Button to="/challenges" size="lg" variant="outline">
-              See events
+            <Button to="/clubs" size="lg" variant="outline">
+              <Users className="h-4 w-4" />
+              Join a Club
             </Button>
           </div>
 
-          <div className="mt-9 flex items-center gap-4">
-            <div className="flex -space-x-2.5">
-              {TRUST_NAMES.map((n) => (
-                <Avatar key={n} name={n} size={34} className="ring-2 ring-ink-950" />
-              ))}
-            </div>
-            <p className="text-sm text-zinc-400">
-              <span className="font-semibold text-white">{formatNumber(stats.clubs)}</span>{' '}
-              {stats.clubs === 1 ? 'club' : 'clubs'} on the grid.
-            </p>
+          <div className="mt-10 flex animate-fade-up items-center justify-center gap-6 text-sm text-zinc-400 [animation-delay:360ms]">
+            <span className="inline-flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-amber-400" />
+              <span className="font-semibold text-white">{event.prize}</span> prize
+            </span>
+            <span className="text-zinc-600">|</span>
+            <span className="inline-flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-brand-400" />
+              <span className="font-semibold text-white">7</span> daily events
+            </span>
+            <span className="text-zinc-600">|</span>
+            <span className="inline-flex items-center gap-2">
+              <Users className="h-4 w-4 text-emerald-400" />
+              <span className="font-semibold text-white">{formatNumber(stats.racers)}</span> racers
+            </span>
           </div>
         </div>
-
-        {featured ? <HeroPreview featured={featured} /> : <HeroPlaceholder firstClub={firstClub} />}
       </div>
     </section>
   )
 }
 
-function HeroVideoBackground() {
-  return (
-    <div aria-hidden="true" className="absolute inset-0">
-      <video
-        className="absolute inset-0 h-full w-full object-cover opacity-60 saturate-110 contrast-105 motion-reduce:hidden"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        poster={HERO_VIDEO.poster}
-      >
-        <source src={HERO_VIDEO.webm} type="video/webm" />
-        <source src={HERO_VIDEO.mp4} type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-festival opacity-65 mix-blend-multiply" />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/80 to-ink-950/25" />
-      <div className="absolute inset-0 bg-gradient-to-b from-ink-950/20 via-ink-950/35 to-ink-950" />
-      <div className="absolute inset-0 bg-grid opacity-35 mask-fade-b" />
-    </div>
-  )
-}
+/* ------------------------------ Sponsor Bar -------------------------------- */
 
-function HeroPlaceholder({ firstClub }) {
-  return (
-    <div className="relative animate-fade-up [animation-delay:120ms]">
-      <div className="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl" />
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850 p-8 text-center shadow-pop">
-        <Flag className="mx-auto h-8 w-8 text-brand-400" />
-        <h3 className="mt-4 text-lg font-bold text-white">Founding board</h3>
-        <p className="mt-2 text-sm text-zinc-400">
-          A clean place for the first verified runs.
-        </p>
-        <Button to={firstClub ? `/club/${firstClub.slug}` : '/clubs'} size="sm" className="mt-5">
-          <ArrowRight className="h-4 w-4" />
-          {firstClub ? `Open ${firstClub.tag}` : 'Find a club'}
-        </Button>
-      </div>
-    </div>
-  )
-}
-
-function HeroPreview({ featured }) {
-  const club = featured.club
-  const top = (featured.entries || []).slice(0, 4)
+function SponsorBar({ sponsors }) {
+  const tierLabels = {
+    organizer: 'Organized by',
+    prize: 'Prize Sponsored by',
+    supporter: 'Supported by',
+  }
+  const tierColors = {
+    organizer: 'text-zinc-400',
+    prize: 'text-amber-400',
+    supporter: 'text-sky-400',
+  }
 
   return (
-    <div className="relative animate-fade-up [animation-delay:120ms]">
-      <div className="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl" />
-
-      {/* Floating accents (desktop) — solid bg, no backdrop-blur to avoid scroll smear */}
-      <div className="absolute -left-4 top-10 z-10 hidden animate-fade-up rounded-xl border border-white/10 bg-ink-850 px-3 py-2 text-xs shadow-pop lg:block [animation-delay:300ms]">
-        <div className="flex items-center gap-2 text-emerald-300">
-          <CheckCircle2 className="h-4 w-4" />
-          <span className="font-medium">Proof verified</span>
-        </div>
-      </div>
-      <div className="absolute -right-3 bottom-16 z-10 hidden animate-fade-up rounded-xl border border-white/10 bg-ink-850 px-3 py-2 text-xs shadow-pop lg:block [animation-delay:420ms]">
-        <div className="text-zinc-400">Top gap</div>
-        <div className="font-num font-bold text-white">+0.407s</div>
-      </div>
-
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850 shadow-pop">
-        <Cover typeId={featured.typeId} className="h-32">
-          <div className="flex h-full flex-col justify-between p-4">
-            <div className="flex items-start justify-between">
-              <TypeBadge typeId={featured.typeId} size="sm" />
-              <StatusBadge status={featured.status} />
-            </div>
-            <div>
-              <div className="text-xs text-zinc-300">{club?.name}</div>
-              <h3 className="text-lg font-bold leading-tight text-white">{featured.title}</h3>
-            </div>
-          </div>
-        </Cover>
-
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-2.5 text-xs">
-          <span className="inline-flex items-center gap-1.5 text-zinc-400">
-            <Users className="h-3.5 w-3.5" />
-            {formatNumber(featured.participants)} racers
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-zinc-300">
-            <Clock className="h-3.5 w-3.5 text-brand-400" />
-            <Countdown to={featured.endDate} /> left
-          </span>
-        </div>
-
-        <div className="divide-y divide-white/[0.05]">
-          {top.map((e) => (
-            <div key={e.rank} className="flex items-center gap-3 px-4 py-2.5">
-              <span className="w-5 text-center font-num text-sm font-semibold text-zinc-500">
-                {e.rank}
-              </span>
-              <Avatar name={e.user.name} size={28} />
-              <span className="flex-1 truncate text-sm text-white">{e.user.tag}</span>
-              {e.verified && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />}
-              <span className="font-num text-sm font-bold tabular-nums text-white">
-                {formatMetric(featured.typeId, e.value)}
+    <section className="border-y border-white/[0.06] bg-ink-900/60 py-6">
+      <div className="container-page">
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+          {sponsors.map((s) => (
+            <div key={s.id} className="flex items-center gap-3">
+              <div className="text-right">
+                <div className={`text-[10px] font-semibold uppercase tracking-wider ${tierColors[s.tier]}`}>
+                  {tierLabels[s.tier]}
+                </div>
+                <div className="text-sm font-bold text-white">{s.name}</div>
+              </div>
+              <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
+                {s.tier === 'prize' ? (
+                  <Gift className="h-5 w-5 text-amber-400" />
+                ) : s.tier === 'organizer' ? (
+                  <Flag className="h-5 w-5 text-brand-400" />
+                ) : (
+                  <ShieldCheck className="h-5 w-5 text-sky-400" />
+                )}
               </span>
             </div>
           ))}
         </div>
-
-        <Link
-          to={`/c/${featured.slug}`}
-          className="flex items-center justify-center gap-1.5 border-t border-white/[0.06] py-3 text-sm font-medium text-brand-300 transition-colors hover:bg-white/[0.03]"
-        >
-          View full leaderboard
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
       </div>
-    </div>
+    </section>
   )
 }
 
-/* --------------------------------- Stats bar -------------------------------- */
+/* ----------------------------- Prize Showcase ------------------------------ */
+
+function PrizeShowcase({ event }) {
+  return (
+    <section className="container-page mt-16">
+      <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.06] via-ink-900/40 to-ink-950 p-8 sm:p-12">
+        <div className="absolute inset-0 bg-shimmer opacity-60" />
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+
+        <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
+              <Gift className="h-3.5 w-3.5" />
+              Grand Prize
+            </div>
+            <h2 className="mt-4 text-4xl font-extrabold sm:text-5xl">
+              Win a <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">{event.prize}</span> Gift Card
+            </h2>
+            <p className="mt-3 max-w-xl text-lg text-zinc-300">
+              {event.prizeDescription}. Awarded to the overall champion after Saturday's Grand Finale.
+            </p>
+            <ul className="mt-6 space-y-2.5">
+              <li className="flex items-center gap-3 text-sm text-zinc-300">
+                <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
+                Earn points across all 7 daily events
+              </li>
+              <li className="flex items-center gap-3 text-sm text-zinc-300">
+                <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
+                Proof-backed submissions on every entry
+              </li>
+              <li className="flex items-center gap-3 text-sm text-zinc-300">
+                <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
+                Winner chooses Steam or Xbox
+              </li>
+            </ul>
+          </div>
+
+          <div className="relative">
+            <div className="glow-pulse grid h-44 w-44 place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5">
+              <div className="text-center">
+                <Gift className="mx-auto h-12 w-12 text-amber-400" />
+                <div className="mt-3 text-5xl font-extrabold text-white">{event.prize}</div>
+                <div className="mt-1 text-xs font-medium uppercase tracking-wider text-amber-300/80">
+                  Gift Card
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ----------------------------- Schedule Section ---------------------------- */
+
+function ScheduleSection({ event }) {
+  return (
+    <section className="container-page mt-20">
+      <SectionHeading
+        eyebrow="7-Day Showdown"
+        title="Weekly Schedule"
+        description="A new challenge every day from Sunday to Saturday. Each day awards points toward the overall championship."
+      />
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {eventSchedule.map((day, i) => {
+          const t = getType(day.typeId)
+          const Icon = t.icon
+          return (
+            <div
+              key={day.day}
+              className="card card-hover group relative overflow-hidden p-5"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              <div
+                className="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl transition-opacity group-hover:opacity-30"
+                style={{ background: t.accent }}
+              />
+              <div className="flex items-center justify-between">
+                <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] font-num text-lg font-bold text-white">
+                  {day.day}
+                </span>
+                <span
+                  className="grid h-9 w-9 place-items-center rounded-lg"
+                  style={{
+                    color: t.accent,
+                    backgroundColor: hexToRgba(t.accent, 0.12),
+                    border: `1px solid ${hexToRgba(t.accent, 0.25)}`,
+                  }}
+                >
+                  <Icon className="h-4 w-4" />
+                </span>
+              </div>
+
+              <div className="mt-3">
+                <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                  {day.label}
+                </div>
+                <h3 className="mt-1 font-semibold text-white">{day.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
+                  {day.description}
+                </p>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <TypeBadge typeId={day.typeId} size="sm" />
+              </div>
+            </div>
+          )
+        })}
+
+        <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/20 bg-brand-500/[0.04]">
+          <Medal className="h-10 w-10 text-amber-400" />
+          <h3 className="mt-3 font-bold text-white">Overall Champion</h3>
+          <p className="mt-1.5 text-sm text-zinc-400">
+            Most points across all 7 events wins the {event.prize} gift card.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* --------------------------- Leaderboard Preview --------------------------- */
+
+function LeaderboardPreview({ event }) {
+  return (
+    <section className="container-page mt-20">
+      <SectionHeading
+        eyebrow="Standings"
+        title="Championship Leaderboard"
+        description="Points accumulate across all daily events. Top racers compete for the grand prize."
+        action={
+          <Button to="/challenges" variant="outline" size="sm">
+            View all events
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        }
+      />
+
+      <div className="mt-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-ink-850/80">
+        <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 border-b border-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          <span className="w-8 text-center">#</span>
+          <span>Racer</span>
+          <span className="hidden text-right sm:inline">Events</span>
+          <span className="text-right">Points</span>
+        </div>
+        <div className="divide-y divide-white/[0.04]">
+          {eventLeaderboard.map((entry) => (
+            <div
+              key={entry.rank}
+              className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]"
+            >
+              <span className={`w-8 text-center font-num text-lg font-bold ${
+                entry.rank === 1 ? 'text-amber-400' : entry.rank === 2 ? 'text-zinc-300' : 'text-zinc-500'
+              }`}>
+                {entry.rank}
+              </span>
+              <div className="flex items-center gap-3">
+                <Avatar name={entry.tag} size={32} />
+                <div>
+                  <div className="font-semibold text-white">{entry.tag}</div>
+                  <div className="text-xs text-zinc-500">{entry.club}</div>
+                </div>
+                {entry.rank === 1 && <Trophy className="h-4 w-4 text-amber-400" />}
+              </div>
+              <span className="hidden text-right font-num text-sm text-zinc-400 sm:inline">
+                {entry.events}
+              </span>
+              <span className="text-right font-num text-lg font-bold tabular-nums text-white">
+                {entry.points}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-white/[0.06] px-5 py-3 text-center text-xs text-zinc-500">
+          Leaderboard populates as events go live — check back Sunday at 6 PM
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* -------------------------------- Stats bar -------------------------------- */
 
 function StatsBar({ stats: s }) {
   const isLaunch = s.isLaunch
   const stats = [
-    {
-      icon: Users,
-      value: formatNumber(s.clubs),
-      label: 'Founding clubs',
-    },
-    {
-      icon: Flag,
-      value: formatNumber(s.challenges),
-      label: s.challenges === 1 ? 'Challenge' : 'Challenges',
-      empty: s.challenges === 0,
-    },
-    {
-      icon: Upload,
-      value: s.submissions === 0 ? '—' : formatCompact(s.submissions),
-      label: 'Submissions verified',
-      empty: s.submissions === 0,
-    },
-    {
-      icon: Trophy,
-      value: s.racers === 0 ? '—' : formatCompact(s.racers),
-      label: 'Racers on boards',
-      empty: s.racers === 0,
-    },
+    { icon: Users, value: formatNumber(s.clubs), label: 'Founding clubs' },
+    { icon: Flag, value: formatNumber(s.challenges), label: s.challenges === 1 ? 'Challenge' : 'Challenges', empty: s.challenges === 0 },
+    { icon: Upload, value: s.submissions === 0 ? '—' : formatNumber(s.submissions), label: 'Submissions verified', empty: s.submissions === 0 },
+    { icon: Trophy, value: s.racers === 0 ? '—' : formatNumber(s.racers), label: 'Racers on boards', empty: s.racers === 0 },
   ]
   return (
-    <section className="container-page -mt-6 space-y-3">
+    <section className="container-page mt-16 space-y-3">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <StatTile
-            key={s.label}
-            icon={s.icon}
-            value={s.value}
-            label={s.label}
-            dim={s.empty}
-          />
+          <StatTile key={s.label} icon={s.icon} value={s.value} label={s.label} dim={s.empty} />
         ))}
       </div>
       {isLaunch && (
@@ -295,53 +393,6 @@ function StatsBar({ stats: s }) {
           Week 1: leaderboards fill as submissions come in
         </p>
       )}
-    </section>
-  )
-}
-
-function AlphaRun({ firstClub, liveCount }) {
-  const clubTarget = firstClub ? `/club/${firstClub.slug}` : '/clubs'
-  const steps = [
-    { icon: Users, label: 'Club link' },
-    { icon: Upload, label: 'Proof-backed entries' },
-    { icon: Trophy, label: 'Public standings' },
-  ]
-
-  return (
-    <section className="container-page mt-10">
-      <div className="overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-500/[0.045]">
-        <div className="grid gap-5 p-5 md:grid-cols-[1fr_auto] md:items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
-              <Rocket className="h-3.5 w-3.5" />
-              Founding board
-            </div>
-            <h2 className="mt-2 text-xl font-bold text-white">
-              {liveCount > 0 ? 'Live events with proof-backed standings.' : 'A cleaner home for the next club run.'}
-            </h2>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {steps.map((step) => {
-                const Icon = step.icon
-                return (
-                  <div key={step.label} className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-ink-950/35 px-3 py-2 text-sm text-zinc-300">
-                    <Icon className="h-4 w-4 text-brand-300" />
-                    {step.label}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2 md:justify-end">
-            <Button to={clubTarget}>
-              {firstClub ? `Open ${firstClub.tag}` : 'Browse clubs'}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button to="/submit" variant="secondary">
-              Entries
-            </Button>
-          </div>
-        </div>
-      </div>
     </section>
   )
 }
@@ -364,53 +415,42 @@ function LiveChallenges({ challenges }) {
       />
       <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {challenges.slice(0, 6).map((c) => (
-          <ChallengeCard key={c.id} challenge={c} />
+          <ChallengeCardLite key={c.id} challenge={c} />
         ))}
       </div>
     </section>
   )
 }
 
-/* ------------------------------ Types showcase ------------------------------ */
-
-function TypesShowcase() {
+function ChallengeCardLite({ challenge }) {
+  const t = getType(challenge.typeId)
+  const Icon = t.icon
   return (
-    <section className="container-page mt-24">
-      <SectionHeading
-        eyebrow="Five formats"
-        title="Event formats"
-        description="Hot laps, drift scores, speed traps, build battles, and photo contests."
-      />
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-        {TYPE_LIST.map((t) => {
-          const Icon = t.icon
-          return (
-            <Link
-              key={t.id}
-              to="/challenges"
-              className="card card-hover group relative overflow-hidden p-5"
-            >
-              <div
-                className="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-20 blur-2xl transition-opacity group-hover:opacity-40"
-                style={{ background: t.accent }}
-              />
-              <span
-                className="relative grid h-11 w-11 place-items-center rounded-xl"
-                style={{
-                  color: t.accent,
-                  backgroundColor: hexToRgba(t.accent, 0.12),
-                  border: `1px solid ${hexToRgba(t.accent, 0.25)}`,
-                }}
-              >
-                <Icon className="h-5 w-5" />
-              </span>
-              <h3 className="relative mt-4 font-semibold text-white">{t.label}</h3>
-              <p className="relative mt-1.5 text-sm leading-relaxed text-zinc-400">{t.summary}</p>
-            </Link>
-          )
-        })}
+    <Link
+      to={`/c/${challenge.slug}`}
+      className="card card-hover group block overflow-hidden p-5"
+    >
+      <div className="flex items-start justify-between">
+        <span
+          className="grid h-10 w-10 place-items-center rounded-xl"
+          style={{ color: t.accent, backgroundColor: hexToRgba(t.accent, 0.12), border: `1px solid ${hexToRgba(t.accent, 0.25)}` }}
+        >
+          <Icon className="h-5 w-5" />
+        </span>
+        <StatusBadge status={challenge.status} />
       </div>
-    </section>
+      <h3 className="mt-4 font-semibold text-white group-hover:text-brand-300">{challenge.title}</h3>
+      <div className="mt-3 flex items-center justify-between text-xs text-zinc-400">
+        <span className="inline-flex items-center gap-1.5">
+          <Users className="h-3.5 w-3.5" />
+          {formatNumber(challenge.participants)} racers
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 text-brand-400" />
+          <Countdown to={challenge.endDate} /> left
+        </span>
+      </div>
+    </Link>
   )
 }
 
@@ -418,30 +458,14 @@ function TypesShowcase() {
 
 function HowItWorks() {
   const steps = [
-    {
-      icon: PlusCircle,
-      title: 'Create a challenge',
-      text: 'Pick a format, set the rules, car class and deadline. Publish in minutes.',
-    },
-    {
-      icon: Upload,
-      title: 'Members submit proof',
-      text: 'Racers post their time or score with a clip or screenshot as evidence.',
-    },
-    {
-      icon: ShieldCheck,
-      title: 'You verify entries',
-      text: 'Approve, flag or reject submissions from one clean review queue.',
-    },
-    {
-      icon: BarChart3,
-      title: 'Leaderboard goes live',
-      text: 'A public board updates after entries are approved.',
-    },
+    { icon: Users, title: 'Join a club', text: 'Find a community or bring your Discord server. Clubs are the home base for events.' },
+    { icon: Flag, title: 'Enter daily events', text: 'Each day features a new challenge format — hot laps, drift, drag, builds, photos.' },
+    { icon: Upload, title: 'Submit your proof', text: 'Post your time or score with a clip or screenshot. Every entry is verified.' },
+    { icon: Trophy, title: 'Climb the board', text: 'Points accumulate all week. Top racer on Saturday wins the $50 gift card.' },
   ]
   return (
     <section className="container-page mt-24">
-      <SectionHeading eyebrow="How it works" title="From idea to leaderboard in four steps" />
+      <SectionHeading eyebrow="How it works" title="From sign-up to championship in four steps" />
       <div className="relative mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent lg:block" />
         {steps.map((s, i) => {
@@ -452,9 +476,7 @@ function HowItWorks() {
                 <span className="relative z-10 grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-ink-850 text-brand-400">
                   <Icon className="h-6 w-6" />
                 </span>
-                <span className="font-num text-4xl font-extrabold text-white/10">
-                  0{i + 1}
-                </span>
+                <span className="font-num text-4xl font-extrabold text-white/10">0{i + 1}</span>
               </div>
               <h3 className="mt-4 font-semibold text-white">{s.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{s.text}</p>
@@ -466,187 +488,30 @@ function HowItWorks() {
   )
 }
 
-/* ------------------------------- Communities -------------------------------- */
+/* -------------------------------- Event CTA -------------------------------- */
 
-function Communities({ clubs }) {
+function EventCTA({ event }) {
   return (
     <section className="container-page mt-24">
-      <SectionHeading
-        eyebrow="Communities"
-        title="Founding clubs"
-        description="Clubs running events on Pitwall."
-        action={
-          <Button to="/clubs" variant="outline" size="sm">
-            All clubs
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        }
-      />
-      {clubs.length > 0 && (
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {clubs.slice(0, 4).map((club) => (
-            <ClubCard key={club.id} club={club} />
-          ))}
-        </div>
-      )}
-
-      {/* Club pitch */}
-      <div className="mt-6 flex items-start gap-5 rounded-2xl border border-white/[0.06] bg-ink-900/40 p-5 sm:items-center">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-ink-850 text-brand-400">
-          <PlusCircle className="h-5 w-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-white">Running a Forza club or Discord?</p>
-          <p className="mt-0.5 text-sm text-zinc-400">
-            Create challenges, review submissions, and keep leaderboards in one place.
-          </p>
-        </div>
-        <Button to="/clubs/new" variant="outline" size="sm" className="shrink-0">
-          Start a community
-        </Button>
-      </div>
-    </section>
-  )
-}
-
-/* ------------------------------ Discord trust ------------------------------- */
-
-function DiscordTrust({ featured }) {
-  const club = featured.club
-  const features = [
-    'Verified proof on every podium: clips and screenshots attached',
-    'A review queue that flags assists, cuts and missing evidence',
-    'Public leaderboards with shareable links for any channel',
-    'Roles for admins, stewards and racers',
-  ]
-  return (
-    <section className="container-page mt-24">
-      <div className="grid items-center gap-10 rounded-3xl border border-white/[0.07] bg-ink-900/60 p-6 sm:p-10 lg:grid-cols-2">
-        <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-300">
-            <MessagesSquare className="h-3.5 w-3.5" />
-            Made to live in your server
-          </span>
-          <h2 className="mt-4 text-3xl font-bold text-balance">
-            Discord-ready event management
-          </h2>
-          <p className="mt-3 text-zinc-400">
-            Pitwall is built around proof and review. Announce events, collect entries,
-            and post results from the same place.
-          </p>
-          <ul className="mt-6 space-y-3">
-            {features.map((f) => (
-              <li key={f} className="flex items-start gap-3 text-sm text-zinc-300">
-                <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-emerald-400" />
-                <span>{f}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Button to="/create">Create a challenge</Button>
-            <Button href="#" variant="secondary">
-              <MessagesSquare className="h-4 w-4" />
-              Connect Discord
-            </Button>
-          </div>
-        </div>
-
-        <DiscordEmbed featured={featured} club={club} />
-      </div>
-    </section>
-  )
-}
-
-function DiscordEmbed({ featured, club }) {
-  const t = getType(featured.typeId)
-  const top = featured.entries[0]
-  const leaderLine = top
-    ? `${top.user.tag} - ${formatMetric(featured.typeId, top.value)}`
-    : 'No approved entries yet'
-  return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#313338] p-4 shadow-pop">
-      <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-ink-950">
-          <Flag className="h-5 w-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-white">Pitwall</span>
-            <span className="rounded bg-indigo-500 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
-              App
-            </span>
-            <span className="text-xs text-zinc-400">Today at 9:41</span>
-          </div>
-          <p className="mt-1 text-sm text-zinc-200">
-            New event just dropped — get your laps in! <span className="align-middle">🏁</span>
-          </p>
-
-          {/* Embed */}
-          <div className="mt-2 overflow-hidden rounded-md border-l-4" style={{ borderColor: t.accent }}>
-            <div className="bg-[#2b2d31] p-3">
-              <div className="text-xs font-medium" style={{ color: t.accent }}>
-                {club?.name} · {t.label}
-              </div>
-              <div className="mt-0.5 font-semibold text-white">{featured.title}</div>
-              <p className="mt-1 text-xs leading-relaxed text-zinc-400">
-                {featured.restriction} · {featured.location}
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <div className="font-semibold text-zinc-300">Current leader</div>
-                  <div className="mt-0.5 text-zinc-400">{leaderLine}</div>
-                </div>
-                <div>
-                  <div className="font-semibold text-zinc-300">Ends in</div>
-                  <div className="mt-0.5 text-zinc-400">
-                    <Countdown to={featured.endDate} />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center gap-2 text-[11px] text-zinc-500">
-                <Hash className="h-3 w-3" />
-                pitwall.gg/c/{featured.slug}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-2 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-md bg-[#2b2d31] px-2 py-1 text-xs text-zinc-300">
-              🏁 <span className="font-num">128</span>
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-md bg-[#2b2d31] px-2 py-1 text-xs text-zinc-300">
-              🔥 <span className="font-num">86</span>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* --------------------------------- CTA band --------------------------------- */
-
-function CtaBand() {
-  return (
-    <section className="container-page mt-24">
-      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-festival px-6 py-14 text-center sm:px-10">
-        <div className="absolute inset-0 bg-grid opacity-50 mask-fade-b" />
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-heatwave px-6 py-14 text-center sm:px-10">
+        <div className="absolute inset-0 bg-grid opacity-40 mask-fade-b" />
         <div className="relative mx-auto max-w-2xl">
-          <Sparkles className="mx-auto h-7 w-7 text-brand-300" />
+          <Flame className="mx-auto h-8 w-8 text-brand-400" />
           <h2 className="mt-4 text-3xl font-bold sm:text-4xl text-balance">
-            Ready to run your next event?
+            Ready for the {event.title}?
           </h2>
           <p className="mt-3 text-zinc-300">
-            Spin up a challenge, share the link, and let the leaderboard do the talking.
-            Free to start — built for communities.
+            Join a club, sharpen your lines, and compete for the {event.prize} gift card.
+            Events kick off Sunday at 6 PM.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Button to="/create" size="lg">
-              <PlusCircle className="h-4 w-4" />
-              Create a challenge
+            <Button to="/clubs" size="lg">
+              <Users className="h-4 w-4" />
+              Join a Club
             </Button>
-            <Button to="/clubs" size="lg" variant="secondary">
-              Explore communities
+            <Button to="/create" size="lg" variant="secondary">
+              <PlusCircle className="h-4 w-4" />
+              Create a Challenge
             </Button>
           </div>
         </div>
@@ -654,3 +519,4 @@ function CtaBand() {
     </section>
   )
 }
+

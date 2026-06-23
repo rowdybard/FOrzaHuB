@@ -79,6 +79,7 @@ export const submissions = []
 // Recent activity feed — empty at launch.
 export const recentActivity = []
 
+// Sponsored event hub data
 export const siteStats = {
   clubs: clubs.length,
   challenges: 0,
@@ -86,6 +87,60 @@ export const siteStats = {
   racers: clubs.reduce((n, c) => n + (c.members || 0), 0),
   isLaunch: true,
 }
+
+function nextSunday() {
+  const now = new Date()
+  const day = now.getDay()
+  const diff = day === 0 ? 7 : 7 - day
+  const sunday = new Date(now)
+  sunday.setDate(now.getDate() + diff)
+  sunday.setHours(18, 0, 0, 0)
+  return sunday.toISOString()
+}
+
+function addDays(iso, days) {
+  const d = new Date(iso)
+  d.setDate(d.getDate() + days)
+  return d.toISOString()
+}
+
+const _eventStart = nextSunday()
+
+export const sponsoredEvent = {
+  id: 'evt-1',
+  title: 'Horizon Heatwave',
+  tagline: 'One week. One champion. One $50 gift card.',
+  description:
+    'A seven-day community showdown across Forza Horizon 6. Daily challenges, cumulative scoring, and a $50 Steam/Xbox gift card for the overall champion. Sponsored by the community, for the community.',
+  startDate: _eventStart,
+  endDate: addDays(_eventStart, 6),
+  prize: '$50',
+  prizeDescription: 'Steam or Xbox gift card (winner\'s choice)',
+  prizeValue: 50,
+  status: 'upcoming',
+  accent: '#ff6b2c',
+}
+
+export const eventSchedule = [
+  { day: 1, label: 'Sunday',    date: _eventStart,              title: 'Opening Hot Lap',       typeId: 'time_trial',   description: 'Single flying lap on the festival circuit. Fastest time sets the tone.',  status: 'upcoming' },
+  { day: 2, label: 'Monday',    date: addDays(_eventStart, 1),  title: 'Drift After Dark',      typeId: 'drift_score',  description: 'Highest single drift score under the night sky.',                         status: 'upcoming' },
+  { day: 3, label: 'Tuesday',   date: addDays(_eventStart, 2),  title: 'Quarter Mile Kings',    typeId: 'drag_time',    description: 'Standing start to finish. Lowest elapsed time wins.',                     status: 'upcoming' },
+  { day: 4, label: 'Wednesday', date: addDays(_eventStart, 3),  title: 'Build Battle Showcase', typeId: 'build_battle', description: 'Build a car to the brief. Community vote decides the cleanest build.',     status: 'upcoming' },
+  { day: 5, label: 'Thursday',  date: addDays(_eventStart, 4),  title: 'Photo Mode Masters',    typeId: 'photo_contest',description: 'Capture the perfect shot. Most votes takes the day.',                     status: 'upcoming' },
+  { day: 6, label: 'Friday',    date: addDays(_eventStart, 5),  title: 'Grand Prix Heat',       typeId: 'time_trial',   description: 'Three-lap average on the GP circuit. Consistency is king.',               status: 'upcoming' },
+  { day: 7, label: 'Saturday',  date: addDays(_eventStart, 6),  title: 'Grand Finale Showdown', typeId: 'time_trial',   description: 'Winner-takes-all final race. Champion crowned, gift card awarded.',       status: 'upcoming' },
+]
+
+export const sponsors = [
+  { id: 'sp-pitwall', name: 'Pitwall',            tier: 'organizer', blurb: 'Community-run event platform' },
+  { id: 'sp-rowdy',   name: 'Rowdybard Racing',   tier: 'prize',     blurb: 'Sponsoring the $50 gift card prize pool' },
+  { id: 'sp-cone',    name: 'PurpleCone Garage',  tier: 'supporter', blurb: 'Build battle judge and community support' },
+]
+
+export const eventLeaderboard = [
+  { rank: 1, tag: 'Rowdybard',  club: 'PW', points: 0, events: 0, accent: '#ff6b2c' },
+  { rank: 2, tag: 'PurpleCone', club: 'PW', points: 0, events: 0, accent: '#a855f7' },
+]
 
 // --- Selectors (mirror the async API in src/data/api.js) -------------------
 export const allChallenges = [...challenges, ...subChallenges]

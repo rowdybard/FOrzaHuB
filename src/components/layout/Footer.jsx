@@ -48,8 +48,8 @@ export default function Footer() {
           <div className="max-w-sm">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-              The community challenge hub for Forza Horizon 6 clubs. Run events,
-              collect proof, and publish clean public leaderboards your members can trust.
+              The sponsored community event hub for Forza Horizon 6. Weekly events,
+              real prizes, proof-backed leaderboards, and a championship worth competing for.
             </p>
             <div className="mt-5 flex items-center gap-2">
               <a
