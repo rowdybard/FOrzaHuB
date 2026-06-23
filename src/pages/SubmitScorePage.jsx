@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   Upload,
@@ -19,7 +19,7 @@ import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { getSubmittableChallenges, createSubmission, uploadProof } from '../data/api'
+import { getSubmittableChallenges, createSubmission, uploadProof, getUserSubmission } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
 import Loading from '../components/common/Loading'
@@ -55,6 +55,18 @@ function parseResult(raw) {
   return Number.isFinite(n) ? n : null
 }
 
+const VIDEO_HOSTS = ['youtube.com', 'youtu.be', 'medal.tv', 'tiktok.com', 'streamable.com', 'xbox.com']
+
+function deriveProofType(form, isGallery) {
+  if (form.file) return isGallery ? 'photo' : 'screenshot'
+  const link = (form.link || '').trim().toLowerCase()
+  if (link) {
+    const isVideo = VIDEO_HOSTS.some((h) => link.includes(h))
+    return isVideo ? 'video' : isGallery ? 'photo' : 'screenshot'
+  }
+  return isGallery ? 'photo' : 'screenshot'
+}
+
 export default function SubmitScorePage() {
   const { slug } = useParams()
   const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
@@ -77,6 +89,29 @@ export default function SubmitScorePage() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [existingSubmission, setExistingSubmission] = useState(null)
+  const [checkingExisting, setCheckingExisting] = useState(false)
+
+  // Check if user already has a pending/approved submission for the selected challenge
+  useEffect(() => {
+    if (!enabled || !user || !challenge) {
+      setExistingSubmission(null)
+      return
+    }
+    let cancelled = false
+    setCheckingExisting(true)
+    getUserSubmission(challenge.id, user.id)
+      .then((sub) => {
+        if (!cancelled) setExistingSubmission(sub)
+      })
+      .catch(() => {
+        if (!cancelled) setExistingSubmission(null)
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingExisting(false)
+      })
+    return () => { cancelled = true }
+  }, [enabled, user, challenge?.id])
 
   // Default selection: URL slug match, else first live challenge.
   const selectedId = challengeId ?? (list.find((c) => c.slug === slug)?.id || list[0]?.id)
@@ -155,7 +190,7 @@ export default function SubmitScorePage() {
         value: isGallery ? null : parseResult(form.result),
         title: isGallery ? form.title : null,
         share_code: form.shareCode || null,
-        proof_type: isGallery ? 'photo' : 'video',
+        proof_type: deriveProofType(form, isGallery),
         proof_url: proofUrl || null,
         note: form.notes || null,
         status: 'pending',
@@ -215,6 +250,44 @@ export default function SubmitScorePage() {
     return <SuccessView challenge={challenge} club={club} t={t} form={form} held={willBeHeld} prereq={prereq} onReset={() => setSubmitted(false)} />
   }
 
+  if (existingSubmission) {
+    const isPending = existingSubmission.status === 'pending'
+    return (
+      <div>
+        <PageHero
+          eyebrow="Submit"
+          title="Already entered"
+          description="You have an existing submission for this event."
+        />
+        <div className="container-page py-8">
+          <div className="mx-auto max-w-md rounded-2xl border border-white/[0.08] bg-ink-900/60 p-6 text-center">
+            {isPending ? (
+              <>
+                <Clock className="mx-auto h-10 w-10 text-amber-400" />
+                <h2 className="mt-4 text-lg font-bold text-white">Your submission is awaiting review</h2>
+                <p className="mt-2 text-sm text-zinc-400">
+                  You already have a pending submission for <span className="font-semibold text-white">{challenge.title}</span>. Wait for a steward to approve it before submitting again.
+                </p>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-400" />
+                <h2 className="mt-4 text-lg font-bold text-white">Your result is on the leaderboard</h2>
+                <p className="mt-2 text-sm text-zinc-400">
+                  You already have an approved submission for <span className="font-semibold text-white">{challenge.title}</span>. Check the leaderboard to see your rank.
+                </p>
+              </>
+            )}
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <Button to={`/c/${challenge.slug}`}>View challenge</Button>
+              <Button to="/challenges" variant="secondary">Browse events</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <PageHero
@@ -245,7 +318,7 @@ export default function SubmitScorePage() {
                 >
                   {list.map((c) => (
                     <option key={c.id} value={c.id} className="bg-ink-850">
-                      {c.title}
+                      {c.title}{c.visibility === 'club' ? ' (Members only)' : ''}
                     </option>
                   ))}
                 </select>
@@ -646,6 +719,9 @@ function SuccessView({ challenge, club, t, form, held, prereq, onReset }) {
             </Button>
             <Button onClick={onReset}>Submit another</Button>
           </div>
+          <Link to="/profile" className="block text-center text-xs text-brand-400 hover:text-brand-300">
+            Track your submissions →
+          </Link>
         </div>
       </div>
     </div>

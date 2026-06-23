@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Check, Hash, MessagesSquare, Save, ShieldCheck, Sparkles, User } from 'lucide-react'
+import { Check, Hash, MessagesSquare, Save, ShieldCheck, Sparkles, User, Inbox } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Nameplate from '../components/ui/Nameplate'
 import PageHero from '../components/common/PageHero'
+import MySubmissions from '../components/common/MySubmissions'
 import { useAuth } from '../hooks/useAuth'
-import { getMyClub, updateMyProfile } from '../data/api'
+import { useAsync } from '../hooks/useAsync'
+import { getMyClub, updateMyProfile, getMySubmissions, withdrawSubmission } from '../data/api'
 import { cn, hexToRgba } from '../lib/utils'
 import {
   ACCENTS,
@@ -35,6 +37,16 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [primaryClub, setPrimaryClub] = useState(null)
+
+  const { data: mySubs, reload: reloadSubs } = useAsync(
+    () => (enabled && user ? getMySubmissions() : Promise.resolve([])),
+    [enabled, user?.id],
+  )
+
+  const handleWithdraw = async (id) => {
+    await withdrawSubmission(id)
+    reloadSubs()
+  }
 
   useEffect(() => {
     if (profile) {
@@ -341,6 +353,15 @@ export default function ProfilePage() {
             </div>
           </section>
         </div>
+      </div>
+
+      {/* My Submissions */}
+      <div className="container-page pb-12">
+        <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          <Inbox className="h-3.5 w-3.5" />
+          My submissions
+        </div>
+        <MySubmissions submissions={mySubs || []} onWithdraw={handleWithdraw} />
       </div>
     </>
   )

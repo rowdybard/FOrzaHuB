@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Users, Clock, Trophy, Hourglass, ImagePlus } from 'lucide-react'
+import { Users, Clock, Trophy, Hourglass, ImagePlus, Sparkles } from 'lucide-react'
 import Cover from '../ui/Cover'
 import { TypeBadge, StatusBadge } from '../ui/Badge'
 import ClubMark from '../ui/ClubMark'
@@ -80,7 +80,15 @@ export default function ChallengeCard({ challenge, club: clubProp }) {
       <Link to={to} className="block">
         <Cover typeId={challenge.typeId} className="h-36">
           <div className="flex items-start justify-between p-3">
-            <TypeBadge typeId={challenge.typeId} size="sm" />
+            <div className="flex items-center gap-1.5">
+              <TypeBadge typeId={challenge.typeId} size="sm" />
+              {challenge.sponsored && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                  <Sparkles className="h-2.5 w-2.5" />
+                  {challenge.sponsor || 'Sponsored'}
+                </span>
+              )}
+            </div>
             <StatusBadge status={challenge.status} />
           </div>
         </Cover>

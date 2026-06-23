@@ -172,11 +172,42 @@ export default function AdminDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/60 px-3.5 py-2.5 text-sm text-zinc-300 transition-colors hover:text-white">
+          <Link
+            to="/challenges"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/60 px-3.5 py-2.5 text-sm text-zinc-300 transition-colors hover:text-white"
+          >
             All events
             <ChevronDown className="h-4 w-4 text-zinc-500" />
-          </button>
-          <Button variant="secondary">
+          </Link>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              try {
+                const rows = ['challenge,user,result,status,proof_url,submitted_at']
+                filtered.forEach((i) => {
+                  const challenge = i.challengeTitle || ''
+                  const user = i.user?.tag || ''
+                  const result = i.value ?? i.title ?? ''
+                  const status = i.status || ''
+                  const proof = i.proof?.url || ''
+                  const date = i.submittedAt || ''
+                  rows.push([challenge, user, result, status, proof, date]
+                    .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+                    .join(','))
+                })
+                const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `submissions-export-${new Date().toISOString().slice(0, 10)}.csv`
+                a.click()
+                URL.revokeObjectURL(url)
+              } catch (err) {
+                console.error('[admin] export failed', err)
+                setActionError('Export failed. Try again.')
+              }
+            }}
+          >
             <Download className="h-4 w-4" />
             Export
           </Button>

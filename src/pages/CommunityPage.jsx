@@ -18,6 +18,7 @@ import {
   CircleAlert,
   LogIn,
   UserPlus,
+  Lock,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ClubMark from '../components/ui/ClubMark'
@@ -31,6 +32,7 @@ import NotFound from './NotFound'
 import Loading from '../components/common/Loading'
 import {
   deleteChallenge,
+  updateChallenge,
   getClubBySlug,
   getChallengesByClub,
   getClubMembers,
@@ -173,7 +175,7 @@ export default function CommunityPage() {
               canManage={canManage}
             />
             <AboutCard club={club} />
-            <StandingsCard standings={standings} />
+            <StandingsCard standings={standings} season={currentSeason} />
           </aside>
         </div>
       </div>
@@ -508,6 +510,22 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
     }
   }
 
+  const close = async (challenge) => {
+    const label = challenge.title || 'this event'
+    if (!window.confirm(`Close "${label}"? This will lock all submissions.`)) return
+    setBusyId(challenge.id)
+    setError('')
+    try {
+      await updateChallenge(challenge.id, { status: 'closed' })
+      onChanged?.()
+    } catch (err) {
+      console.error('[community] close challenge failed', err)
+      setError(err?.message || 'Could not close this event.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   return (
     <section className="mt-6 rounded-2xl border border-brand-500/15 bg-brand-500/[0.04] p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -553,6 +571,22 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
               >
                 <Edit3 className="h-4 w-4" />
               </Button>
+              {(challenge.status === 'live' || challenge.status === 'upcoming') && (
+                <button
+                  type="button"
+                  title="Close now"
+                  aria-label="Close now"
+                  onClick={() => close(challenge)}
+                  disabled={busyId === challenge.id}
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-amber-500/25 bg-amber-500/10 text-amber-300 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
+                >
+                  {busyId === challenge.id ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <Lock className="h-4 w-4" />
+                  )}
+                </button>
+              )}
               <button
                 type="button"
                 title="Delete event"
@@ -632,12 +666,14 @@ function AboutCard({ club }) {
   )
 }
 
-function StandingsCard({ standings }) {
+function StandingsCard({ standings, season }) {
   return (
     <div className="card overflow-hidden">
       <div className="flex items-center gap-2 border-b border-white/[0.06] p-5">
         <Medal className="h-5 w-5 text-brand-400" />
-        <h3 className="font-bold">Season standings</h3>
+        <h3 className="font-bold">
+          Season standings{season ? ` — ${season}` : ''}
+        </h3>
       </div>
       <div className="divide-y divide-white/[0.05]">
         {standings.length === 0 ? (

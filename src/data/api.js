@@ -117,6 +117,8 @@ function normChallenge(row) {
     prerequisiteId: row.prerequisite_id || null,
     isSubChallenge: !!row.is_sub_challenge,
     parentId: row.parent_id || null,
+    sponsor: row.sponsor || null,
+    sponsored: !!row.sponsored,
     entries: [],
     gallery: [],
     participants: 0,
@@ -156,7 +158,12 @@ function buildBoard(challenge, approvedSubs) {
   if (t.gallery) {
     const items = approvedSubs
       .slice()
-      .sort((a, b) => (b.votes || 0) - (a.votes || 0))
+      .sort((a, b) => {
+        const dv = (b.votes || 0) - (a.votes || 0)
+        if (dv !== 0) return dv
+        // Tie-break: earliest submission wins
+        return new Date(a.submittedAt || 0) - new Date(b.submittedAt || 0)
+      })
       .map((s, i) => ({
         id: s.id,
         rank: i + 1,
@@ -171,7 +178,12 @@ function buildBoard(challenge, approvedSubs) {
   }
   const entries = approvedSubs
     .filter((s) => s.value != null)
-    .sort((a, b) => (t.sort === 'asc' ? a.value - b.value : b.value - a.value))
+    .sort((a, b) => {
+      const dv = t.sort === 'asc' ? a.value - b.value : b.value - a.value
+      if (dv !== 0) return dv
+      // Tie-break: earliest submission wins
+      return new Date(a.submittedAt || 0) - new Date(b.submittedAt || 0)
+    })
     .map((s, i) => ({
       rank: i + 1,
       user: s.user,
@@ -277,18 +289,11 @@ export async function getMyClubMemberships(userId) {
 export async function setPrimaryClub(userId, clubId) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
   const currentUserId = await requireCurrentUserId()
-  const clear = await supabase
-    .from('club_members')
-    .update({ is_primary: false })
-    .eq('user_id', currentUserId)
-  if (clear.error) throw clear.error
-
-  const set = await supabase
-    .from('club_members')
-    .update({ is_primary: true })
-    .eq('user_id', currentUserId)
-    .eq('club_id', clubId)
-  if (set.error) throw set.error
+  const { error } = await supabase.rpc('set_primary_club', {
+    p_club_id: clubId,
+    p_user_id: currentUserId,
+  })
+  if (error) throw error
   return { ok: true }
 }
 
@@ -481,6 +486,56 @@ export async function reviewSubmission(id, status) {
   return { ok: true }
 }
 
+export async function getMySubmissions() {
+  if (!isSupabaseEnabled) {
+    return mock.submissions
+      .filter((s) => s.user)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .map((s) => {
+        const challenge = mock.allChallenges.find((c) => c.id === s.challenge_id)
+        return normSubmission(s, {
+          profile: s.user,
+          challengeTitle: challenge?.title || '',
+        })
+      })
+  }
+  const userId = await requireCurrentUserId()
+  const { data, error } = await supabase
+    .from('submissions')
+    .select('*, profiles!submissions_user_id_fkey(*), challenges!submissions_challenge_id_fkey(title, slug, type_id)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map((row) =>
+    normSubmission(row, {
+      profile: row.profiles,
+      challengeTitle: row.challenges?.title || '',
+    }),
+  )
+}
+
+export async function updateSubmission(id, payload) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { error } = await supabase
+    .from('submissions')
+    .update(payload)
+    .eq('id', id)
+    .eq('status', 'pending')
+  if (error) throw error
+  return { ok: true }
+}
+
+export async function withdrawSubmission(id) {
+  if (!isSupabaseEnabled) return { ok: true, demo: true }
+  const { error } = await supabase
+    .from('submissions')
+    .delete()
+    .eq('id', id)
+    .eq('status', 'pending')
+  if (error) throw error
+  return { ok: true }
+}
+
 export async function createChallenge(payload) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
   const { data, error } = await supabase.from('challenges').insert(payload).select().maybeSingle()
@@ -521,6 +576,25 @@ export async function deleteChallenge(id) {
   return { ok: true }
 }
 
+export async function getUserSubmission(challengeId, userId) {
+  if (!isSupabaseEnabled) {
+    const sub = mock.submissions.find(
+      (s) => s.challenge_id === challengeId && s.user?.id === userId,
+    )
+    return sub ? normSubmission(sub) : null
+  }
+  const uid = userId || (await requireCurrentUserId())
+  const { data, error } = await supabase
+    .from('submissions')
+    .select('*, profiles!submissions_user_id_fkey(*)')
+    .eq('challenge_id', challengeId)
+    .eq('user_id', uid)
+    .in('status', ['pending', 'approved'])
+    .maybeSingle()
+  if (error) throw error
+  return data ? normSubmission(data) : null
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Derived collections + stats                                               */
 /* -------------------------------------------------------------------------- */
@@ -531,11 +605,37 @@ export async function getLiveChallenges() {
 }
 
 // Live challenges with club + prerequisite attached, for the submit form.
+// Club-only challenges are filtered to only those the current user is a member of.
 export async function getSubmittableChallenges() {
   const [live, clubs] = await Promise.all([getLiveChallenges(), getClubs()])
   const byId = new Map(clubs.map((c) => [c.id, c]))
+
+  // If Supabase is enabled, fetch user's club memberships to filter club-only challenges
+  let userClubIds = null
+  if (isSupabaseEnabled) {
+    try {
+      const userId = await requireCurrentUserId()
+      if (userId) {
+        const { data: memberships } = await supabase
+          .from('club_members')
+          .select('club_id')
+          .eq('user_id', userId)
+        userClubIds = new Set((memberships || []).map((m) => m.club_id))
+      }
+    } catch {
+      // Not signed in — userClubIds stays null, club-only challenges excluded
+      userClubIds = new Set()
+    }
+  }
+
+  const filtered = live.filter((c) => {
+    if (c.visibility === 'public') return true
+    if (c.visibility === 'club') return userClubIds ? userClubIds.has(c.clubId) : false
+    return true
+  })
+
   return Promise.all(
-    live.map(async (c) => ({
+    filtered.map(async (c) => ({
       ...c,
       club: byId.get(c.clubId) || null,
       prereq: await getPrerequisite(c),
@@ -557,19 +657,23 @@ export async function getFeaturedChallenge() {
 
 export async function getSiteStats() {
   if (!isSupabaseEnabled) return mock.siteStats
-  const [clubsRes, challengesRes, subsRes] = await Promise.all([
+  const [clubsRes, challengesRes, subsRes, racersRes] = await Promise.all([
     supabase.from('clubs').select('id', { count: 'exact', head: true }),
     supabase.from('challenges').select('id', { count: 'exact', head: true }),
     supabase.from('submissions').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+    supabase.from('submissions').select('user_id'),
   ])
   const clubs = clubsRes.count ?? 0
   const challenges = challengesRes.count ?? 0
   const submissions = subsRes.count ?? 0
+  const distinctRacers = new Set(
+    (racersRes.data || []).map((r) => r.user_id).filter(Boolean),
+  ).size
   return {
     clubs,
     challenges,
     submissions,
-    racers: submissions, // refined later via distinct user count
+    racers: distinctRacers,
     isLaunch: submissions === 0,
   }
 }

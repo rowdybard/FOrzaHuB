@@ -12,6 +12,7 @@ import {
   Lock,
   PartyPopper,
   ArrowLeft,
+  Sparkles,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ChallengeCard from '../components/common/ChallengeCard'
@@ -80,6 +81,8 @@ export default function CreateChallengePage() {
     endDate: existing ? toDateInput(existing.endDate) : plusDays(7),
     rules: existing?.rules?.length ? [...existing.rules] : [''],
     visibility: 'public',
+    sponsor: existing?.sponsor || '',
+    sponsored: existing?.sponsored || false,
   }))
   const [published, setPublished] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -108,6 +111,8 @@ export default function CreateChallengePage() {
       endDate: toDateInput(existing.endDate) || plusDays(7),
       rules: existing.rules?.length ? [...existing.rules] : [''],
       visibility: existing.visibility || 'public',
+      sponsor: existing.sponsor || '',
+      sponsored: existing.sponsored || false,
     })
   }, [existing, clubList[0]?.id])
 
@@ -181,6 +186,8 @@ export default function CreateChallengePage() {
         end_date: new Date(form.endDate).toISOString(),
         rules: form.rules.filter(Boolean),
         visibility: form.visibility,
+        sponsor: form.sponsored ? form.sponsor.trim() : null,
+        sponsored: form.sponsored,
         status: startInFuture ? 'upcoming' : 'live',
         created_by: user?.id || null,
       }
@@ -504,6 +511,36 @@ export default function CreateChallengePage() {
                 />
               </div>
             </Panel>
+
+            {/* Sponsor (staff/owners only) */}
+            {canEditMaterial && (
+              <Panel step="6" title="Sponsor">
+                <label className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-ink-900/40 p-3.5">
+                  <input
+                    type="checkbox"
+                    checked={form.sponsored}
+                    onChange={(e) => set('sponsored', e.target.checked)}
+                    className="h-4 w-4 rounded border-white/20 accent-amber-500"
+                  />
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <span className="text-sm font-medium text-white">This is a sponsored event</span>
+                  </div>
+                </label>
+                {form.sponsored && (
+                  <div className="mt-3">
+                    <Field label="Sponsor name" hint="Shown on the challenge card and page">
+                      <input
+                        value={form.sponsor}
+                        onChange={(e) => set('sponsor', e.target.value)}
+                        placeholder="e.g. Apex Tuning"
+                        className={inputCls}
+                      />
+                    </Field>
+                  </div>
+                )}
+              </Panel>
+            )}
           </div>
 
           {/* Preview */}

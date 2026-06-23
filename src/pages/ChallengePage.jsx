@@ -19,6 +19,7 @@ import {
   Vote,
   Lock,
   ClipboardCheck,
+  Sparkles,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
@@ -124,6 +125,13 @@ function ChallengeHeader({ challenge, club, t }) {
           <h1 className="mt-4 max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             {challenge.title}
           </h1>
+
+          {challenge.sponsored && (
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-sm font-semibold text-amber-300">
+              <Sparkles className="h-3.5 w-3.5" />
+              Sponsored by {challenge.sponsor || 'a community partner'}
+            </div>
+          )}
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-300">
             <Link to={`/club/${club?.slug}`} className="flex items-center gap-2 hover:text-white">
