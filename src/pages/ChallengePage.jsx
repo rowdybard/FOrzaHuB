@@ -13,7 +13,6 @@ import {
   Link2,
   Check,
   MessagesSquare,
-  ListChecks,
   Flag,
   Hourglass,
   Vote,
@@ -24,7 +23,6 @@ import {
 import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
-import Avatar from '../components/ui/Avatar'
 import { TypeBadge, StatusBadge, Badge } from '../components/ui/Badge'
 import Countdown from '../components/common/Countdown'
 import Leaderboard from '../components/common/Leaderboard'
@@ -36,7 +34,7 @@ import Loading from '../components/common/Loading'
 import { getChallengeBySlug, getPrerequisite, getChallengesByClub } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { getType } from '../lib/challengeTypes'
-import { formatDate, formatNumber } from '../lib/utils'
+import { formatDate, formatNumber, hexToRgba } from '../lib/utils'
 
 async function loadChallenge(slug) {
   const challenge = await getChallengeBySlug(slug)
@@ -66,16 +64,16 @@ export default function ChallengePage() {
   return (
     <>
       <ChallengeHeader challenge={challenge} club={club} t={t} />
+      <FactStrip challenge={challenge} t={t} />
 
       <div className="container-page mt-8 grid items-start gap-8 lg:grid-cols-[1fr_336px]">
-        <div className="space-y-8">
+        <div className="space-y-6">
           {prereq && <PrereqBanner prereq={prereq} />}
           <Standings challenge={challenge} t={t} />
-          <Rules challenge={challenge} />
-          <About challenge={challenge} />
+          <Rules challenge={challenge} t={t} />
         </div>
 
-        <aside className="space-y-5 lg:sticky lg:top-20">
+        <aside className="space-y-4 lg:sticky lg:top-20">
           <EventDetails challenge={challenge} club={club} t={t} isLive={isLive} prereq={prereq} />
           {challenge.sponsored && <SponsorMiniCard challenge={challenge} />}
           <OrganizerCard club={club} />
@@ -109,9 +107,9 @@ export default function ChallengePage() {
 function ChallengeHeader({ challenge, club, t }) {
   return (
     <section className="relative">
-      <Cover typeId={challenge.typeId} className="min-h-[300px] sm:min-h-[340px]" iconSize="h-72 w-72">
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
-        <div className="container-page relative flex min-h-[300px] flex-col justify-end pb-8 pt-24 sm:min-h-[340px]">
+      <Cover typeId={challenge.typeId} className="min-h-[320px] sm:min-h-[380px]" iconSize="h-80 w-80">
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/50 to-transparent" />
+        <div className="container-page relative flex min-h-[320px] flex-col justify-end pb-8 pt-24 sm:min-h-[380px]">
           <nav className="mb-4 flex items-center gap-1.5 text-sm text-zinc-400">
             <Link to="/challenges" className="hover:text-white">Challenges</Link>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -121,32 +119,31 @@ function ChallengeHeader({ challenge, club, t }) {
           <div className="flex flex-wrap items-center gap-2">
             <TypeBadge typeId={challenge.typeId} />
             <StatusBadge status={challenge.status} />
+            {challenge.sponsored && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300">
+                <Sparkles className="h-3 w-3" />
+                {challenge.sponsor || 'Sponsored'}
+              </span>
+            )}
           </div>
 
           <h1 className="mt-4 max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             {challenge.title}
           </h1>
 
-          {challenge.sponsored && (
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-sm font-semibold text-amber-300">
-              <Sparkles className="h-3.5 w-3.5" />
-              Sponsored by {challenge.sponsor || 'a community partner'}
-            </div>
+          {challenge.description && (
+            <p className="mt-3 max-w-2xl text-balance text-base leading-relaxed text-zinc-300 sm:text-lg">
+              {challenge.description}
+            </p>
           )}
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-300">
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-zinc-300">
             <Link to={`/club/${club?.slug}`} className="flex items-center gap-2 hover:text-white">
-              <ClubMark club={club} size={26} />
+              <ClubMark club={club} size={24} />
               <span className="font-medium">{club?.name}</span>
               {club?.verified && <ShieldCheck className="h-4 w-4 text-brand-400" />}
             </Link>
-            <span className="text-zinc-600">·</span>
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-zinc-500" />
-              {challenge.location}
-            </span>
-            <span className="text-zinc-600">·</span>
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-zinc-400">
               <Users className="h-4 w-4 text-zinc-500" />
               {formatNumber(challenge.participants)} racers
             </span>
@@ -154,6 +151,45 @@ function ChallengeHeader({ challenge, club, t }) {
         </div>
       </Cover>
     </section>
+  )
+}
+
+/* ------------------------------- Fact Strip ------------------------------- */
+
+function FactChip({ icon: Icon, label, value, accent }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span
+        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg"
+        style={{
+          color: accent,
+          backgroundColor: hexToRgba(accent, 0.12),
+          border: `1px solid ${hexToRgba(accent, 0.2)}`,
+        }}
+      >
+        <Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{label}</div>
+        <div className="truncate text-sm font-medium text-white">{value}</div>
+      </div>
+    </div>
+  )
+}
+
+function FactStrip({ challenge, t }) {
+  return (
+    <div className="border-b border-white/[0.06] bg-ink-900/40">
+      <div className="container-page flex flex-wrap items-center gap-x-8 gap-y-4 py-4">
+        <FactChip icon={Flag} label="Format" value={t.label} accent={t.accent} />
+        <FactChip icon={Car} label="Class" value={challenge.restriction || 'Open'} accent={t.accent} />
+        <FactChip icon={MapPin} label="Track" value={challenge.location || '—'} accent={t.accent} />
+        <FactChip icon={CalendarDays} label="Window" value={`${formatDate(challenge.startDate, { month: 'short', day: 'numeric' })} – ${formatDate(challenge.endDate, { month: 'short', day: 'numeric' })}`} accent={t.accent} />
+        {challenge.prize && (
+          <FactChip icon={Gift} label="Prize" value={challenge.prize} accent="#fbbf24" />
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -168,7 +204,7 @@ function Standings({ challenge, t }) {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <h2 className="text-xl font-bold">{t.gallery ? 'Entries' : 'Standings'}</h2>
-          <Badge tone="neutral">{formatNumber(count)} {t.gallery ? 'entries' : 'racers'}</Badge>
+          {count > 0 && <Badge tone="neutral">{formatNumber(count)} {t.gallery ? 'entries' : 'racers'}</Badge>}
         </div>
         {hasEntries && (
           <span className="inline-flex items-center gap-1.5 text-xs text-emerald-300">
@@ -181,10 +217,10 @@ function Standings({ challenge, t }) {
       {!hasEntries ? (
         <EmptyState
           icon={t.gallery ? Vote : Flag}
-          title={challenge.status === 'upcoming' ? 'This event hasn’t started yet' : 'No entries yet'}
+          title={challenge.status === 'upcoming' ? 'Event hasn\'t started yet' : 'No entries yet'}
           description={
             challenge.status === 'upcoming'
-              ? 'Submissions open when the challenge goes live. Set a reminder and get your car dialled in.'
+              ? 'Submissions open when the challenge goes live. Get your car dialled in.'
               : 'Be the first to put a result on the board.'
           }
         />
@@ -203,49 +239,36 @@ function Standings({ challenge, t }) {
 
 /* ---------------------------------- Rules --------------------------------- */
 
-function Rules({ challenge }) {
+function Rules({ challenge, t }) {
+  const Icon = t.icon
   return (
     <section className="card p-6">
-      <h2 className="flex items-center gap-2 text-lg font-bold">
-        <ListChecks className="h-5 w-5 text-brand-400" />
-        Rules & format
-      </h2>
-      <ul className="mt-4 space-y-3">
+      <div className="flex items-center gap-2.5">
+        <span
+          className="grid h-7 w-7 place-items-center rounded-lg"
+          style={{
+            color: t.accent,
+            backgroundColor: hexToRgba(t.accent, 0.12),
+            border: `1px solid ${hexToRgba(t.accent, 0.2)}`,
+          }}
+        >
+          <Icon className="h-4 w-4" />
+        </span>
+        <h2 className="text-lg font-bold">Rules & format</h2>
+      </div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {challenge.rules.map((r, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
-            <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/[0.06] font-num text-[11px] font-semibold text-zinc-400">
-              {i + 1}
-            </span>
-            <span className="leading-relaxed">{r}</span>
-          </li>
+          <div key={i} className="flex items-start gap-2.5 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3.5 py-3">
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+            <span className="text-sm leading-relaxed text-zinc-300">{r}</span>
+          </div>
         ))}
-      </ul>
-    </section>
-  )
-}
-
-function About({ challenge }) {
-  return (
-    <section className="card p-6">
-      <h2 className="text-lg font-bold">About this challenge</h2>
-      <p className="mt-3 leading-relaxed text-zinc-400">{challenge.description}</p>
+      </div>
     </section>
   )
 }
 
 /* ------------------------------ Event details ----------------------------- */
-
-function FactRow({ icon: Icon, label, children }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-3">
-      <span className="inline-flex items-center gap-2 text-sm text-zinc-400">
-        <Icon className="h-4 w-4 text-zinc-500" />
-        {label}
-      </span>
-      <span className="text-right text-sm font-medium text-white">{children}</span>
-    </div>
-  )
-}
 
 function PrereqBanner({ prereq }) {
   return (
@@ -310,18 +333,7 @@ function EventDetails({ challenge, club, t, isLive, prereq }) {
         )}
       </div>
 
-      <div className="divide-y divide-white/[0.05] px-5">
-        <FactRow icon={Flag} label="Format">{t.label}</FactRow>
-        <FactRow icon={Car} label="Restriction">{challenge.restriction}</FactRow>
-        <FactRow icon={MapPin} label="Location">{challenge.location}</FactRow>
-        <FactRow icon={CalendarDays} label="Window">
-          {formatDate(challenge.startDate, { month: 'short', day: 'numeric' })} –{' '}
-          {formatDate(challenge.endDate, { month: 'short', day: 'numeric' })}
-        </FactRow>
-        <FactRow icon={Gift} label="Prize">{challenge.prize}</FactRow>
-      </div>
-
-      <div className="space-y-3 border-t border-white/[0.06] p-5">
+      <div className="space-y-3 p-5">
         {isLive ? (
           prereq ? (
             <>
