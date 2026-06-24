@@ -37,8 +37,8 @@ export default function Leaderboard({ entries = [], typeId, caption, className }
         <span className="flex-1">Racer</span>
         <span className="hidden w-24 text-right md:block">Submitted</span>
         <span className="hidden w-20 text-right sm:block">Gap</span>
-        <span className="w-24 text-right sm:w-28">{t.metricLabel}</span>
-        <span className="w-9" />
+        <span className="w-20 text-right sm:w-28">{t.metricLabel}</span>
+        <span className="w-8 sm:w-9" />
       </div>
 
       <div className="divide-y divide-white/[0.05]">
@@ -48,7 +48,7 @@ export default function Leaderboard({ entries = [], typeId, caption, className }
             <div
               key={e.rank}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/[0.025]',
+                'flex items-center gap-2 px-3 py-3 transition-colors hover:bg-white/[0.025] sm:gap-3 sm:px-4',
                 e.rank === 1 && 'bg-brand-500/[0.04]',
               )}
             >
@@ -75,14 +75,14 @@ export default function Leaderboard({ entries = [], typeId, caption, className }
                 {gap || '—'}
               </span>
 
-              <span className="flex w-24 items-center justify-end gap-1.5 sm:w-28">
+              <span className="flex w-20 items-center justify-end gap-1 sm:w-28 sm:gap-1.5">
                 {e.verified && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />}
                 <span className="font-num text-[15px] font-bold tabular-nums text-white">
                   {formatMetric(typeId, e.value)}
                 </span>
               </span>
 
-              <span className="flex w-9 justify-end">
+              <span className="flex w-8 justify-end sm:w-9">
                 <ProofTag proof={e.proof} compact />
               </span>
             </div>

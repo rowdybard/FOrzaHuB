@@ -196,9 +196,9 @@ function ClubHeader({ club, canManage, onChanged }) {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex items-end gap-4">
             <ClubMark club={club} size={64} />
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{club.name}</h1>
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl break-words">{club.name}</h1>
                 {club.verified && <ShieldCheck className="h-5 w-5 text-brand-400" />}
               </div>
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-zinc-400">

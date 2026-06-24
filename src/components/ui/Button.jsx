@@ -32,7 +32,7 @@ export default function Button({
   ...props
 }) {
   const cls = cn(
-    'inline-flex select-none items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap active:scale-[0.98]',
+    'inline-flex max-w-full select-none items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap active:scale-[0.98]',
     variants[variant],
     sizes[size],
     className,

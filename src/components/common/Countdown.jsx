@@ -27,7 +27,7 @@ export default function Countdown({ to, className, variant = 'inline', endedLabe
       <div className={cn('flex items-center gap-1.5 sm:gap-2', className)}>
         {blocks.map((b, i) => (
           <div key={b.l} className="flex items-center gap-1.5 sm:gap-2">
-            <div className="min-w-[3.1rem] rounded-xl border border-white/[0.07] bg-ink-800/80 px-2 py-2 text-center">
+            <div className="min-w-[2.7rem] rounded-xl border border-white/[0.07] bg-ink-800/80 px-1.5 py-2 text-center sm:min-w-[3.1rem] sm:px-2">
               <div className="font-num text-xl font-bold tabular-nums text-white">{pad(b.v)}</div>
               <div className="text-[10px] uppercase tracking-wider text-zinc-500">{b.l}</div>
             </div>

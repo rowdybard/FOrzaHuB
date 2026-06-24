@@ -179,7 +179,7 @@ function FactChip({ icon: Icon, label, value, accent }) {
 function FactStrip({ challenge, t }) {
   return (
     <div className="border-b border-white/[0.06] bg-ink-900/40">
-      <div className="container-page flex flex-wrap items-center gap-x-8 gap-y-4 py-4">
+      <div className="container-page flex flex-wrap items-center gap-x-4 gap-y-3 py-4 sm:gap-x-8 sm:gap-y-4">
         <FactChip icon={Flag} label="Format" value={t.label} accent={t.accent} />
         <FactChip icon={Car} label="Class" value={challenge.restriction || 'Open'} accent={t.accent} />
         <FactChip icon={MapPin} label="Track" value={challenge.location || '—'} accent={t.accent} />
@@ -219,7 +219,7 @@ function Standings({ challenge, t }) {
           title={challenge.status === 'upcoming' ? 'Event hasn\'t started yet' : 'No entries yet'}
           description={
             challenge.status === 'upcoming'
-              ? 'Submissions open when the challenge goes live. Get your car dialled in.'
+              ? 'Submissions open when the challenge goes live. Get your car dialed in.'
               : 'Be the first to put a result on the board.'
           }
         />
@@ -422,7 +422,7 @@ function OrganizerCard({ club }) {
   if (!club) return null
   return (
     <div className="card p-5">
-      <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Organised by</div>
+      <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Organized by</div>
       <Link to={`/club/${club.slug}`} className="mt-3 flex items-center gap-3 group">
         <ClubMark club={club} size={44} />
         <div className="min-w-0">

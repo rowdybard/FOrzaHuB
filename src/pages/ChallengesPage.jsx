@@ -84,13 +84,13 @@ export default function ChallengesPage() {
                 ))}
               </div>
 
-              <div className="flex shrink-0 gap-1.5 rounded-xl border border-white/[0.06] bg-ink-900/60 p-1">
+              <div className="no-scrollbar -mx-1 flex shrink-0 gap-1.5 overflow-x-auto px-1 pb-1">
                 {STATUSES.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => setStatus(s.id)}
                     className={cn(
-                      'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+                      'shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
                       status === s.id
                         ? 'bg-white/[0.08] text-white'
                         : 'text-zinc-400 hover:text-white',

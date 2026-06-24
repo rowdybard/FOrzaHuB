@@ -122,13 +122,13 @@ export const sponsoredEvent = {
 }
 
 export const eventSchedule = [
-  { day: 1, label: 'Sunday',    date: _eventStart,              title: 'Opening Hot Lap',       typeId: 'time_trial',   description: 'Single flying lap on the festival circuit. Fastest time sets the tone.',  status: 'upcoming' },
-  { day: 2, label: 'Monday',    date: addDays(_eventStart, 1),  title: 'Drift After Dark',      typeId: 'drift_score',  description: 'Highest single drift score under the night sky.',                         status: 'upcoming' },
-  { day: 3, label: 'Tuesday',   date: addDays(_eventStart, 2),  title: 'Quarter Mile Kings',    typeId: 'drag_time',    description: 'Standing start to finish. Lowest elapsed time wins.',                     status: 'upcoming' },
-  { day: 4, label: 'Wednesday', date: addDays(_eventStart, 3),  title: 'Build Battle Showcase', typeId: 'build_battle', description: 'Build a car to the brief. Community vote decides the cleanest build.',     status: 'upcoming' },
-  { day: 5, label: 'Thursday',  date: addDays(_eventStart, 4),  title: 'Photo Mode Masters',    typeId: 'photo_contest',description: 'Capture the perfect shot. Most votes takes the day.',                     status: 'upcoming' },
-  { day: 6, label: 'Friday',    date: addDays(_eventStart, 5),  title: 'Grand Prix Heat',       typeId: 'time_trial',   description: 'Three-lap average on the GP circuit. Consistency is king.',               status: 'upcoming' },
-  { day: 7, label: 'Saturday',  date: addDays(_eventStart, 6),  title: 'Grand Finale Showdown', typeId: 'time_trial',   description: 'Winner-takes-all final race. Champion crowned, gift card awarded.',       status: 'upcoming' },
+  { day: 1, label: 'Sunday',    date: _eventStart,              title: 'A-Class Festival Circuit',  typeId: 'time_trial',   description: 'Single flying lap on the festival circuit. Fastest time sets the tone.',  status: 'upcoming' },
+  { day: 2, label: 'Monday',    date: addDays(_eventStart, 1),  title: 'S2 Drift Zone Trial',       typeId: 'drift_score',  description: 'Highest single drift score under the night sky.',                         status: 'upcoming' },
+  { day: 3, label: 'Tuesday',   date: addDays(_eventStart, 2),  title: 'R-Class Drag Sprint',       typeId: 'drag_time',    description: 'Standing start to finish. Lowest elapsed time wins.',                     status: 'upcoming' },
+  { day: 4, label: 'Wednesday', date: addDays(_eventStart, 3),  title: 'B-Class Street Build',     typeId: 'build_battle', description: 'Build a car to the brief. Community vote decides the cleanest build.',     status: 'upcoming' },
+  { day: 5, label: 'Thursday',  date: addDays(_eventStart, 4),  title: 'Photo Challenge: Rally Theme', typeId: 'photo_contest',description: 'Capture the perfect shot. Most votes takes the day.',                     status: 'upcoming' },
+  { day: 6, label: 'Friday',    date: addDays(_eventStart, 5),  title: 'S1 Road Circuit Trial',    typeId: 'time_trial',   description: 'Three-lap average on the GP circuit. Consistency is king.',               status: 'upcoming' },
+  { day: 7, label: 'Saturday',  date: addDays(_eventStart, 6),  title: 'R-Class Festival Finale',  typeId: 'time_trial',   description: 'Winner-takes-all final race. Champion crowned, gift card awarded.',       status: 'upcoming' },
 ]
 
 export const sponsors = [

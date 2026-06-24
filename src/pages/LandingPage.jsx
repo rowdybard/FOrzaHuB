@@ -67,7 +67,7 @@ export default function LandingPage() {
       )}
       <StatsBar stats={stats} />
       {live.length > 0 && <LiveChallenges challenges={live} />}
-      <HowItWorks />
+      <HowItWorks event={featuredEvent} />
       {featuredEvent && <EventCTA event={featuredEvent} />}
     </>
   )
@@ -96,7 +96,7 @@ function EventHero({ event, stats }) {
             </span>
           </div>
 
-          <h1 className="mt-6 animate-fade-up text-balance text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [animation-delay:60ms]">
+          <h1 className="mt-6 animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
             <span className="text-gradient">{event.title}</span>
           </h1>
 
@@ -250,7 +250,7 @@ function PrizeShowcase({ event }) {
   if (!event.prize) return null
   return (
     <section className="container-page mt-16">
-      <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.06] via-ink-900/40 to-ink-950 p-8 sm:p-12">
+      <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.06] via-ink-900/40 to-ink-950 p-5 sm:p-8 lg:p-12">
         <div className="absolute inset-0 bg-shimmer opacity-60" />
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
 
@@ -389,14 +389,14 @@ function LeaderboardPreview() {
       />
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-ink-850/80">
-        <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 border-b border-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+        <div className="grid grid-cols-[auto_1fr_auto_auto] gap-2 border-b border-white/[0.06] px-3 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:gap-4 sm:px-5">
           <span className="w-8 text-center">#</span>
           <span>Racer</span>
           <span className="hidden text-right sm:inline">Events</span>
           <span className="text-right">Points</span>
         </div>
         <div className="divide-y divide-white/[0.04]">
-          <div className="px-5 py-12 text-center">
+          <div className="px-3 py-12 text-center sm:px-5">
             <Trophy className="mx-auto h-10 w-10 text-zinc-600" />
             <h3 className="mt-4 font-semibold text-white">No standings yet</h3>
             <p className="mt-1.5 text-sm text-zinc-500">
@@ -495,12 +495,12 @@ function ChallengeCardLite({ challenge }) {
 
 /* ------------------------------- How it works ------------------------------- */
 
-function HowItWorks() {
+function HowItWorks({ event }) {
   const steps = [
     { icon: Users, title: 'Join a club', text: 'Find a community or bring your Discord server. Clubs are the home base for events.' },
     { icon: Flag, title: 'Enter daily events', text: 'Each day features a new challenge format — hot laps, drift, drag, builds, photos.' },
     { icon: Upload, title: 'Submit your proof', text: 'Post your time or score with a clip or screenshot. Every entry is verified.' },
-    { icon: Trophy, title: 'Climb the board', text: 'Points accumulate all week. Top racer on Saturday wins the $50 gift card.' },
+    { icon: Trophy, title: 'Climb the board', text: `Points accumulate all week. Top racer on Saturday wins the ${event?.prize || 'grand'} prize.` },
   ]
   return (
     <section className="container-page mt-24">
@@ -536,11 +536,11 @@ function EventCTA({ event }) {
         <div className="absolute inset-0 bg-grid opacity-40 mask-fade-b" />
         <div className="relative mx-auto max-w-2xl">
           <Flame className="mx-auto h-8 w-8 text-brand-400" />
-          <h2 className="mt-4 text-3xl font-bold sm:text-4xl text-balance">
+          <h2 className="mt-4 text-3xl font-bold sm:text-4xl text-balance break-words">
             Ready for the {event.title}?
           </h2>
           <p className="mt-3 text-zinc-300">
-            Join a club, sharpen your lines, and compete for the {event.prize} gift card.
+            Join a club, sharpen your lines, and compete for the {event.prize} prize.
             Events kick off Sunday at 6 PM.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">

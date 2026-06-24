@@ -274,7 +274,7 @@ export default function CreateChallengePage() {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {enabled && !user ? (
               <Button variant="secondary" onClick={signIn}>
                 Sign in

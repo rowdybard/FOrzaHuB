@@ -17,7 +17,7 @@ export default function SeriesStandings({ standings, compact = false }) {
   const max = standings[0]?.totalPoints || 1
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/[0.06]">
+    <div className="overflow-x-auto rounded-xl border border-white/[0.06]">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-white/[0.06] bg-white/[0.02] text-left text-xs text-zinc-500">
