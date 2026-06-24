@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Users, ArrowRight } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
 import ClubCard from '../components/common/ClubCard'
 import Loading from '../components/common/Loading'
@@ -13,20 +13,17 @@ function BringYourClubCard() {
   return (
     <Link
       to="/clubs/new"
-      className="group flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/[0.12] bg-transparent p-6 text-center transition-colors hover:border-brand-500/40 hover:bg-brand-500/[0.04]"
+      className="group flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/[0.08] bg-transparent p-6 text-center transition-colors hover:border-white/20 hover:bg-white/[0.02]"
     >
-      <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/[0.08] bg-ink-900 text-zinc-500 transition-colors group-hover:border-brand-500/30 group-hover:text-brand-400">
+      <span className="grid h-10 w-10 place-items-center rounded-lg border border-white/[0.06] bg-ink-900 text-zinc-500 transition-colors group-hover:text-zinc-300">
         <Plus className="h-5 w-5" />
       </span>
       <div>
-        <p className="font-semibold text-zinc-300 group-hover:text-white">Your club here</p>
+        <p className="font-medium text-zinc-300 group-hover:text-white">Your club here</p>
         <p className="mt-1 text-sm text-zinc-600 group-hover:text-zinc-400">
           Create a club for your Discord or racing group.
         </p>
       </div>
-      <span className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 group-hover:text-brand-400">
-        Get started <ArrowRight className="h-3 w-3" />
-      </span>
     </Link>
   )
 }
@@ -46,7 +43,7 @@ export default function ClubsPage() {
     <div>
       <PageHero
         eyebrow="Communities"
-        title="Clubs on the grid"
+        title="Clubs"
         description="Forza clubs running events on GripCafe."
       >
         <div className="mt-6 flex flex-wrap gap-3">
@@ -66,8 +63,8 @@ export default function ClubsPage() {
               className={cn(
                 'shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
                 region === r
-                  ? 'border-brand-500/40 bg-brand-500/15 text-brand-200'
-                  : 'border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:border-white/20 hover:text-white',
+                  ? 'border-white/[0.1] bg-white/[0.06] text-white'
+                  : 'border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/15 hover:text-white',
               )}
             >
               {r}
@@ -78,7 +75,7 @@ export default function ClubsPage() {
         {loading ? (
           <Loading label="Loading clubs…" />
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((club) => (
               <ClubCard key={club.id} club={club} />
             ))}

@@ -12,7 +12,6 @@ import {
   ChevronRight,
   Copy,
   Plus,
-  Medal,
   Edit3,
   Trash2,
   CircleAlert,
@@ -23,7 +22,6 @@ import {
 import Button from '../components/ui/Button'
 import ClubMark from '../components/ui/ClubMark'
 import StatTile from '../components/ui/StatTile'
-import { Badge } from '../components/ui/Badge'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
 import MembersCard from '../components/common/MembersCard'
@@ -41,7 +39,7 @@ import {
 } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
-import { formatNumber, hexToRgba } from '../lib/utils'
+import { formatNumber } from '../lib/utils'
 
 async function loadCommunity(slug) {
   const club = await getClubBySlug(slug)
@@ -187,17 +185,8 @@ export default function CommunityPage() {
 function ClubHeader({ club, canManage, onChanged }) {
   const hasDiscord = !!club.discord
   return (
-    <section className="relative overflow-hidden border-b border-white/[0.06]">
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(70% 120% at 8% 0%, ${hexToRgba(club.accent, 0.5)}, transparent 60%), radial-gradient(60% 110% at 92% 0%, ${hexToRgba(club.accent, 0.22)}, transparent 60%)`,
-        }}
-      />
-      <div className="absolute inset-0 bg-grid opacity-50 mask-fade-b" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-ink-950/70" />
-
-      <div className="container-page relative pb-8 pt-16">
+    <section className="border-b border-white/[0.06] bg-ink-950">
+      <div className="container-page pb-8 pt-12">
         <nav className="mb-6 flex items-center gap-1.5 text-sm text-zinc-400">
           <Link to="/clubs" className="hover:text-white">Communities</Link>
           <ChevronRight className="h-3.5 w-3.5" />
@@ -206,13 +195,13 @@ function ClubHeader({ club, canManage, onChanged }) {
 
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex items-end gap-4">
-            <ClubMark club={club} size={76} className="shadow-pop" />
+            <ClubMark club={club} size={64} />
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{club.name}</h1>
-                {club.verified && <ShieldCheck className="h-6 w-6 text-brand-400" />}
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{club.name}</h1>
+                {club.verified && <ShieldCheck className="h-5 w-5 text-brand-400" />}
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
                 <span className="chip">[{club.tag}]</span>
                 <span>{club.region}</span>
                 {club.founded && (
@@ -228,9 +217,9 @@ function ClubHeader({ club, canManage, onChanged }) {
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
             <ClubInviteActions club={club} onChanged={onChanged} />
             {hasDiscord && (
-              <Button href={club.discord} target="_blank" rel="noreferrer">
+              <Button href={club.discord} target="_blank" rel="noreferrer" variant="secondary">
                 <MessagesSquare className="h-4 w-4" />
-                Join on Discord
+                Discord
               </Button>
             )}
             {canManage && (
@@ -242,7 +231,7 @@ function ClubHeader({ club, canManage, onChanged }) {
           </div>
         </div>
 
-        <p className="mt-5 max-w-2xl text-balance text-zinc-300">{club.tagline || club.about}</p>
+        <p className="mt-5 max-w-2xl text-sm text-zinc-400">{club.tagline || club.about}</p>
       </div>
     </section>
   )
@@ -453,14 +442,13 @@ function ClubStartPanel({ club, enabled, user, signIn, isMember, liveChallenge, 
   ]
 
   return (
-    <section className="mt-5 overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-500/[0.045] p-4 sm:p-5">
+    <section className="mt-5 rounded-xl border border-white/[0.06] bg-ink-850/50 p-4 sm:p-5">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
-            <Trophy className="h-3.5 w-3.5" />
+          <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
             Club board
           </div>
-          <h2 className="mt-1.5 text-lg font-bold text-white">
+          <h2 className="mt-1.5 text-base font-bold text-white">
             {liveChallenge ? liveChallenge.title : 'Proof-backed runs. Clean standings.'}
           </h2>
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -469,9 +457,9 @@ function ClubStartPanel({ club, enabled, user, signIn, isMember, liveChallenge, 
               return (
                 <div
                   key={step.label}
-                  className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-ink-950/35 px-3 py-2 text-sm text-zinc-300"
+                  className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-ink-900/40 px-3 py-2 text-sm text-zinc-300"
                 >
-                  {step.done ? <Check className="h-4 w-4 text-emerald-300" /> : <Icon className="h-4 w-4 text-brand-300" />}
+                  {step.done ? <Check className="h-4 w-4 text-emerald-400" /> : <Icon className="h-4 w-4 text-zinc-500" />}
                   {step.label}
                 </div>
               )
@@ -528,14 +516,13 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-brand-500/15 bg-brand-500/[0.04] p-4 sm:p-5">
+    <section className="mt-6 rounded-xl border border-white/[0.06] bg-ink-850/50 p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
-            <ShieldCheck className="h-3.5 w-3.5" />
+          <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
             Club admin
           </div>
-          <h2 className="mt-1 text-lg font-bold text-white">{club.name} tools</h2>
+          <h2 className="mt-1 text-base font-bold text-white">{club.name} tools</h2>
         </div>
         <Button to="/create" size="sm" variant="secondary">
           <Plus className="h-4 w-4" />
@@ -544,20 +531,20 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
       </div>
 
       {error && (
-        <div className="mt-4 flex gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/[0.07] p-3 text-sm text-rose-200">
+        <div className="mt-4 flex gap-2.5 rounded-lg border border-rose-500/15 bg-rose-500/[0.05] p-3 text-sm text-rose-200">
           <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </div>
       )}
 
-      <div className="mt-4 divide-y divide-white/[0.06] overflow-hidden rounded-xl border border-white/[0.07] bg-ink-950/35">
+      <div className="mt-4 divide-y divide-white/[0.05] overflow-hidden rounded-lg border border-white/[0.05] bg-ink-900/40">
         {challenges.length === 0 ? (
           <div className="p-4 text-sm text-zinc-500">No events to manage yet.</div>
         ) : (
           challenges.map((challenge) => (
             <div key={challenge.id} className="flex items-center gap-3 px-4 py-3">
               <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold text-white">{challenge.title}</div>
+                <div className="truncate text-sm font-medium text-white">{challenge.title}</div>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                   <span className="capitalize text-zinc-400">{challenge.status}</span>
                   <span>{formatNumber(challenge.submissionCount || 0)} submissions</span>
@@ -579,7 +566,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
                   aria-label="Close now"
                   onClick={() => close(challenge)}
                   disabled={busyId === challenge.id}
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-amber-500/25 bg-amber-500/10 text-amber-300 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-400 transition-colors hover:bg-white/[0.08] hover:text-white disabled:opacity-50"
                 >
                   {busyId === challenge.id ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -594,7 +581,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
                 aria-label="Delete event"
                 onClick={() => remove(challenge)}
                 disabled={busyId === challenge.id}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-rose-500/25 bg-rose-500/10 text-rose-300 transition-colors hover:bg-rose-500/20 disabled:opacity-50"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-rose-500/15 bg-rose-500/[0.05] text-rose-300/80 transition-colors hover:bg-rose-500/15 disabled:opacity-50"
               >
                 {busyId === challenge.id ? (
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -613,9 +600,9 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
 function Section({ title, count, children }) {
   return (
     <section>
-      <div className="mb-5 flex items-center gap-2.5">
-        <h2 className="text-xl font-bold">{title}</h2>
-        {typeof count === 'number' && <Badge tone="neutral">{count}</Badge>}
+      <div className="mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-bold">{title}</h2>
+        {typeof count === 'number' && <span className="text-sm text-zinc-500">{count}</span>}
       </div>
       {children}
     </section>
@@ -671,8 +658,8 @@ function StandingsCard({ standings, season }) {
   return (
     <div className="card overflow-hidden">
       <div className="flex items-center gap-2 border-b border-white/[0.06] p-5">
-        <Medal className="h-5 w-5 text-brand-400" />
-        <h3 className="font-bold">
+        <Trophy className="h-4 w-4 text-zinc-400" />
+        <h3 className="text-sm font-semibold">
           Season standings{season ? ` — ${season}` : ''}
         </h3>
       </div>
@@ -686,7 +673,7 @@ function StandingsCard({ standings, season }) {
             </span>
             <Nameplate
               user={s.user}
-              size={32}
+              size={28}
               showSub={false}
               className="flex-1"
             />

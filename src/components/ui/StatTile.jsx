@@ -5,7 +5,7 @@ export default function StatTile({ icon: Icon, label, value, sub, dim, className
     <div className={cn('card p-5', dim && 'opacity-50', className)}>
       <div className="flex items-center gap-3.5">
         {Icon && (
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.04] text-brand-400">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.04] text-zinc-400">
             <Icon className="h-5 w-5" />
           </span>
         )}

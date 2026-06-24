@@ -7,12 +7,11 @@ import RecordTile from '../components/common/RecordTile'
 import EmptyState from '../components/common/EmptyState'
 import Button from '../components/ui/Button'
 import ClubMark from '../components/ui/ClubMark'
-import { TypeBadge } from '../components/ui/Badge'
 import Loading from '../components/common/Loading'
 import { getClosedChallenges, getClubs } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { TYPE_LIST, getType } from '../lib/challengeTypes'
-import { cn, hexToRgba, formatNumber, formatDate } from '../lib/utils'
+import { cn, formatNumber, formatDate } from '../lib/utils'
 
 async function loadArchive() {
   const [events, clubs] = await Promise.all([getClosedChallenges(), getClubs()])
@@ -115,7 +114,6 @@ export default function ArchivePage() {
                       onClick={() => setType(t.id)}
                       label={t.label}
                       icon={t.icon}
-                      accent={t.accent}
                     />
                   ))}
                 </div>
@@ -193,33 +191,36 @@ function ArchiveEventCard({ challenge }) {
   const to = `/c/${challenge.slug}`
 
   return (
-    <article className="card overflow-hidden">
-      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
+    <article className="rounded-xl border border-white/[0.06] bg-ink-850/50 overflow-hidden">
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <TypeBadge typeId={challenge.typeId} size="sm" />
+          <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+            <span>{t.label}</span>
             {club && (
-              <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
-                <ClubMark club={club} size={18} />
-                {club.name}
-              </span>
+              <>
+                <span className="text-zinc-600">·</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <ClubMark club={club} size={16} />
+                  {club.name}
+                </span>
+              </>
             )}
           </div>
-          <h3 className="mt-2.5 text-lg font-bold leading-snug">
+          <h3 className="mt-2 text-base font-bold leading-snug">
             <Link to={to} className="transition-colors hover:text-brand-300">
               {challenge.title}
             </Link>
           </h3>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500">
             <span className="inline-flex items-center gap-1.5">
-              <CalendarDays className="h-3.5 w-3.5" />
+              <CalendarDays className="h-3 w-3" />
               {formatDate(challenge.endDate)}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" />
+              <Users className="h-3 w-3" />
               {formatNumber(challenge.participants)} racers
             </span>
-            <span className="chip">{challenge.restriction}</span>
+            <span>{challenge.restriction}</span>
           </div>
         </div>
         <Button to={to} variant="secondary" size="sm" className="shrink-0">
@@ -228,8 +229,8 @@ function ArchiveEventCard({ challenge }) {
         </Button>
       </div>
 
-      <div className="border-t border-white/[0.06] p-5 pt-4">
-        <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+      <div className="border-t border-white/[0.05] p-4 pt-3">
+        <div className="mb-3 text-[11px] font-medium uppercase tracking-wider text-zinc-500">
           {t.gallery ? 'Top entries' : 'Podium'}
         </div>
         <PodiumSpotlight challenge={challenge} />
@@ -238,25 +239,16 @@ function ArchiveEventCard({ challenge }) {
   )
 }
 
-function Chip({ active, onClick, label, icon: Icon, accent }) {
+function Chip({ active, onClick, label, icon: Icon }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all',
+        'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
         active
-          ? 'text-white'
-          : 'border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:border-white/20 hover:text-white',
+          ? 'border-brand-500/30 bg-brand-500/10 text-brand-300'
+          : 'border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/15 hover:text-white',
       )}
-      style={
-        active
-          ? {
-              color: accent || '#ff6b2c',
-              backgroundColor: hexToRgba(accent || '#ff6b2c', 0.12),
-              borderColor: hexToRgba(accent || '#ff6b2c', 0.3),
-            }
-          : undefined
-      }
     >
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {label}

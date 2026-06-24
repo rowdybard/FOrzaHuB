@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Trophy } from 'lucide-react'
 import Avatar from '../ui/Avatar'
-import { hexToRgba, formatNumber } from '../../lib/utils'
+import { formatNumber } from '../../lib/utils'
 import { getType, formatMetric } from '../../lib/challengeTypes'
 
 export default function RecordTile({ typeId, record }) {
@@ -9,24 +9,13 @@ export default function RecordTile({ typeId, record }) {
   const Icon = t.icon
 
   return (
-    <div className="card relative overflow-hidden p-5">
-      <div
-        className="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-20 blur-2xl"
-        style={{ background: t.accent }}
-      />
-      <div className="relative flex items-center gap-2.5">
-        <span
-          className="grid h-9 w-9 place-items-center rounded-lg"
-          style={{
-            color: t.accent,
-            backgroundColor: hexToRgba(t.accent, 0.14),
-            border: `1px solid ${hexToRgba(t.accent, 0.25)}`,
-          }}
-        >
-          <Icon className="h-[18px] w-[18px]" />
+    <div className="card p-5">
+      <div className="flex items-center gap-2.5">
+        <span className="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.06] bg-white/[0.03]">
+          <Icon className="h-4 w-4" style={{ color: t.accent }} />
         </span>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <div className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
             All-time best
           </div>
           <div className="text-sm font-semibold text-white">{t.label}</div>
@@ -35,12 +24,12 @@ export default function RecordTile({ typeId, record }) {
 
       {record ? (
         <>
-          <div className="relative mt-4 font-num text-3xl font-extrabold tracking-tight text-white">
+          <div className="mt-4 font-num text-2xl font-bold tracking-tight text-white">
             {t.gallery ? formatNumber(record.votes) : formatMetric(typeId, record.value)}
-            {t.gallery && <span className="ml-1.5 text-base font-semibold text-zinc-500">votes</span>}
+            {t.gallery && <span className="ml-1.5 text-sm font-medium text-zinc-500">votes</span>}
           </div>
-          <div className="relative mt-3 flex items-center gap-2 border-t border-white/[0.06] pt-3">
-            <Avatar name={record.user.name} size={26} />
+          <div className="mt-3 flex items-center gap-2 border-t border-white/[0.06] pt-3">
+            <Avatar name={record.user.name} size={24} />
             <div className="min-w-0">
               <div className="truncate text-sm font-medium text-white">{record.user.tag}</div>
               <Link
@@ -54,7 +43,7 @@ export default function RecordTile({ typeId, record }) {
           </div>
         </>
       ) : (
-        <div className="relative mt-4 text-sm text-zinc-500">No verified results yet.</div>
+        <div className="mt-4 text-sm text-zinc-500">No verified results yet.</div>
       )}
     </div>
   )
