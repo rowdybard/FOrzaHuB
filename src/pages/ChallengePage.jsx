@@ -77,6 +77,7 @@ export default function ChallengePage() {
 
         <aside className="space-y-5 lg:sticky lg:top-20">
           <EventDetails challenge={challenge} club={club} t={t} isLive={isLive} prereq={prereq} />
+          {challenge.sponsored && <SponsorMiniCard challenge={challenge} />}
           <OrganizerCard club={club} />
         </aside>
       </div>
@@ -383,6 +384,25 @@ function ShareRow() {
         <MessagesSquare className="h-3.5 w-3.5" />
         Discord
       </a>
+    </div>
+  )
+}
+
+function SponsorMiniCard({ challenge }) {
+  return (
+    <div className="card p-5">
+      <div className="text-xs font-semibold uppercase tracking-wider text-amber-400">Sponsored challenge</div>
+      <div className="mt-3 space-y-2 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-400">Presented by</span>
+          <span className="font-medium text-white">{challenge.sponsor || 'a community partner'}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-400">Prize</span>
+          <span className="font-medium text-white">{challenge.prize || 'Community prize'}</span>
+        </div>
+      </div>
+      <p className="mt-3 text-xs text-zinc-500">Free to enter. Winner selected by challenge rules.</p>
     </div>
   )
 }
