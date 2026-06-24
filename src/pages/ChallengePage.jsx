@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import Seo from '../components/Seo'
 import {
   ChevronRight,
   ShieldCheck,
@@ -65,6 +66,7 @@ export default function ChallengePage() {
 
   return (
     <>
+      <Seo title={`${challenge.title} — ${t.label}`} description={`${challenge.title}: ${challenge.description || t.label + ' challenge on GripCafe'}. ${challenge.restriction || ''} ${challenge.location ? 'at ' + challenge.location : ''}.`} path={`/c/${challenge.slug}`} />
       <ChallengeHeader challenge={challenge} club={club} t={t} />
       <FactStrip challenge={challenge} t={t} />
 

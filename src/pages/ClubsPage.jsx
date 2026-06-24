@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
+import Seo from '../components/Seo'
 import PageHero from '../components/common/PageHero'
 import ClubCard from '../components/common/ClubCard'
 import Loading from '../components/common/Loading'
@@ -41,6 +42,7 @@ export default function ClubsPage() {
 
   return (
     <div>
+      <Seo title="Forza Horizon Racing Clubs & Communities" description="Join Forza Horizon racing clubs running verified tournaments on GripCafe. Find a community, or bring your Discord server and start competing." path="/clubs" />
       <PageHero
         eyebrow="Communities"
         title="Clubs"

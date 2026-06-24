@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import Seo from '../components/Seo'
 import {
   Upload,
   CheckCircle2,
@@ -283,6 +284,7 @@ export default function SubmitScorePage() {
 
   return (
     <div>
+      <Seo title="Submit Your Score" description="Submit your Forza Horizon tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
       <PageHero
         eyebrow="Submit"
         title={isGallery ? 'Submit your entry' : 'Submit your result'}

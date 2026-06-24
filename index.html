@@ -6,19 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="GripCafe — the sponsored community event hub for Forza Horizon 6. Weekly events with real prizes, proof-backed leaderboards, and a championship worth competing for."
+      content="Host competitive Forza Horizon events with verified proof, public leaderboards, and real prizes. Build your racing community with scheduled tournaments, club management, and championship scoring."
     />
     <meta name="theme-color" content="#0a0b0d" />
 
     <!-- Open Graph / social sharing -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="GripCafe — Win $50 in the Weekly Championship" />
-    <meta property="og:description" content="Sponsored community event hub for Forza Horizon 6. Weekly events, real prizes, proof-backed leaderboards. Join a club and compete for a $50 Steam/Xbox gift card." />
+    <meta property="og:title" content="GripCafe — Verified Tournaments for Forza Horizon Communities" />
+    <meta property="og:description" content="Host competitive Forza Horizon events with verified proof, public leaderboards, and real prizes. Build your racing community with scheduled tournaments and championship scoring." />
     <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://gripcafe.com" />
     <meta property="og:site_name" content="GripCafe" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="GripCafe — Win $50 in the Weekly Championship" />
-    <meta name="twitter:description" content="Sponsored community event hub for Forza Horizon 6. Weekly events, real prizes, proof-backed leaderboards." />
+    <meta name="twitter:title" content="GripCafe — Verified Tournaments for Forza Horizon Communities" />
+    <meta name="twitter:description" content="Host competitive Forza Horizon events with verified proof, public leaderboards, and real prizes." />
     <meta name="twitter:image" content="/og-image.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,7 +29,82 @@
       rel="stylesheet"
     />
 
-    <title>GripCafe — Sponsored Event Hub</title>
+    <link rel="canonical" href="https://gripcafe.com" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://gripcafe.com/#organization",
+          "name": "GripCafe",
+          "url": "https://gripcafe.com",
+          "description": "Community tournament platform for Forza Horizon with verified proof, leaderboards, and real prizes.",
+          "sameAs": ["https://discord.gg/GJw3XRuCXr"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://gripcafe.com/#website",
+          "url": "https://gripcafe.com",
+          "name": "GripCafe",
+          "publisher": { "@id": "https://gripcafe.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gripcafe.com/challenges?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How do I run a Forza Horizon tournament?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Create a free GripCafe account, start or join a club, then use the Create Challenge page to set up a tournament. Choose a format like time trial, drift, drag, or photo contest, set the rules and schedule, and share the invite link with your community."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is a verified gaming competition?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Every submission on GripCafe requires proof — a screenshot or video clip showing your result. Staff reviewers verify each entry before it appears on the public leaderboard, so standings are always legitimate."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do proof-backed leaderboards work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Players submit their time or score with a screenshot or video. Each submission is reviewed by club staff before it's approved. Only verified entries appear on the leaderboard, and every result links back to its proof."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I win real prizes playing Forza Horizon?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Sponsored events on GripCafe offer real prizes like Steam and Xbox gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify for prize payouts."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is GripCafe free to use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Creating an account, joining clubs, and entering challenges is completely free. Clubs can run unlimited tournaments at no cost."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <title>GripCafe — Run Verified Tournaments for Your Forza Horizon Community</title>
   </head>
   <body>
     <div id="root"></div>

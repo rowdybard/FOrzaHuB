@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Archive, Trophy, Users, CalendarDays, ArrowRight } from 'lucide-react'
+import Seo from '../components/Seo'
 import PageHero from '../components/common/PageHero'
 import PodiumSpotlight from '../components/common/PodiumSpotlight'
 import RecordTile from '../components/common/RecordTile'
@@ -69,6 +70,7 @@ export default function ArchivePage() {
 
   return (
     <div>
+      <Seo title="Tournament Results Archive" description="Browse completed Forza Horizon tournaments with podium finishes, records, and verified results. See past champions and leaderboard standings." path="/archive" />
       <PageHero
         eyebrow="Archive"
         title="Results archive"

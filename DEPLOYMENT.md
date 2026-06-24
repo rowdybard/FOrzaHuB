@@ -9,12 +9,13 @@ local mock data in `src/data/mock.js`.
 
 1. Push this repo to GitHub.
 2. Cloudflare dashboard -> Workers & Pages -> Create -> Pages -> Connect to Git.
-3. Use:
+3. After deploy, add a custom domain: Cloudflare dashboard -> Pages -> your project -> Custom domains -> Add `gripcafe.com` and `www.gripcafe.com`.
+4. Use:
    - Framework preset: `Vite`
    - Build command: `npm run build`
    - Build output directory: `dist`
    - Node version: 20
-4. Add these Cloudflare Pages environment variables for Production and Preview:
+5. Add these Cloudflare Pages environment variables for Production and Preview:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_MAX_PROOF_UPLOAD_MB` (optional, defaults to `50`)
@@ -44,8 +45,8 @@ available. A legacy anon public key also works. Do not use or share a
 5. Add the Supabase callback URL to the Discord app:
    - `https://<project-ref>.supabase.co/auth/v1/callback`
 6. In Supabase Authentication -> URL Configuration, set:
-   - Site URL: your Cloudflare Pages production URL
-   - Redirect URLs: production URL, preview URL pattern if needed, and `http://localhost:5173`
+   - Site URL: `https://gripcafe.com`
+   - Redirect URLs: `https://gripcafe.com`, `https://*.pages.dev` (preview), and `http://localhost:5173`
 
 ## First Admin
 

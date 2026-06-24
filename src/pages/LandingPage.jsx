@@ -28,6 +28,7 @@ import {
 import { useAsync } from '../hooks/useAsync'
 import { getType } from '../lib/challengeTypes'
 import { formatNumber, hexToRgba, formatDate } from '../lib/utils'
+import Seo from '../components/Seo'
 
 export default function LandingPage() {
   const { data } = useAsync(
@@ -54,6 +55,7 @@ export default function LandingPage() {
 
   return (
     <>
+      <Seo />
       {featuredEvent ? (
         <>
           <EventHero event={featuredEvent} stats={stats} />
@@ -68,6 +70,7 @@ export default function LandingPage() {
       <StatsBar stats={stats} />
       {live.length > 0 && <LiveChallenges challenges={live} />}
       <HowItWorks event={featuredEvent} />
+      <FAQSection />
       {featuredEvent && <EventCTA event={featuredEvent} />}
     </>
   )
@@ -522,6 +525,46 @@ function HowItWorks({ event }) {
             </div>
           )
         })}
+      </div>
+    </section>
+  )
+}
+
+/* ---------------------------------- FAQ ----------------------------------- */
+
+function FAQSection() {
+  const faqs = [
+    {
+      q: 'How do I run a Forza Horizon tournament?',
+      a: 'Create a free GripCafe account, start or join a club, then use the Create Challenge page to set up a tournament. Choose a format like time trial, drift, drag, or photo contest, set the rules and schedule, and share the invite link with your community.',
+    },
+    {
+      q: 'What is a verified gaming competition?',
+      a: 'Every submission on GripCafe requires proof — a screenshot or video clip showing your result. Staff reviewers verify each entry before it appears on the public leaderboard, so standings are always legitimate.',
+    },
+    {
+      q: 'How do proof-backed leaderboards work?',
+      a: 'Players submit their time or score with a screenshot or video. Each submission is reviewed by club staff before it\'s approved. Only verified entries appear on the leaderboard, and every result links back to its proof.',
+    },
+    {
+      q: 'Can I win real prizes playing Forza Horizon?',
+      a: 'Yes. Sponsored events on GripCafe offer real prizes like Steam and Xbox gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify for prize payouts.',
+    },
+    {
+      q: 'Is GripCafe free to use?',
+      a: 'Yes. Creating an account, joining clubs, and entering challenges is completely free. Clubs can run unlimited tournaments at no cost.',
+    },
+  ]
+  return (
+    <section className="container-page mt-24">
+      <SectionHeading eyebrow="FAQ" title="Frequently asked questions" />
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {faqs.map((f) => (
+          <div key={f.q} className="card p-5">
+            <h3 className="text-sm font-semibold text-white">{f.q}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">{f.a}</p>
+          </div>
+        ))}
       </div>
     </section>
   )

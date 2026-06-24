@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { Search, Flag } from 'lucide-react'
+import Seo from '../components/Seo'
 import PageHero from '../components/common/PageHero'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
@@ -49,6 +50,7 @@ export default function ChallengesPage() {
 
   return (
     <div>
+      <Seo title="Forza Horizon Tournaments & Challenges" description="Browse live and upcoming Forza Horizon tournaments. Time trials, drift battles, drag races, photo contests, and build battles with verified proof and real prizes." path="/challenges" />
       <PageHero
         eyebrow="Challenges"
         title="Club events"
