@@ -1,10 +1,10 @@
 -- 0016_fix_prizes.sql
--- Daily events earn series points, not $50 each.
--- Only the Grand Finale awards the $50 gift card.
+-- Daily events: $5 Gift Card + Series points
+-- Grand Finale: $50 Gift Card
 
-update public.challenges set prize = 'Series points' where title = 'Opening Hot Lap' and sponsored = true;
-update public.challenges set prize = 'Series points' where title = 'Drift After Dark' and sponsored = true;
-update public.challenges set prize = 'Series points' where title = 'Quarter Mile Kings' and sponsored = true;
-update public.challenges set prize = 'Series points' where title = 'Build Battle Showcase' and sponsored = true;
-update public.challenges set prize = 'Series points' where title = 'Photo Mode Masters' and sponsored = true;
-update public.challenges set prize = 'Series points' where title = 'Grand Prix Heat' and sponsored = true;
+update public.challenges set prize = '$5 Gift Card + Series points' where title = 'A-Class Festival Circuit' and sponsored = true;
+update public.challenges set prize = '$5 Gift Card + Series points' where title = 'S2 Drift Zone Trial' and sponsored = true;
+update public.challenges set prize = '$5 Gift Card + Series points' where title = 'R-Class Drag Sprint' and sponsored = true;
+update public.challenges set prize = '$5 Gift Card + Series points' where title = 'B-Class Street Build' and sponsored = true;
+update public.challenges set prize = '$5 Gift Card + Series points' where title = 'Photo Challenge: Rally Theme' and sponsored = true;
+update public.challenges set prize = '$5 Gift Card + Series points' where title = 'S1 Road Circuit Trial' and sponsored = true;

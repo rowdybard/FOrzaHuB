@@ -655,6 +655,29 @@ export async function getFeaturedChallenge() {
   return all.find((c) => c.featured) || all[0] || null
 }
 
+export async function getSeriesStandings(clubId) {
+  if (!isSupabaseEnabled) return []
+  let query = supabase
+    .from('series_standings')
+    .select('*')
+    .order('total_points', { ascending: false })
+    .order('best_finish', { ascending: true })
+  if (clubId) query = query.eq('club_id', clubId)
+  const { data, error } = await query.limit(50)
+  if (error) throw error
+  return (data || []).map((row, i) => ({
+    rank: i + 1,
+    userId: row.user_id,
+    gamertag: row.gamertag,
+    displayName: row.display_name,
+    avatarUrl: row.avatar_url,
+    platform: row.platform,
+    eventsEntered: row.events_entered,
+    totalPoints: row.total_points,
+    bestFinish: row.best_finish,
+  }))
+}
+
 export async function getSiteStats() {
   if (!isSupabaseEnabled) return mock.siteStats
   const [clubsRes, challengesRes, subsRes, racersRes] = await Promise.all([

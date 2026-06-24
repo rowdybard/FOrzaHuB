@@ -28,9 +28,10 @@ import Leaderboard from '../components/common/Leaderboard'
 import Gallery from '../components/common/Gallery'
 import ChallengeCard from '../components/common/ChallengeCard'
 import EmptyState from '../components/common/EmptyState'
+import SeriesStandings from '../components/common/SeriesStandings'
 import NotFound from './NotFound'
 import Loading from '../components/common/Loading'
-import { getChallengeBySlug, getPrerequisite, getChallengesByClub } from '../data/api'
+import { getChallengeBySlug, getPrerequisite, getChallengesByClub, getSeriesStandings } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { getType } from '../lib/challengeTypes'
 import { formatDate, formatNumber, hexToRgba } from '../lib/utils'
@@ -38,12 +39,13 @@ import { formatDate, formatNumber, hexToRgba } from '../lib/utils'
 async function loadChallenge(slug) {
   const challenge = await getChallengeBySlug(slug)
   if (!challenge) return { challenge: null }
-  const [prereq, clubChallenges] = await Promise.all([
+  const [prereq, clubChallenges, seriesStandings] = await Promise.all([
     getPrerequisite(challenge),
     getChallengesByClub(challenge.clubId),
+    challenge.sponsored ? getSeriesStandings(challenge.clubId) : Promise.resolve([]),
   ])
   const more = clubChallenges.filter((c) => c.id !== challenge.id)
-  return { challenge, prereq, more }
+  return { challenge, prereq, more, seriesStandings }
 }
 
 export default function ChallengePage() {
@@ -59,6 +61,7 @@ export default function ChallengePage() {
   const isLive = challenge.status === 'live'
   const prereq = data.prereq
   const more = data.more || []
+  const seriesStandings = data.seriesStandings || []
 
   return (
     <>
@@ -70,6 +73,9 @@ export default function ChallengePage() {
           {prereq && <PrereqBanner prereq={prereq} />}
           <Standings challenge={challenge} t={t} />
           <Rules challenge={challenge} t={t} />
+          {challenge.sponsored && seriesStandings.length > 0 && (
+            <SeriesStandingsSection standings={seriesStandings} />
+          )}
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-20">
@@ -440,5 +446,20 @@ function OrganizerCard({ club }) {
         </Button>
       </div>
     </div>
+  )
+}
+
+function SeriesStandingsSection({ standings }) {
+  return (
+    <section>
+      <div className="mb-4 flex items-center gap-2.5">
+        <Trophy className="h-5 w-5 text-amber-400" />
+        <h2 className="text-xl font-bold">Series Standings</h2>
+      </div>
+      <p className="mb-4 text-sm text-zinc-400">
+        Points awarded per event: 1st = 50, 2nd = 49, down to 1 point for 50th place.
+      </p>
+      <SeriesStandings standings={standings} />
+    </section>
   )
 }
