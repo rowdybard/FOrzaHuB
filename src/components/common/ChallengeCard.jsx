@@ -5,7 +5,6 @@ import { TypeBadge, StatusBadge } from '../ui/Badge'
 import ClubMark from '../ui/ClubMark'
 import Avatar from '../ui/Avatar'
 import Countdown from './Countdown'
-import { getClubById } from '../../data/mock'
 import { getType, formatMetric } from '../../lib/challengeTypes'
 import { formatNumber } from '../../lib/utils'
 
@@ -72,7 +71,7 @@ function LeaderStrip({ challenge }) {
 }
 
 export default function ChallengeCard({ challenge, club: clubProp }) {
-  const club = clubProp || challenge.club || getClubById(challenge.clubId)
+  const club = clubProp || challenge.club || null
   const to = `/c/${challenge.slug}`
 
   return (

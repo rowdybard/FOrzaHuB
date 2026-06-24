@@ -16,7 +16,6 @@ import {
   Medal,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
-import Avatar from '../components/ui/Avatar'
 import { TypeBadge, StatusBadge } from '../components/ui/Badge'
 import SectionHeading from '../components/ui/SectionHeading'
 import StatTile from '../components/ui/StatTile'
@@ -26,12 +25,6 @@ import {
   getChallengesWithClubs,
   getSiteStats,
 } from '../data/api'
-import {
-  sponsoredEvent,
-  eventSchedule,
-  sponsors,
-  eventLeaderboard,
-} from '../data/mock'
 import { useAsync } from '../hooks/useAsync'
 import { getType } from '../lib/challengeTypes'
 import { formatNumber, hexToRgba, formatDate } from '../lib/utils'
@@ -42,20 +35,40 @@ export default function LandingPage() {
     [],
   )
   const clubs = data?.[0] || []
-  const live = (data?.[1] || []).filter((c) => c.status === 'live')
+  const allChallenges = data?.[1] || []
   const stats = data?.[2] || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
+
+  const sponsored = allChallenges
+    .filter((c) => c.sponsored)
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+  const live = allChallenges.filter((c) => c.status === 'live')
+
+  const featuredEvent = sponsored[0] || null
+  const eventSchedule = sponsored
+  const eventClub = featuredEvent?.club || clubs[0] || null
+  const sponsors = eventClub
+    ? [
+        { id: eventClub.id, name: eventClub.name, tier: 'organizer', blurb: eventClub.tagline || 'Community-run event platform' },
+      ]
+    : []
 
   return (
     <>
-      <EventHero event={sponsoredEvent} stats={stats} />
-      <SponsorBar sponsors={sponsors} />
-      <PrizeShowcase event={sponsoredEvent} />
-      <ScheduleSection event={sponsoredEvent} />
-      <LeaderboardPreview event={sponsoredEvent} />
+      {featuredEvent ? (
+        <>
+          <EventHero event={featuredEvent} stats={stats} />
+          {sponsors.length > 0 && <SponsorBar sponsors={sponsors} />}
+          <PrizeShowcase event={featuredEvent} />
+          <ScheduleSection schedule={eventSchedule} event={featuredEvent} />
+          <LeaderboardPreview />
+        </>
+      ) : (
+        <FallbackHero stats={stats} />
+      )}
       <StatsBar stats={stats} />
       {live.length > 0 && <LiveChallenges challenges={live} />}
       <HowItWorks />
-      <EventCTA event={sponsoredEvent} />
+      {featuredEvent && <EventCTA event={featuredEvent} />}
     </>
   )
 }
@@ -63,6 +76,12 @@ export default function LandingPage() {
 /* ------------------------------- Event Hero ------------------------------- */
 
 function EventHero({ event, stats }) {
+  const statusLabel = event.status === 'live' ? 'Live Now' : event.status === 'upcoming' ? 'Upcoming' : event.status === 'closed' ? 'Completed' : 'Reviewing'
+  const statusCls = event.status === 'live'
+    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+    : event.status === 'upcoming'
+    ? 'border-sky-500/30 bg-sky-500/10 text-sky-300'
+    : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
   return (
     <section className="relative overflow-hidden bg-heatwave">
       <div className="absolute inset-0 bg-grid opacity-30 mask-fade-b" />
@@ -73,7 +92,7 @@ function EventHero({ event, stats }) {
           <div className="animate-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-300">
               <Flame className="h-4 w-4" />
-              Sponsored Community Event
+              {event.sponsor || 'Sponsored'} Community Event
             </span>
           </div>
 
@@ -81,9 +100,11 @@ function EventHero({ event, stats }) {
             <span className="text-gradient">{event.title}</span>
           </h1>
 
-          <p className="mt-4 animate-fade-up text-balance text-xl text-zinc-300 [animation-delay:120ms]">
-            {event.tagline}
-          </p>
+          {event.description && (
+            <p className="mt-4 animate-fade-up text-balance text-xl text-zinc-300 [animation-delay:120ms]">
+              {event.description}
+            </p>
+          )}
 
           <div className="mt-6 flex animate-fade-up items-center justify-center gap-3 text-sm text-zinc-400 [animation-delay:180ms]">
             <Calendar className="h-4 w-4 text-brand-400" />
@@ -94,21 +115,25 @@ function EventHero({ event, stats }) {
             <span className="font-medium text-white">
               {formatDate(event.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
-            <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-2.5 py-0.5 text-xs font-semibold text-sky-300">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-400" />
-              </span>
-              Upcoming
+            <span className={`ml-2 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusCls}`}>
+              {event.status === 'live' && (
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                </span>
+              )}
+              {statusLabel}
             </span>
           </div>
 
-          <div className="mt-8 animate-fade-up [animation-delay:240ms]">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Event starts in
-            </p>
-            <Countdown to={event.startDate} variant="blocks" className="justify-center" />
-          </div>
+          {event.status === 'upcoming' && (
+            <div className="mt-8 animate-fade-up [animation-delay:240ms]">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Event starts in
+              </p>
+              <Countdown to={event.startDate} variant="blocks" className="justify-center" />
+            </div>
+          )}
 
           <div className="mt-8 flex animate-fade-up flex-wrap justify-center gap-3 [animation-delay:300ms]">
             <Button to="/challenges" size="lg">
@@ -122,20 +147,53 @@ function EventHero({ event, stats }) {
           </div>
 
           <div className="mt-10 flex animate-fade-up items-center justify-center gap-6 text-sm text-zinc-400 [animation-delay:360ms]">
-            <span className="inline-flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-amber-400" />
-              <span className="font-semibold text-white">{event.prize}</span> prize
-            </span>
-            <span className="text-zinc-600">|</span>
+            {event.prize && (
+              <>
+                <span className="inline-flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-amber-400" />
+                  <span className="font-semibold text-white">{event.prize}</span> prize
+                </span>
+                <span className="text-zinc-600">|</span>
+              </>
+            )}
             <span className="inline-flex items-center gap-2">
               <Calendar className="h-4 w-4 text-brand-400" />
-              <span className="font-semibold text-white">7</span> daily events
+              <span className="font-semibold text-white">{formatNumber(stats.challenges)}</span> events
             </span>
             <span className="text-zinc-600">|</span>
             <span className="inline-flex items-center gap-2">
               <Users className="h-4 w-4 text-emerald-400" />
               <span className="font-semibold text-white">{formatNumber(stats.racers)}</span> racers
             </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function FallbackHero({ stats }) {
+  return (
+    <section className="relative overflow-hidden bg-heatwave">
+      <div className="absolute inset-0 bg-grid opacity-30 mask-fade-b" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ink-950/40 to-ink-950" />
+      <div className="container-page relative py-16 lg:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+            <span className="text-gradient">GripCafe</span>
+          </h1>
+          <p className="mt-4 text-xl text-zinc-300">
+            Community-run competitive events for Forza Horizon.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button to="/challenges" size="lg">
+              <Flag className="h-4 w-4" />
+              Browse Events
+            </Button>
+            <Button to="/clubs" size="lg" variant="outline">
+              <Users className="h-4 w-4" />
+              Join a Club
+            </Button>
           </div>
         </div>
       </div>
@@ -189,6 +247,7 @@ function SponsorBar({ sponsors }) {
 /* ----------------------------- Prize Showcase ------------------------------ */
 
 function PrizeShowcase({ event }) {
+  if (!event.prize) return null
   return (
     <section className="container-page mt-16">
       <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.06] via-ink-900/40 to-ink-950 p-8 sm:p-12">
@@ -202,23 +261,21 @@ function PrizeShowcase({ event }) {
               Grand Prize
             </div>
             <h2 className="mt-4 text-4xl font-extrabold sm:text-5xl">
-              Win a <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">{event.prize}</span> Gift Card
+              Win <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">{event.prize}</span>
             </h2>
-            <p className="mt-3 max-w-xl text-lg text-zinc-300">
-              {event.prizeDescription}. Awarded to the overall champion after Saturday's Grand Finale.
-            </p>
+            {event.description && (
+              <p className="mt-3 max-w-xl text-lg text-zinc-300">
+                {event.description}
+              </p>
+            )}
             <ul className="mt-6 space-y-2.5">
-              <li className="flex items-center gap-3 text-sm text-zinc-300">
-                <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
-                Earn points across all 7 daily events
-              </li>
               <li className="flex items-center gap-3 text-sm text-zinc-300">
                 <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
                 Proof-backed submissions on every entry
               </li>
               <li className="flex items-center gap-3 text-sm text-zinc-300">
                 <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
-                Winner chooses Steam or Xbox
+                Verified by stewards before going live
               </li>
             </ul>
           </div>
@@ -227,10 +284,7 @@ function PrizeShowcase({ event }) {
             <div className="glow-pulse grid h-44 w-44 place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5">
               <div className="text-center">
                 <Gift className="mx-auto h-12 w-12 text-amber-400" />
-                <div className="mt-3 text-5xl font-extrabold text-white">{event.prize}</div>
-                <div className="mt-1 text-xs font-medium uppercase tracking-wider text-amber-300/80">
-                  Gift Card
-                </div>
+                <div className="mt-3 text-3xl font-extrabold text-white">{event.prize}</div>
               </div>
             </div>
           </div>
@@ -242,22 +296,24 @@ function PrizeShowcase({ event }) {
 
 /* ----------------------------- Schedule Section ---------------------------- */
 
-function ScheduleSection({ event }) {
+function ScheduleSection({ schedule, event }) {
+  if (schedule.length === 0) return null
   return (
     <section className="container-page mt-20">
       <SectionHeading
-        eyebrow="7-Day Showdown"
-        title="Weekly Schedule"
-        description="A new challenge every day from Sunday to Saturday. Each day awards points toward the overall championship."
+        eyebrow="Event Schedule"
+        title="Daily Challenges"
+        description="Each event runs for 24 hours. Submit your proof before the deadline."
       />
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {eventSchedule.map((day, i) => {
-          const t = getType(day.typeId)
+        {schedule.map((c, i) => {
+          const t = getType(c.typeId)
           const Icon = t.icon
           return (
-            <div
-              key={day.day}
+            <Link
+              key={c.id}
+              to={`/c/${c.slug}`}
               className="card card-hover group relative overflow-hidden p-5"
               style={{ animationDelay: `${i * 60}ms` }}
             >
@@ -267,7 +323,7 @@ function ScheduleSection({ event }) {
               />
               <div className="flex items-center justify-between">
                 <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] font-num text-lg font-bold text-white">
-                  {day.day}
+                  {i + 1}
                 </span>
                 <span
                   className="grid h-9 w-9 place-items-center rounded-lg"
@@ -283,28 +339,33 @@ function ScheduleSection({ event }) {
 
               <div className="mt-3">
                 <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                  {day.label}
+                  {formatDate(c.startDate, { weekday: 'short', month: 'short', day: 'numeric' })}
                 </div>
-                <h3 className="mt-1 font-semibold text-white">{day.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-                  {day.description}
-                </p>
+                <h3 className="mt-1 font-semibold text-white group-hover:text-brand-300">{c.title}</h3>
+                {c.description && (
+                  <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
+                    {c.description}
+                  </p>
+                )}
               </div>
 
-              <div className="mt-4 flex items-center gap-2">
-                <TypeBadge typeId={day.typeId} size="sm" />
+              <div className="mt-4 flex items-center justify-between">
+                <TypeBadge typeId={c.typeId} size="sm" />
+                <StatusBadge status={c.status} />
               </div>
-            </div>
+            </Link>
           )
         })}
 
-        <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/20 bg-brand-500/[0.04]">
-          <Medal className="h-10 w-10 text-amber-400" />
-          <h3 className="mt-3 font-bold text-white">Overall Champion</h3>
-          <p className="mt-1.5 text-sm text-zinc-400">
-            Most points across all 7 events wins the {event.prize} gift card.
-          </p>
-        </div>
+        {event.prize && (
+          <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/20 bg-brand-500/[0.04]">
+            <Medal className="h-10 w-10 text-amber-400" />
+            <h3 className="mt-3 font-bold text-white">Overall Champion</h3>
+            <p className="mt-1.5 text-sm text-zinc-400">
+              Most points across all events wins the {event.prize} prize.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   )
@@ -312,13 +373,13 @@ function ScheduleSection({ event }) {
 
 /* --------------------------- Leaderboard Preview --------------------------- */
 
-function LeaderboardPreview({ event }) {
+function LeaderboardPreview() {
   return (
     <section className="container-page mt-20">
       <SectionHeading
         eyebrow="Standings"
         title="Championship Leaderboard"
-        description="Points accumulate across all daily events. Top racers compete for the grand prize."
+        description="Points accumulate across all events. Top racers compete for the grand prize."
         action={
           <Button to="/challenges" variant="outline" size="sm">
             View all events
@@ -335,35 +396,13 @@ function LeaderboardPreview({ event }) {
           <span className="text-right">Points</span>
         </div>
         <div className="divide-y divide-white/[0.04]">
-          {eventLeaderboard.map((entry) => (
-            <div
-              key={entry.rank}
-              className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]"
-            >
-              <span className={`w-8 text-center font-num text-lg font-bold ${
-                entry.rank === 1 ? 'text-amber-400' : entry.rank === 2 ? 'text-zinc-300' : 'text-zinc-500'
-              }`}>
-                {entry.rank}
-              </span>
-              <div className="flex items-center gap-3">
-                <Avatar name={entry.tag} size={32} />
-                <div>
-                  <div className="font-semibold text-white">{entry.tag}</div>
-                  <div className="text-xs text-zinc-500">{entry.club}</div>
-                </div>
-                {entry.rank === 1 && <Trophy className="h-4 w-4 text-amber-400" />}
-              </div>
-              <span className="hidden text-right font-num text-sm text-zinc-400 sm:inline">
-                {entry.events}
-              </span>
-              <span className="text-right font-num text-lg font-bold tabular-nums text-white">
-                {entry.points}
-              </span>
-            </div>
-          ))}
-        </div>
-        <div className="border-t border-white/[0.06] px-5 py-3 text-center text-xs text-zinc-500">
-          Leaderboard populates as events go live — check back Sunday at 6 PM
+          <div className="px-5 py-12 text-center">
+            <Trophy className="mx-auto h-10 w-10 text-zinc-600" />
+            <h3 className="mt-4 font-semibold text-white">No standings yet</h3>
+            <p className="mt-1.5 text-sm text-zinc-500">
+              Leaderboard populates as events go live and submissions are approved.
+            </p>
+          </div>
         </div>
       </div>
     </section>

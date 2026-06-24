@@ -58,22 +58,13 @@ available. A legacy anon public key also works. Never put a `service_role` or
 
 ## Supabase
 
-Run migrations in order:
+Apply all migrations in order:
 
-```text
-supabase/migrations/0001_init.sql
-supabase/migrations/0002_members_and_cosmetics.sql
-supabase/migrations/0003_backend_ready.sql
-supabase/migrations/0004_fix_challenge_rls.sql
-supabase/migrations/0004_profile_flair.sql
-supabase/migrations/0005_club_beta_limits.sql
-supabase/migrations/0005_restrict_proof_uploads_to_images.sql
-supabase/migrations/0006_challenge_lifecycle_automation.sql
-supabase/migrations/0007_one_submission_per_user.sql
-supabase/migrations/0008_set_primary_club_rpc.sql
-supabase/migrations/0009_submission_self_service.sql
-supabase/migrations/0010_sponsored_challenges.sql
+```bash
+supabase db push
 ```
+
+The CLI handles migration ordering and tracks applied state automatically.
 
 See `DEPLOYMENT.md` and `docs/auth.md` for Cloudflare Pages and Discord setup.
 

@@ -11,7 +11,6 @@ import {
   Video,
   ChevronRight,
   CircleAlert,
-  Lock,
   ClipboardCheck,
 } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
@@ -92,6 +91,16 @@ export default function SubmitScorePage() {
   const [existingSubmission, setExistingSubmission] = useState(null)
   const [checkingExisting, setCheckingExisting] = useState(false)
 
+  // Default selection: URL slug match, else first live challenge.
+  const selectedId = challengeId ?? (list.find((c) => c.slug === slug)?.id || list[0]?.id)
+  const challenge = list.find((c) => c.id === selectedId) || null
+  const t = challenge ? getType(challenge.typeId) : null
+  const club = challenge?.club || null
+  const isGallery = t?.gallery
+
+  // Prerequisite challenge (qualifier), attached by the API.
+  const prereq = challenge?.prereq || null
+
   // Check if user already has a pending/approved submission for the selected challenge
   useEffect(() => {
     if (!enabled || !user || !challenge) {
@@ -112,21 +121,6 @@ export default function SubmitScorePage() {
       })
     return () => { cancelled = true }
   }, [enabled, user, challenge?.id])
-
-  // Default selection: URL slug match, else first live challenge.
-  const selectedId = challengeId ?? (list.find((c) => c.slug === slug)?.id || list[0]?.id)
-  const challenge = list.find((c) => c.id === selectedId) || null
-  const t = challenge ? getType(challenge.typeId) : null
-  const club = challenge?.club || null
-  const isGallery = t?.gallery
-
-  // Prerequisite challenge (qualifier), attached by the API.
-  // Note: per-user submission state requires auth (not wired yet), so the gate
-  // is informational until login lands. See src/data/api.js.
-  const prereq = challenge?.prereq || null
-  const prereqSubmitted = false
-  const prereqApproved = false
-  const willBeHeld = false
 
   const set = (k) => (e) => {
     const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value
@@ -162,8 +156,7 @@ export default function SubmitScorePage() {
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
   const hasProof = form.file || form.link.trim()
   const authReady = !!user
-  const prereqGated = false
-  const canSubmit = authReady && form.gamertag.trim() && resultFilled && hasProof && form.agree && !prereqGated && !submitting
+  const canSubmit = authReady && form.gamertag.trim() && resultFilled && hasProof && form.agree && !submitting
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -247,7 +240,7 @@ export default function SubmitScorePage() {
   }
 
   if (submitted) {
-    return <SuccessView challenge={challenge} club={club} t={t} form={form} held={willBeHeld} prereq={prereq} onReset={() => setSubmitted(false)} />
+    return <SuccessView challenge={challenge} club={club} t={t} form={form} prereq={prereq} onReset={() => setSubmitted(false)} />
   }
 
   if (existingSubmission) {
@@ -301,11 +294,25 @@ export default function SubmitScorePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Prereq gate banner */}
             {prereq && (
-              <PrereqGate
-                prereq={prereq}
-                submitted={prereqSubmitted}
-                approved={prereqApproved}
-              />
+              <div className="flex items-start gap-3 rounded-xl border border-sky-500/25 bg-sky-500/[0.06] p-4">
+                <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-400" />
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-sky-200">Qualifier event</div>
+                  <p className="mt-0.5 text-sm text-sky-200/70">
+                    This event has a qualifier. Ask your club admin for details.
+                  </p>
+                  {prereq.slug && (
+                    <Link
+                      to={`/c/${prereq.slug}`}
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-sky-300 hover:text-sky-200"
+                    >
+                      <ClipboardCheck className="h-3.5 w-3.5" />
+                      {prereq.title}
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
+                  )}
+                </div>
+              </div>
             )}
 
             {/* Challenge + identity */}
@@ -413,7 +420,7 @@ export default function SubmitScorePage() {
                   {isGallery ? <ImageIcon className="h-6 w-6" /> : <Video className="h-6 w-6" />}
                 </span>
                 <span className="mt-3 text-sm font-medium text-white">
-                  {form.fileName || (isGallery ? 'Upload your photo' : 'Upload your clip or screenshot')}
+                  {form.fileName || (isGallery ? 'Upload your photo' : 'Upload your screenshot')}
                 </span>
                 <span className="mt-1 text-xs text-zinc-500">
                   PNG, JPG, or WEBP. Max {MAX_PROOF_MB}MB.
@@ -479,12 +486,8 @@ export default function SubmitScorePage() {
                 Cancel
               </Link>
               <Button type="submit" size="lg" disabled={!canSubmit} className="w-full sm:w-auto">
-                {willBeHeld ? <Clock className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
-                {submitting
-                  ? 'Submitting...'
-                  : willBeHeld
-                    ? 'Submit (held pending qualifier)'
-                    : 'Submit for review'}
+                <Upload className="h-4 w-4" />
+                {submitting ? 'Submitting...' : 'Submit for review'}
               </Button>
             </div>
             {error && (
@@ -493,12 +496,7 @@ export default function SubmitScorePage() {
                 {error}
               </p>
             )}
-            {prereqGated ? (
-              <p className="flex items-center justify-end gap-1.5 text-xs text-amber-400">
-                <Lock className="h-3.5 w-3.5" />
-                Complete the qualifier sub-challenge first.
-              </p>
-            ) : !canSubmit ? (
+            {!canSubmit ? (
               <p className="flex items-center justify-end gap-1.5 text-xs text-zinc-500">
                 <CircleAlert className="h-3.5 w-3.5" />
                 Add your gamertag, result, proof, and confirm the rules to submit.
@@ -523,52 +521,6 @@ function Centered({ title, body, action }) {
         <h1 className="text-2xl font-extrabold">{title}</h1>
         {body && <p className="mt-2 text-zinc-400">{body}</p>}
         {action && <div className="mt-6 flex justify-center">{action}</div>}
-      </div>
-    </div>
-  )
-}
-
-function PrereqGate({ prereq, submitted, approved }) {
-  if (approved) {
-    return (
-      <div className="flex items-center gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.07] p-4">
-        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
-        <div>
-          <div className="text-sm font-semibold text-emerald-200">Qualifier approved</div>
-          <div className="text-sm text-emerald-200/70">You're cleared to submit your result.</div>
-        </div>
-      </div>
-    )
-  }
-  if (submitted) {
-    return (
-      <div className="flex items-center gap-3 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] p-4">
-        <Clock className="h-5 w-5 shrink-0 text-amber-400" />
-        <div>
-          <div className="text-sm font-semibold text-amber-200">Qualifier pending review</div>
-          <div className="text-sm text-amber-200/70">
-            Your submission will be held here until a steward approves your qualifier.
-          </div>
-        </div>
-      </div>
-    )
-  }
-  return (
-    <div className="flex items-start gap-3 rounded-xl border border-rose-500/25 bg-rose-500/[0.06] p-4">
-      <Lock className="mt-0.5 h-5 w-5 shrink-0 text-rose-400" />
-      <div className="min-w-0">
-        <div className="text-sm font-semibold text-rose-200">Qualifier required</div>
-        <p className="mt-0.5 text-sm text-rose-200/70">
-          Submit the qualifier first to unlock this form.
-        </p>
-        <Link
-          to={`/c/${prereq.slug}`}
-          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-rose-300 hover:text-rose-200"
-        >
-          <ClipboardCheck className="h-3.5 w-3.5" />
-          {prereq.title}
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
       </div>
     </div>
   )
@@ -669,7 +621,7 @@ function Checklist({ t }) {
   )
 }
 
-function SuccessView({ challenge, club, t, form, held, prereq, onReset }) {
+function SuccessView({ challenge, club, t, form, prereq, onReset }) {
   return (
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="card w-full max-w-md overflow-hidden text-center">
@@ -693,26 +645,10 @@ function SuccessView({ challenge, club, t, form, held, prereq, onReset }) {
               </span>
             </div>
           </div>
-          {held ? (
-            <div className="space-y-2">
-              <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
-                <Clock className="h-4 w-4" />
-                Held — waiting for qualifier approval
-              </div>
-              <p className="text-center text-xs text-zinc-500">
-                Once your{' '}
-                <Link to={`/c/${prereq.slug}`} className="text-brand-400 hover:text-brand-300">
-                  {prereq.title}
-                </Link>{' '}
-                is approved, this enters the review queue automatically.
-              </p>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
-              <Clock className="h-4 w-4" />
-              Pending verification by a steward
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
+            <Clock className="h-4 w-4" />
+            Pending verification by a steward
+          </div>
           <div className="grid grid-cols-2 gap-3 pt-1">
             <Button to={`/c/${challenge.slug}`} variant="secondary">
               View challenge
