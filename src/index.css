@@ -191,3 +191,34 @@
     background: linear-gradient(to bottom, rgba(255, 107, 44, 0.4), rgba(255, 107, 44, 0.05));
   }
 }
+
+/* ----------------------- High-Contrast Mode ----------------------- */
+/* Toggled via .high-contrast class on <html>. Boosts text brightness,
+   minimum font sizes, and border opacity for vision-impaired users. */
+
+/* Boost text colors — target Tailwind zinc text classes via attribute selectors */
+.high-contrast [class*="text-zinc-600"] { color: #d4d4d8 !important; }
+.high-contrast [class*="text-zinc-500"] { color: #e4e4e7 !important; }
+.high-contrast [class*="text-zinc-400"] { color: #f4f4f5 !important; }
+.high-contrast [class*="text-zinc-300"] { color: #fafafa !important; }
+
+/* Boost placeholder text */
+.high-contrast input::placeholder,
+.high-contrast textarea::placeholder { color: #d4d4d8 !important; opacity: 1 !important; }
+
+/* Minimum font size — bump any sub-12px text to 12px */
+.high-contrast [class*="text-[10px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
+.high-contrast [class*="text-[11px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
+
+/* Boost border opacity on cards and common borders */
+.high-contrast .card { border-color: rgba(255, 255, 255, 0.18) !important; }
+.high-contrast .hairline { border-color: rgba(255, 255, 255, 0.18) !important; }
+.high-contrast [class*="border-white/[0.06"] { border-color: rgba(255, 255, 255, 0.18) !important; }
+.high-contrast [class*="border-white/[0.07"] { border-color: rgba(255, 255, 255, 0.20) !important; }
+.high-contrast [class*="border-white/[0.08"] { border-color: rgba(255, 255, 255, 0.22) !important; }
+
+/* Boost focus ring visibility */
+.high-contrast :focus-visible {
+  outline: 2px solid #ff6b2c !important;
+  outline-offset: 2px !important;
+}

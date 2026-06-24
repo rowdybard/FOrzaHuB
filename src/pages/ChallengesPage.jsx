@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Search, Flag } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
 import ChallengeCard from '../components/common/ChallengeCard'
@@ -23,6 +23,17 @@ export default function ChallengesPage() {
   const [type, setType] = useState('all')
   const [status, setStatus] = useState('all')
   const [q, setQ] = useState('')
+  const defaultedRef = useRef(false)
+
+  useEffect(() => {
+    if (defaultedRef.current || loading || !challenges) return
+    defaultedRef.current = true
+    if (challenges.some((c) => c.status === 'live')) {
+      setStatus('live')
+    } else if (challenges.some((c) => c.status === 'upcoming')) {
+      setStatus('upcoming')
+    }
+  }, [challenges, loading])
 
   const filtered = useMemo(() => {
     return (challenges || []).filter((c) => {

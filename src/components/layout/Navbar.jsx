@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { NavLink, useLocation, Link } from 'react-router-dom'
-import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User } from 'lucide-react'
+import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User, Eye, EyeOff } from 'lucide-react'
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import Avatar from '../ui/Avatar'
@@ -27,10 +27,18 @@ function navClass({ isActive }) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [hc, setHc] = useState(() => localStorage.getItem('high-contrast') === 'true')
   const location = useLocation()
   const { enabled, profile } = useAuth()
   const isStaff = !enabled || ['admin', 'steward'].includes(profile?.role)
   const visibleLinks = isStaff ? [...links, ...staffLinks] : links
+
+  const toggleHc = () => {
+    const next = !hc
+    setHc(next)
+    document.documentElement.classList.toggle('high-contrast', next)
+    localStorage.setItem('high-contrast', String(next))
+  }
 
   useEffect(() => {
     setOpen(false)
@@ -70,6 +78,15 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleHc}
+              className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+              aria-label={hc ? 'Disable high contrast' : 'Enable high contrast'}
+              title={hc ? 'High contrast on' : 'High contrast off'}
+            >
+              {hc ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
             <AuthControl />
             <Button to="/create" size="sm" className="hidden sm:inline-flex">
               <Plus className="h-4 w-4" />
