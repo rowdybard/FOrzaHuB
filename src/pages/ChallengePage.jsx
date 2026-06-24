@@ -18,7 +18,6 @@ import {
   Vote,
   Lock,
   ClipboardCheck,
-  Sparkles,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
@@ -119,12 +118,6 @@ function ChallengeHeader({ challenge, club, t }) {
           <div className="flex flex-wrap items-center gap-2">
             <TypeBadge typeId={challenge.typeId} />
             <StatusBadge status={challenge.status} />
-            {challenge.sponsored && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300">
-                <Sparkles className="h-3 w-3" />
-                {challenge.sponsor || 'Sponsored'}
-              </span>
-            )}
           </div>
 
           <h1 className="mt-4 max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
