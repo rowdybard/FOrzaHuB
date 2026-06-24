@@ -138,8 +138,8 @@ export const sponsors = [
 ]
 
 export const eventLeaderboard = [
-  { rank: 1, tag: 'Rowdybard',  club: 'PW', points: 0, events: 0, accent: '#ff6b2c' },
-  { rank: 2, tag: 'PurpleCone', club: 'PW', points: 0, events: 0, accent: '#a855f7' },
+  { rank: 1, tag: 'Rowdybard',  club: 'GC', points: 0, events: 0, accent: '#ff6b2c' },
+  { rank: 2, tag: 'PurpleCone', club: 'GC', points: 0, events: 0, accent: '#a855f7' },
 ]
 
 // --- Selectors (mirror the async API in src/data/api.js) -------------------

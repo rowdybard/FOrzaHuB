@@ -719,7 +719,7 @@ function SuccessView({ challenge, club, t, form, held, prereq, onReset }) {
             </Button>
             <Button onClick={onReset}>Submit another</Button>
           </div>
-          <Link to="/profile" className="block text-center text-xs text-brand-400 hover:text-brand-300">
+          <Link to="/me" className="block text-center text-xs text-brand-400 hover:text-brand-300">
             Track your submissions →
           </Link>
         </div>

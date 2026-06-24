@@ -89,6 +89,7 @@ export default function CommunityPage() {
   const active = all.filter((c) => c.status !== 'closed')
   const past = all.filter((c) => c.status === 'closed')
   const standings = clubStandings(all)
+  const currentSeason = new Date().getFullYear().toString()
   const isStaff = profile?.role === 'admin' || profile?.role === 'steward'
   const canManage = isStaff || (!!user && user.id === club.ownerId)
   const isMember = !!user && members.some((member) => member.id === user.id)
