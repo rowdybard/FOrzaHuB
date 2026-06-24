@@ -93,6 +93,9 @@ drop policy if exists "users leave clubs" on public.club_members;
 drop policy if exists "users leave own member row" on public.club_members;
 drop policy if exists "users set primary club" on public.club_members;
 
+drop policy if exists "users join up to five clubs" on public.club_members;
+drop policy if exists "users leave joined clubs" on public.club_members;
+
 create policy "users join up to five clubs"
   on public.club_members for insert to authenticated
   with check (
