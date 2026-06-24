@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
-import { MessagesSquare, Github, Twitter } from 'lucide-react'
+import { MessagesSquare } from 'lucide-react'
 import Logo from '../ui/Logo'
 import { useAuth } from '../../hooks/useAuth'
+
+const DISCORD_URL = 'https://discord.gg/GJw3XRuCXr'
 
 const columns = [
   {
@@ -18,17 +20,6 @@ const columns = [
     links: [
       { label: 'Create a challenge', to: '/create' },
       { label: 'Admin tools', to: '/admin' },
-      { label: 'Verification guide', to: '#' },
-      { label: 'Connect Discord', to: '#' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Rules & fair play', to: '#' },
-      { label: 'Help center', to: '#' },
-      { label: 'Changelog', to: '#' },
-      { label: 'Status', to: '#' },
     ],
   },
 ]
@@ -44,7 +35,7 @@ export default function Footer() {
   return (
     <footer className="mt-24 border-t border-white/[0.06] bg-ink-900/60">
       <div className="container-page py-14">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr_1fr]">
           <div className="max-w-sm">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-zinc-400">
@@ -53,25 +44,13 @@ export default function Footer() {
             </p>
             <div className="mt-5 flex items-center gap-2">
               <a
-                href="#"
+                href={DISCORD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
                 aria-label="Discord"
               >
                 <MessagesSquare className="h-[18px] w-[18px]" />
-              </a>
-              <a
-                href="#"
-                className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-                aria-label="X"
-              >
-                <Twitter className="h-[18px] w-[18px]" />
-              </a>
-              <a
-                href="#"
-                className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-                aria-label="GitHub"
-              >
-                <Github className="h-[18px] w-[18px]" />
               </a>
             </div>
           </div>
@@ -97,14 +76,12 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-white/[0.06] pt-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-2xl leading-relaxed">
-            Pitwall is an unofficial, fan-made community project. Not affiliated with,
+            GripCafe is an unofficial, fan-made community project. Not affiliated with,
             endorsed by, or sponsored by Forza, Forza Horizon, Playground Games, Turn 10
             Studios, or Microsoft. All trademarks belong to their respective owners.
           </p>
           <div className="flex items-center gap-4">
-            <span>© {new Date().getFullYear()} Pitwall</span>
-            <a href="#" className="hover:text-zinc-300">Privacy</a>
-            <a href="#" className="hover:text-zinc-300">Terms</a>
+            <span>© {new Date().getFullYear()} GripCafe</span>
           </div>
         </div>
       </div>

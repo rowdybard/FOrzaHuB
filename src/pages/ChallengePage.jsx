@@ -375,17 +375,13 @@ function ShareRow() {
         {copied ? 'Copied' : 'Copy link'}
       </button>
       <a
-        href="#"
+        href="https://discord.gg/GJw3XRuCXr"
+        target="_blank"
+        rel="noopener noreferrer"
         className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 px-2 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
       >
         <MessagesSquare className="h-3.5 w-3.5" />
         Discord
-      </a>
-      <a
-        href="#"
-        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 px-2 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-      >
-        Share
       </a>
     </div>
   )
@@ -413,7 +409,7 @@ function OrganizerCard({ club }) {
         <Button to={`/club/${club.slug}`} variant="secondary" size="sm">
           View club
         </Button>
-        <Button href="#" variant="ghost" size="sm">
+        <Button href="https://discord.gg/GJw3XRuCXr" variant="ghost" size="sm">
           <MessagesSquare className="h-4 w-4" />
           Discord
         </Button>

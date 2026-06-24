@@ -1,4 +1,4 @@
-// Pitwall data access layer.
+// GripCafe data access layer.
 // Every page imports from here. When Supabase is configured the functions hit
 // the database; otherwise they fall back to the honest mock data in mock.js.
 //

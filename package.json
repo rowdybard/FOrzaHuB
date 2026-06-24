@@ -1,9 +1,9 @@
 {
-  "name": "pitwall",
+  "name": "gripcafe",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Pitwall — unofficial community challenge hub for Forza Horizon 6 clubs and Discord communities.",
+  "description": "GripCafe — unofficial community challenge hub for Forza Horizon 6 clubs and Discord communities.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

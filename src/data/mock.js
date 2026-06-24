@@ -1,4 +1,4 @@
-// Pitwall fallback data — used only when Supabase is NOT configured.
+// GripCafe fallback data — used only when Supabase is NOT configured.
 // One real founding club, two real members, no fake challenges or times.
 // When VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are set, the app reads
 // live data from the database instead (see src/data/api.js).
@@ -16,7 +16,7 @@ const U = {
     nameGradient: true,
     nameEffect: 'glow',
     plateFrame: 'carbon',
-    profileTitle: 'Pitwall Founder',
+    profileTitle: 'GripCafe Founder',
     badges: ['founder', 'verified'],
     avatarUrl: null,
   },
@@ -41,7 +41,7 @@ export const profiles = Object.values(U)
 
 // Club rosters: clubId -> [{ userKey, role }]
 const MEMBERSHIPS = {
-  pitwall: [
+  gripcafe: [
     { user: U.rowdy, role: 'owner', isPrimary: true },
     { user: U.cone, role: 'member', isPrimary: true },
   ],
@@ -49,17 +49,17 @@ const MEMBERSHIPS = {
 
 export const clubs = [
   {
-    id: 'pitwall',
-    slug: 'pitwall',
-    name: 'Pitwall',
-    tag: 'PW',
+    id: 'gripcafe',
+    slug: 'gripcafe',
+    name: 'GripCafe',
+    tag: 'GC',
     region: 'Global',
     members: 2,
     verified: true,
     accent: '#ff6b2c',
     tagline: 'The home base. More clubs coming.',
     about:
-      'The founding club for Pitwall. Rowdybard and PurpleCone are here. Challenges, leaderboards and verified proof.',
+      'The founding club for GripCafe. Rowdybard and PurpleCone are here. Challenges, leaderboards and verified proof.',
     discord: '',
     founded: 'Jun 2025',
     ownerId: 'u-rowdy',
@@ -132,7 +132,7 @@ export const eventSchedule = [
 ]
 
 export const sponsors = [
-  { id: 'sp-pitwall', name: 'Pitwall',            tier: 'organizer', blurb: 'Community-run event platform' },
+  { id: 'sp-gripcafe', name: 'GripCafe',           tier: 'organizer', blurb: 'Community-run event platform' },
   { id: 'sp-rowdy',   name: 'Rowdybard Racing',   tier: 'prize',     blurb: 'Sponsoring the $50 gift card prize pool' },
   { id: 'sp-cone',    name: 'PurpleCone Garage',  tier: 'supporter', blurb: 'Build battle judge and community support' },
 ]

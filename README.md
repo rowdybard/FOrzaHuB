@@ -1,4 +1,4 @@
-# Pitwall
+# GripCafe
 
 The community challenge hub for Forza Horizon 6 clubs and Discord communities.
 Run weekly time trials, drift battles, drag shootouts, photo contests, and build
@@ -7,7 +7,7 @@ battles with verified proof and public leaderboards.
 > Unofficial fan project. Not affiliated with or endorsed by Forza, Playground
 > Games, Turn 10 Studios, or Microsoft.
 
-Pitwall runs with local mock data when Supabase env vars are missing. Add
+GripCafe runs with local mock data when Supabase env vars are missing. Add
 Supabase env vars and run the migrations to enable Discord auth, database reads
 and writes, club membership, profile cosmetics, staff review, and proof storage.
 
@@ -64,8 +64,15 @@ Run migrations in order:
 supabase/migrations/0001_init.sql
 supabase/migrations/0002_members_and_cosmetics.sql
 supabase/migrations/0003_backend_ready.sql
+supabase/migrations/0004_fix_challenge_rls.sql
 supabase/migrations/0004_profile_flair.sql
 supabase/migrations/0005_club_beta_limits.sql
+supabase/migrations/0005_restrict_proof_uploads_to_images.sql
+supabase/migrations/0006_challenge_lifecycle_automation.sql
+supabase/migrations/0007_one_submission_per_user.sql
+supabase/migrations/0008_set_primary_club_rpc.sql
+supabase/migrations/0009_submission_self_service.sql
+supabase/migrations/0010_sponsored_challenges.sql
 ```
 
 See `DEPLOYMENT.md` and `docs/auth.md` for Cloudflare Pages and Discord setup.

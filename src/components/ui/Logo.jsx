@@ -10,7 +10,7 @@ export default function Logo({ className, showText = true, to = '/' }) {
       </span>
       {showText && (
         <span className="font-display text-lg font-extrabold tracking-tight text-white">
-          Pitwall
+          GripCafe
         </span>
       )}
     </Link>

@@ -1,6 +1,6 @@
-# Deploying Pitwall
+# Deploying GripCafe
 
-Pitwall is a static React SPA for Cloudflare Pages. It uses Supabase directly
+GripCafe is a static React SPA for Cloudflare Pages. It uses Supabase directly
 from the browser for public data, Discord auth, proof storage, and staff-gated
 challenge/admin writes. If Supabase env vars are missing, it falls back to the
 local mock data in `src/data/mock.js`.
@@ -30,8 +30,15 @@ available. A legacy anon public key also works. Do not use or share a
    - `supabase/migrations/0001_init.sql`
    - `supabase/migrations/0002_members_and_cosmetics.sql`
    - `supabase/migrations/0003_backend_ready.sql`
+   - `supabase/migrations/0004_fix_challenge_rls.sql`
    - `supabase/migrations/0004_profile_flair.sql`
    - `supabase/migrations/0005_club_beta_limits.sql`
+   - `supabase/migrations/0005_restrict_proof_uploads_to_images.sql`
+   - `supabase/migrations/0006_challenge_lifecycle_automation.sql`
+   - `supabase/migrations/0007_one_submission_per_user.sql`
+   - `supabase/migrations/0008_set_primary_club_rpc.sql`
+   - `supabase/migrations/0009_submission_self_service.sql`
+   - `supabase/migrations/0010_sponsored_challenges.sql`
 3. Optionally run `supabase/seed.sql` for starter clubs and one challenge.
 4. Enable Authentication -> Providers -> Discord.
 5. Add the Supabase callback URL to the Discord app:

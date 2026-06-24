@@ -7,6 +7,8 @@ import Avatar from '../ui/Avatar'
 import { cn } from '../../lib/utils'
 import { useAuth } from '../../hooks/useAuth'
 
+const DISCORD_URL = 'https://discord.gg/GJw3XRuCXr'
+
 const links = [
   { to: '/challenges', label: 'Challenges' },
   { to: '/archive', label: 'Archive' },
@@ -111,7 +113,7 @@ export default function Navbar() {
               ))}
             </nav>
             <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.06] pt-3">
-              <Button href="#" variant="secondary" size="md">
+              <Button href={DISCORD_URL} variant="secondary" size="md">
                 <MessagesSquare className="h-4 w-4" />
                 Discord
               </Button>
@@ -134,7 +136,7 @@ function AuthControl() {
   // No backend configured — keep the simple Discord community link.
   if (!enabled) {
     return (
-      <Button href="#" variant="ghost" size="sm" className="hidden sm:inline-flex">
+      <Button href={DISCORD_URL} variant="ghost" size="sm" className="hidden sm:inline-flex">
         <MessagesSquare className="h-4 w-4" />
         Discord
       </Button>
