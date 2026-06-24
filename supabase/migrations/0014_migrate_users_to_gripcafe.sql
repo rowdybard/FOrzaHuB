@@ -1,16 +1,22 @@
 -- 0014_migrate_users_to_gripcafe.sql
--- Add Rowdybard and PurpleCone as members of the GripCafe club (the event host).
+-- Move Rowdybard and PurpleCone from Drift Club Tokyo to GripCafe, then delete Drift Club Tokyo.
 -- Users are looked up by display_name since their IDs are auth-generated UUIDs.
 
 do $migrate$
 declare
   v_club_id uuid;
+  v_dct_id uuid;
   v_rowdy_id uuid;
   v_cone_id uuid;
 begin
   -- Find the GripCafe club
   select id into v_club_id from public.clubs where slug = 'gripcafe' limit 1;
   if v_club_id is null then return; end if;
+
+  -- Find Drift Club Tokyo (if it exists)
+  select id into v_dct_id from public.clubs
+    where slug ilike 'drift-club-tokyo' or name ilike 'Drift Club Tokyo'
+    limit 1;
 
   -- Find Rowdybard (owner)
   select id into v_rowdy_id from public.profiles
@@ -22,7 +28,7 @@ begin
     where display_name ilike 'PurpleCone%' or gamertag ilike 'PurpleCone%'
     limit 1;
 
-  -- Add Rowdybard as owner
+  -- Add Rowdybard as owner of GripCafe
   if v_rowdy_id is not null then
     update public.club_members set is_primary = false where user_id = v_rowdy_id;
     insert into public.club_members (club_id, user_id, role, is_primary)
@@ -31,7 +37,7 @@ begin
       set role = 'owner', is_primary = true;
   end if;
 
-  -- Add PurpleCone as member
+  -- Add PurpleCone as member of GripCafe
   if v_cone_id is not null then
     update public.club_members set is_primary = false where user_id = v_cone_id;
     insert into public.club_members (club_id, user_id, role, is_primary)
@@ -40,7 +46,12 @@ begin
       set role = 'member', is_primary = true;
   end if;
 
-  -- Sync member count
+  -- Delete Drift Club Tokyo (cascades to club_members)
+  if v_dct_id is not null then
+    delete from public.clubs where id = v_dct_id;
+  end if;
+
+  -- Sync GripCafe member count
   update public.clubs
     set members = (select count(*) from public.club_members where club_id = v_club_id)
     where id = v_club_id;

@@ -57,9 +57,6 @@ export default function Navbar() {
         <div className="container-page flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Logo />
-            <span className="hidden items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-brand-300 lg:inline-flex">
-              Event Hub
-            </span>
           </div>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -88,7 +85,7 @@ export default function Navbar() {
               {hc ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
             <AuthControl />
-            <Button to="/create" size="sm" className="hidden sm:inline-flex">
+            <Button to="/create" size="sm" variant="secondary" className="hidden sm:inline-flex">
               <Plus className="h-4 w-4" />
               New challenge
             </Button>

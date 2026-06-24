@@ -51,7 +51,7 @@ export default function ChallengesPage() {
     <div>
       <PageHero
         eyebrow="Challenges"
-        title="Find your next event"
+        title="Club events"
         description="Open, upcoming, and finished challenges."
       />
 
@@ -138,7 +138,7 @@ export default function ChallengesPage() {
             }
           />
         ) : (
-          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((c) => (
               <ChallengeCard key={c.id} challenge={c} club={c.club} />
             ))}

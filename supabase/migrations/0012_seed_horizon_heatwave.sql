@@ -35,7 +35,7 @@ begin
   values (
     'opening-hot-lap-' || to_char(v_day1, 'YYYYMMDD'),
     'time_trial',
-    'Opening Hot Lap',
+    'A-Class Festival Circuit',
     v_club_id,
     'upcoming',
     v_day1,
@@ -56,7 +56,7 @@ begin
   values (
     'drift-after-dark-' || to_char(v_day1 + interval '1 day', 'YYYYMMDD'),
     'drift_score',
-    'Drift After Dark',
+    'S2 Drift Zone Trial',
     v_club_id,
     'upcoming',
     v_day1 + interval '1 day',
@@ -77,7 +77,7 @@ begin
   values (
     'quarter-mile-kings-' || to_char(v_day1 + interval '2 days', 'YYYYMMDD'),
     'drag_time',
-    'Quarter Mile Kings',
+    'R-Class Drag Sprint',
     v_club_id,
     'upcoming',
     v_day1 + interval '2 days',
@@ -98,7 +98,7 @@ begin
   values (
     'build-battle-showcase-' || to_char(v_day1 + interval '3 days', 'YYYYMMDD'),
     'build_battle',
-    'Build Battle Showcase',
+    'B-Class Street Build',
     v_club_id,
     'upcoming',
     v_day1 + interval '3 days',
@@ -119,7 +119,7 @@ begin
   values (
     'photo-mode-masters-' || to_char(v_day1 + interval '4 days', 'YYYYMMDD'),
     'photo_contest',
-    'Photo Mode Masters',
+    'Photo Challenge: Rally Theme',
     v_club_id,
     'upcoming',
     v_day1 + interval '4 days',
@@ -140,7 +140,7 @@ begin
   values (
     'grand-prix-heat-' || to_char(v_day1 + interval '5 days', 'YYYYMMDD'),
     'time_trial',
-    'Grand Prix Heat',
+    'S1 Road Circuit Trial',
     v_club_id,
     'upcoming',
     v_day1 + interval '5 days',
@@ -161,7 +161,7 @@ begin
   values (
     'grand-finale-showdown-' || to_char(v_day1 + interval '6 days', 'YYYYMMDD'),
     'time_trial',
-    'Grand Finale Showdown',
+    'R-Class Festival Finale',
     v_club_id,
     'upcoming',
     v_day1 + interval '6 days',

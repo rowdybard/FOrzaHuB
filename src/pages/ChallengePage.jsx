@@ -396,7 +396,7 @@ function ShareRow() {
 function SponsorMiniCard({ challenge }) {
   return (
     <div className="card p-5">
-      <div className="text-xs font-semibold uppercase tracking-wider text-amber-400">Sponsored challenge</div>
+      <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">Sponsored</div>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between">
           <span className="text-zinc-400">Presented by</span>
