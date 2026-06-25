@@ -11,16 +11,12 @@ export default function Cover({ typeId, className, children, iconSize = 'h-40 w-
   return (
     <div className={cn('relative overflow-hidden bg-ink-900', className)}>
       <div className={cn('absolute inset-0 bg-gradient-to-br', t.cover)} />
-      <div
-        className="absolute -right-12 -top-16 h-52 w-52 rounded-full opacity-20 blur-3xl"
-        style={{ background: t.accent }}
-      />
       <Icon
-        className={cn('absolute -bottom-6 -right-4 opacity-[0.06]', iconSize)}
+        className={cn('absolute -bottom-4 -right-2 opacity-[0.04]', iconSize)}
         style={{ color: t.accent }}
-        strokeWidth={1.2}
+        strokeWidth={1}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-ink-950/20 to-transparent" />
       {children && <div className="relative h-full w-full">{children}</div>}
     </div>
   )

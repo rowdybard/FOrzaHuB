@@ -111,7 +111,6 @@ function ChallengeHeader({ challenge, club, t }) {
   return (
     <section className="relative">
       <Cover typeId={challenge.typeId} className="min-h-[320px] sm:min-h-[380px]" iconSize="h-80 w-80">
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/50 to-transparent" />
         <div className="container-page relative flex min-h-[320px] flex-col justify-end pb-8 pt-24 sm:min-h-[380px]">
           <nav className="mb-4 flex items-center gap-1.5 text-sm text-zinc-400">
             <Link to="/challenges" className="hover:text-white">Challenges</Link>
