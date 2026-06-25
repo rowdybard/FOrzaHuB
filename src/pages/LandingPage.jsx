@@ -93,7 +93,7 @@ function EventHero({ event, stats }) {
       <div className="container-page relative py-16 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <div className="animate-fade-up">
-            <span className="inline-flex items-center gap-2 rounded border border-brand-500/20 bg-brand-500/[0.04] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
+            <span className="inline-flex items-center gap-2 rounded border border-brand-500/25 bg-brand-500/[0.1] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
               <Flame className="h-3.5 w-3.5" />
               Beta Race Series
             </span>
@@ -268,7 +268,7 @@ function BetaSeasonInfo({ event }) {
 
         <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
-            <div className="inline-flex items-center gap-2 rounded border border-amber-500/20 bg-amber-500/[0.04] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
+            <div className="inline-flex items-center gap-2 rounded border border-amber-500/25 bg-amber-500/[0.1] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
               <Trophy className="h-3.5 w-3.5" />
               Beta Race Series
             </div>
@@ -392,7 +392,7 @@ function ScheduleSection({ schedule, event }) {
         })}
 
         {event.season && (
-          <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/20 bg-brand-500/[0.04]">
+          <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/25 bg-brand-500/[0.1]">
             <Medal className="h-10 w-10 text-amber-400" />
             <h3 className="mt-3 font-bold text-white">Overall Champion</h3>
             <p className="mt-1.5 text-sm text-zinc-400">

@@ -41,7 +41,7 @@ const STATUS_META = {
   pending: { label: 'Pending', cls: 'border-amber-500/30 bg-amber-500/10 text-amber-300', icon: Clock },
   flagged: { label: 'Flagged', cls: 'border-rose-500/30 bg-rose-500/10 text-rose-300', icon: Flag },
   approved: { label: 'Approved', cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300', icon: Check },
-  rejected: { label: 'Rejected', cls: 'border-white/10 bg-white/[0.04] text-zinc-400', icon: X },
+  rejected: { label: 'Rejected', cls: 'border-white/[0.1] bg-white/[0.06] text-zinc-300', icon: X },
 }
 
 function StatusPill({ status }) {

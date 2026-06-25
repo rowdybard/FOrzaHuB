@@ -254,7 +254,7 @@ function Rules({ challenge, t }) {
       </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {challenge.rules.map((r, i) => (
-          <div key={i} className="flex items-start gap-2.5 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3.5 py-3">
+          <div key={i} className="flex items-start gap-2.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3.5 py-3">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
             <span className="text-sm leading-relaxed text-zinc-300">{r}</span>
           </div>
@@ -297,7 +297,7 @@ function EventDetails({ challenge, club, t, isLive }) {
         )}
         {challenge.status === 'closed' && (
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl border border-amber-500/20 bg-amber-500/[0.04] text-amber-400">
+            <span className="grid h-10 w-10 place-items-center rounded-xl border border-amber-500/25 bg-amber-500/[0.1] text-amber-400">
               <Trophy className="h-5 w-5" />
             </span>
             <div>
@@ -414,7 +414,7 @@ function OrganizerCard({ club }) {
 
 function SeriesPrizeCard() {
   return (
-    <div className="card overflow-hidden border-amber-500/20 bg-amber-500/[0.04]">
+    <div className="card overflow-hidden border-amber-500/25 bg-amber-500/[0.08]">
       <div className="flex items-center gap-2 border-b border-amber-500/10 p-5">
         <Gift className="h-4 w-4 text-amber-400" />
         <h3 className="text-sm font-semibold text-white">$50 Series Champion Prize</h3>
