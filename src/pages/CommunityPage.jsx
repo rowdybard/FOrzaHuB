@@ -341,7 +341,7 @@ function ClubInviteActions({ club, onChanged }) {
       <p className="hidden max-w-sm truncate text-right font-mono text-[11px] text-zinc-400 sm:block">
         {inviteUrl}
       </p>
-      {error && <p className="max-w-sm text-right text-xs text-rose-300">{error}</p>}
+      {error && <p className="max-w-sm text-right text-sm text-rose-300">{error}</p>}
     </div>
   )
 }
@@ -545,7 +545,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
             <div key={challenge.id} className="flex items-center gap-3 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-white">{challenge.title}</div>
-                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
                   <span className="capitalize text-zinc-400">{challenge.status}</span>
                   <span>{formatNumber(challenge.submissionCount || 0)} submissions</span>
                 </div>
@@ -646,7 +646,7 @@ function AboutCard({ club }) {
           Discord
         </Button>
       ) : (
-        <div className="mt-4 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-center text-xs text-zinc-500">
+        <div className="mt-4 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 text-center text-sm text-zinc-400">
           Discord link not set
         </div>
       )}

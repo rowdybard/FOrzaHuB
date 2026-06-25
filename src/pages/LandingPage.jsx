@@ -250,12 +250,12 @@ function SponsorBar({ sponsors }) {
                 )}
               </span>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                   {s.tier === 'organizer' ? 'Hosted by' : s.tier === 'prize' ? 'Prizes by' : 'Supported by'}
                 </div>
                 <div className="text-sm font-bold text-white">{s.name}</div>
                 {s.blurb && (
-                  <div className="text-xs text-zinc-500">{s.blurb}</div>
+                  <div className="text-xs text-zinc-400">{s.blurb}</div>
                 )}
               </div>
             </div>
@@ -290,7 +290,7 @@ function BetaSeasonInfo({ event }) {
             </p>
 
             <div className="mt-6 card-readable rounded-2xl p-5">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Series Rules</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Series Rules</h3>
               <ul className="mt-3 space-y-2 text-sm text-zinc-300">
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
@@ -317,7 +317,7 @@ function BetaSeasonInfo({ event }) {
                   Tiebreakers: most event wins, most podiums, best finish in final event.
                 </li>
               </ul>
-              <p className="mt-4 border-t border-white/[0.06] pt-3 text-xs text-zinc-500">
+              <p className="mt-4 border-t border-white/[0.06] pt-3 text-sm text-zinc-400">
                 Photo and build events are showcase entries — participation gives season points but they are not ranked by score.
               </p>
             </div>
@@ -382,7 +382,7 @@ function ScheduleSection({ schedule, event }) {
               </div>
 
               <div className="mt-3">
-                <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                   {formatDate(c.startDate, { weekday: 'short', month: 'short', day: 'numeric' })}
                 </div>
                 <h3 className="mt-1 font-semibold text-white group-hover:text-brand-300">{c.title}</h3>
@@ -443,7 +443,7 @@ function LeaderboardPreview() {
           <div className="px-3 py-12 text-center sm:px-5">
             <Trophy className="mx-auto h-10 w-10 text-zinc-600" />
             <h3 className="mt-4 font-semibold text-white">No standings yet</h3>
-            <p className="mt-1.5 text-sm text-zinc-500">
+            <p className="mt-1.5 text-sm text-zinc-400">
               Leaderboard populates as events go live and submissions are approved.
             </p>
           </div>
