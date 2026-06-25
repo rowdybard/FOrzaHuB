@@ -93,8 +93,8 @@ function EventHero({ event, stats }) {
       <div className="container-page relative py-16 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <div className="animate-fade-up">
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-300">
-              <Flame className="h-4 w-4" />
+            <span className="inline-flex items-center gap-2 rounded border border-brand-500/20 bg-brand-500/[0.04] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
+              <Flame className="h-3.5 w-3.5" />
               Beta Race Series
             </span>
           </div>
@@ -122,7 +122,7 @@ function EventHero({ event, stats }) {
             <span className="font-medium text-white">
               {formatDate(event.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
-            <span className={`ml-2 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusCls}`}>
+            <span className={`ml-2 inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-xs font-semibold uppercase tracking-wide ${statusCls}`}>
               {event.status === 'live' && (
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -268,7 +268,7 @@ function BetaSeasonInfo({ event }) {
 
         <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
+            <div className="inline-flex items-center gap-2 rounded border border-amber-500/20 bg-amber-500/[0.04] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
               <Trophy className="h-3.5 w-3.5" />
               Beta Race Series
             </div>
