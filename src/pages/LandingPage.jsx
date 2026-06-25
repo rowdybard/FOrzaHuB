@@ -190,7 +190,7 @@ function FallbackHero({ stats, allChallenges }) {
             <span className="text-white">GripCafe</span>
           </h1>
           <p className="mt-4 text-xl text-zinc-300">
-            Community-run competitive events for Forza Horizon.
+            Community-run competitive events for sim racing.
           </p>
           {nextEvent && (
             <Link
@@ -566,7 +566,7 @@ function HowItWorks({ event }) {
 function FAQSection() {
   const faqs = [
     {
-      q: 'How do I run a Forza Horizon tournament?',
+      q: 'How do I run a sim racing tournament?',
       a: 'Create a free GripCafe account, start or join a club, then use the Create Challenge page to set up a tournament. Choose a format like time trial, drift, drag, or photo contest, set the rules and schedule, and share the invite link with your community.',
     },
     {
@@ -578,8 +578,8 @@ function FAQSection() {
       a: 'Players submit their time or score with a screenshot or video. Each submission is reviewed by club staff before it\'s approved. Only verified entries appear on the leaderboard, and every result links back to its proof.',
     },
     {
-      q: 'Can I win community prizes playing Forza Horizon?',
-      a: 'Yes. Sponsored events on GripCafe offer community prizes like Steam and Xbox gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify.',
+      q: 'Can I win community prizes in sim racing?',
+      a: 'Yes. Sponsored events on GripCafe offer community prizes like Steam gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify.',
     },
     {
       q: 'Is GripCafe free to use?',

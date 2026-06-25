@@ -79,7 +79,7 @@ export default function SubmitScorePage() {
   const [challengeId, setChallengeId] = useState(null)
   const [form, setForm] = useState({
     gamertag: '',
-    platform: 'Xbox',
+    platform: 'PC',
     result: '',
     title: '',
     shareCode: '',
@@ -232,7 +232,7 @@ export default function SubmitScorePage() {
     const nextEvent = upcoming[0] || null
     return (
       <div>
-        <Seo title="Submit Your Score" description="Submit your Forza Horizon tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
+        <Seo title="Submit Your Score" description="Submit your sim racing tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
         <PageHero
           eyebrow="Submit"
           title="No live events right now"
@@ -325,7 +325,7 @@ export default function SubmitScorePage() {
 
   return (
     <div>
-      <Seo title="Submit Your Score" description="Submit your Forza Horizon tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
+      <Seo title="Submit Your Score" description="Submit your sim racing tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
       <PageHero
         eyebrow="Submit"
         title={isGallery ? 'Submit your entry' : 'Submit your result'}

@@ -42,11 +42,11 @@ export default function ClubsPage() {
 
   return (
     <div>
-      <Seo title="Forza Horizon Racing Clubs & Communities" description="Join Forza Horizon racing clubs running verified tournaments on GripCafe. Find a community, or bring your Discord server and start competing." path="/clubs" />
+      <Seo title="Sim Racing Clubs & Communities" description="Join sim racing clubs running verified tournaments on GripCafe. Find a community, or bring your Discord server and start competing." path="/clubs" />
       <PageHero
         eyebrow="Communities"
         title="Clubs"
-        description="Forza clubs running events on GripCafe."
+        description="Racing clubs running events on GripCafe."
       >
         <div className="mt-6 flex flex-wrap gap-3">
           <Button to="/clubs/new">

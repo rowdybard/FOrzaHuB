@@ -39,7 +39,7 @@ export default function Footer() {
           <div className="max-w-sm">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-              The sponsored community event hub for Forza Horizon 6. Weekly events,
+              The sponsored community event hub for sim racing. Weekly events,
               community prizes, proof-backed leaderboards, and a championship worth competing for.
             </p>
             <div className="mt-5 flex items-center gap-2">
@@ -77,8 +77,7 @@ export default function Footer() {
         <div className="mt-12 flex flex-col gap-4 border-t border-white/[0.06] pt-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-2xl leading-relaxed">
             GripCafe is an unofficial, fan-made community project. Not affiliated with,
-            endorsed by, or sponsored by Forza, Forza Horizon, Playground Games, Turn 10
-            Studios, or Microsoft. All trademarks belong to their respective owners.
+            endorsed by, or sponsored by any game publisher or developer. All trademarks belong to their respective owners.
           </p>
           <div className="flex items-center gap-4">
             <span>© {new Date().getFullYear()} GripCafe</span>

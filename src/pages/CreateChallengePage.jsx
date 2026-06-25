@@ -259,7 +259,7 @@ export default function CreateChallengePage() {
 
   return (
     <div>
-      <Seo title={isEdit ? 'Edit Challenge' : 'Create a Tournament'} description={isEdit ? 'Edit your Forza Horizon tournament settings.' : 'Create a verified Forza Horizon tournament for your club. Time trials, drift, drag, photo contests, and build battles with custom rules and community prizes.'} path="/create" />
+      <Seo title={isEdit ? 'Edit Challenge' : 'Create a Tournament'} description={isEdit ? 'Edit your sim racing tournament settings.' : 'Create a verified sim racing tournament for your club. Time trials, drift, drag, photo contests, and build battles with custom rules and community prizes.'} path="/create" />
       <div className="border-b border-white/[0.06] bg-ink-900/40">
         <div className="container-page flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div>

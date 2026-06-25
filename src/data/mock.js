@@ -111,7 +111,7 @@ export const sponsoredEvent = {
   title: 'GripCafe Beta Race Series',
   tagline: '7 events. 1 week. Most points wins the $50 prize.',
   description:
-    'A seven-day community showdown across Forza Horizon 6. Seven events, cumulative season points, and a $50 gift card for the overall champion.',
+    'A seven-day community showdown. Seven events, cumulative season points, and a $50 gift card for the overall champion.',
   startDate: _eventStart,
   endDate: addDays(_eventStart, 6),
   prize: '$50',

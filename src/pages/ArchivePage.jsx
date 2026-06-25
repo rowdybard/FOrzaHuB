@@ -70,7 +70,7 @@ export default function ArchivePage() {
 
   return (
     <div>
-      <Seo title="Tournament Results Archive" description="Browse completed Forza Horizon tournaments with podium finishes, records, and verified results. See past champions and leaderboard standings." path="/archive" />
+      <Seo title="Tournament Results Archive" description="Browse completed sim racing tournaments with podium finishes, records, and verified results. See past champions and leaderboard standings." path="/archive" />
       <PageHero
         eyebrow="Archive"
         title="Results archive"
