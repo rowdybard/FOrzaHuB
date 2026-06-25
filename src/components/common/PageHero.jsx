@@ -2,7 +2,7 @@ import { cn } from '../../lib/utils'
 
 export default function PageHero({ eyebrow, title, description, children, className }) {
   return (
-    <section className={cn('relative border-b border-white/[0.06] bg-ink-950', className)}>
+    <section className={cn('relative border-b border-white/[0.06] bg-ink-900/60 backdrop-blur-xl', className)}>
       <div className="container-page relative py-10 sm:py-12">
         {eyebrow && (
           <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
