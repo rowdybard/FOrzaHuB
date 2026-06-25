@@ -258,7 +258,7 @@ export default function SubmitScorePage() {
                 </p>
               </Link>
             )}
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 text-center">
+            <div className="rounded-2xl border border-white/[0.1] bg-white/[0.06] p-5 text-center">
               <p className="text-sm text-zinc-400">
                 {nextEvent
                   ? "Check back when the event goes live, or join the Discord to get notified."
@@ -428,14 +428,14 @@ export default function SubmitScorePage() {
                   <span className="ml-1 text-rose-500">*</span>
                 </span>
               </div>
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3.5">
+              <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.1] p-3.5">
                 <div className="flex gap-2.5 text-sm text-amber-200/90">
                   <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
                   <p>{t.proofHint}</p>
                 </div>
               </div>
 
-              <label className="group mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.02] px-6 py-9 text-center transition-colors hover:border-brand-500/40 hover:bg-white/[0.03]">
+              <label className="group mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.05] px-6 py-9 text-center transition-colors hover:border-brand-500/40 hover:bg-white/[0.07]">
                 <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/[0.08] bg-ink-800 text-brand-400">
                   {isGallery ? <ImageIcon className="h-6 w-6" /> : <Video className="h-6 w-6" />}
                 </span>
@@ -489,7 +489,7 @@ export default function SubmitScorePage() {
               </p>
             </Panel>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/[0.1] bg-white/[0.06] p-4">
               <input
                 type="checkbox"
                 checked={form.agree}
@@ -645,7 +645,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
   return (
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="card w-full max-w-md overflow-hidden text-center">
-        <div className="relative border-b border-white/[0.06] bg-emerald-500/[0.06] px-6 py-10">
+        <div className="relative border-b border-white/[0.08] bg-emerald-500/[0.1] px-6 py-10">
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
             <CheckCircle2 className="h-8 w-8" />
           </span>
@@ -655,7 +655,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
           </p>
         </div>
         <div className="space-y-4 p-6">
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-left">
+          <div className="rounded-xl border border-white/[0.1] bg-white/[0.06] p-4 text-left">
             <div className="text-xs text-zinc-500">{club?.name} · {t.label}</div>
             <div className="mt-1 font-semibold text-white">{challenge.title}</div>
             <div className="mt-3 flex items-center justify-between border-t border-white/[0.06] pt-3">
@@ -665,7 +665,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
               </span>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/[0.06] py-2.5 text-sm text-amber-200/90">
+          <div className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.1] py-2.5 text-sm text-amber-200/90">
             <Clock className="h-4 w-4" />
             Pending verification by a steward
           </div>

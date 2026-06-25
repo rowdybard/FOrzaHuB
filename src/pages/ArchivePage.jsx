@@ -249,7 +249,7 @@ function Chip({ active, onClick, label, icon: Icon }) {
         'inline-flex shrink-0 items-center gap-1.5 rounded border px-3 py-1.5 text-sm font-medium transition-colors',
         active
           ? 'border-brand-500/30 bg-brand-500/10 text-brand-300'
-          : 'border-white/[0.06] bg-white/[0.01] text-zinc-400 hover:border-white/15 hover:text-white',
+          : 'border-white/[0.1] bg-white/[0.06] text-zinc-300 hover:border-white/15 hover:text-white',
       )}
     >
       {Icon && <Icon className="h-3.5 w-3.5" />}
@@ -264,7 +264,7 @@ function SeasonBtn({ active, onClick, label }) {
       onClick={onClick}
       className={cn(
         'shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-        active ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white',
+        active ? 'bg-white/[0.1] text-white' : 'text-zinc-400 hover:text-white',
       )}
     >
       {label}
