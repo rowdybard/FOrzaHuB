@@ -18,6 +18,7 @@ import {
 import Button from '../components/ui/Button'
 import ChallengeCard from '../components/common/ChallengeCard'
 import Loading from '../components/common/Loading'
+import RulePresets from '../components/common/RulePresets'
 import NotFound from './NotFound'
 import {
   getChallengeBySlug,
@@ -124,6 +125,7 @@ export default function CreateChallengePage() {
 
   const setRule = (i, v) => setForm((f) => ({ ...f, rules: f.rules.map((r, idx) => (idx === i ? v : r)) }))
   const addRule = () => setForm((f) => ({ ...f, rules: [...f.rules, ''] }))
+  const addPresetRule = (preset) => setForm((f) => ({ ...f, rules: [...f.rules.filter(Boolean), preset] }))
   const removeRule = (i) => setForm((f) => ({ ...f, rules: f.rules.filter((_, idx) => idx !== i) }))
 
   const startInFuture = new Date(form.startDate).getTime() > Date.now()
@@ -421,7 +423,14 @@ export default function CreateChallengePage() {
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
                   <span className="text-sm font-medium text-zinc-300">Rules</span>
-                  <span className="text-xs text-zinc-500">{form.rules.length} rules</span>
+                  <span className="text-xs text-zinc-500">{form.rules.filter(Boolean).length} rules</span>
+                </div>
+                <div className="mb-3">
+                  <RulePresets
+                    existingRules={form.rules}
+                    onAdd={addPresetRule}
+                    disabled={!canEditMaterial}
+                  />
                 </div>
                 <div className="space-y-2">
                   {form.rules.map((rule, i) => (
