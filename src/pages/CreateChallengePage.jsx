@@ -227,7 +227,7 @@ export default function CreateChallengePage() {
     return (
       <Centered
         title="Sign in required"
-        body="Sign in before creating or editing community challenges."
+        body="Sign in before creating or editing club challenges."
         action={<Button onClick={signIn}>Sign in</Button>}
       />
     )
@@ -236,9 +236,9 @@ export default function CreateChallengePage() {
   if (!isEditingRoute && !clubsLoading && clubList.length === 0) {
     return (
       <Centered
-        title="Create a community first"
-        body="Challenges can only be created for communities you own."
-        action={<Button to="/clubs/new">Start a community</Button>}
+        title="Create a club hub first"
+        body="Challenges can only be created for clubs you own."
+        action={<Button to="/clubs/new">Create club hub</Button>}
       />
     )
   }

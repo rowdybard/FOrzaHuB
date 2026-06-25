@@ -13,7 +13,7 @@ const DISCORD_URL = 'https://discord.gg/GJw3XRuCXr'
 const links = [
   { to: '/challenges', label: 'Challenges' },
   { to: '/archive', label: 'Archive' },
-  { to: '/clubs', label: 'Communities' },
+  { to: '/clubs', label: 'Clubs' },
   { to: '/submit', label: 'Submit' },
 ]
 

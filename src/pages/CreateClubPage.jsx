@@ -140,7 +140,7 @@ export default function CreateClubPage() {
     return (
       <Centered
         title="Supabase required"
-        body="Community creation needs Discord login and the database backend."
+        body="Club creation needs Discord login and the database backend."
       />
     )
   }
@@ -151,7 +151,7 @@ export default function CreateClubPage() {
     return (
       <Centered
         title="Sign in required"
-        body="Sign in with Discord before creating a community."
+        body="Sign in with Discord before creating a club hub."
         action={
           <Button onClick={signIn}>
             <MessagesSquare className="h-4 w-4" />
@@ -166,7 +166,7 @@ export default function CreateClubPage() {
     return (
       <div>
         <PageHero
-          eyebrow="Communities"
+          eyebrow="Clubs"
           title="You already own a club"
           description="During beta, each account can own one club."
         />
@@ -192,9 +192,9 @@ export default function CreateClubPage() {
   return (
     <div>
       <PageHero
-        eyebrow="Communities"
-        title="Start a community"
-        description="Create one club for your Discord or racing group."
+        eyebrow="Clubs"
+        title="Create club hub"
+        description="Your Discord stays the home base. GripCafe gives your group event pages, submissions, proof review, and leaderboards."
       />
 
       <div className="container-page py-8">

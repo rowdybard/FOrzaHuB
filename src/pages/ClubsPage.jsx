@@ -42,16 +42,16 @@ export default function ClubsPage() {
 
   return (
     <div>
-      <Seo title="Sim Racing Clubs & Communities" description="Join sim racing clubs running verified tournaments on GripCafe. Find a community, or bring your Discord server and start competing." path="/clubs" />
+      <Seo title="Sim Racing Clubs" description="Join sim racing clubs running verified tournaments on GripCafe. Find a club, or bring your Discord server and start competing." path="/clubs" />
       <PageHero
-        eyebrow="Communities"
+        eyebrow="Clubs"
         title="Clubs"
-        description="Racing clubs running events on GripCafe."
+        description="Racing clubs running events on GripCafe. Your Discord stays the home base — GripCafe adds event pages, proof review, and leaderboards."
       >
         <div className="mt-6 flex flex-wrap gap-3">
           <Button to="/clubs/new">
             <Plus className="h-4 w-4" />
-            Start a community
+            Start a club hub
           </Button>
         </div>
       </PageHero>

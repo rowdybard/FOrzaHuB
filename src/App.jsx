@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import CreateChallengePage from './pages/CreateChallengePage'
 import CreateClubPage from './pages/CreateClubPage'
 import ArchivePage from './pages/ArchivePage'
+import OfficialRulesPage from './pages/OfficialRulesPage'
 import ProfilePage from './pages/ProfilePage'
 import NotFound from './pages/NotFound'
 
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/create" element={<CreateChallengePage />} />
         <Route path="/create/:slug" element={<CreateChallengePage />} />
+      <Route path="/official-rules" element={<OfficialRulesPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

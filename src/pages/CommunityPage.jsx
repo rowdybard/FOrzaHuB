@@ -188,7 +188,7 @@ function ClubHeader({ club, canManage, onChanged }) {
     <section className="border-b border-white/[0.06] bg-ink-950">
       <div className="container-page pb-8 pt-12">
         <nav className="mb-6 flex items-center gap-1.5 text-sm text-zinc-400">
-          <Link to="/clubs" className="hover:text-white">Communities</Link>
+          <Link to="/clubs" className="hover:text-white">Clubs</Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <span className="text-zinc-500">{club.name}</span>
         </nav>
@@ -615,7 +615,7 @@ function AboutCard({ club }) {
     <div className="card p-5">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">About</h3>
       <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-        {club.about || 'No community profile has been added yet.'}
+        {club.about || 'No club profile has been added yet.'}
       </p>
       <div className="mt-4 space-y-2.5 border-t border-white/[0.06] pt-4 text-sm">
         <div className="flex items-center justify-between">

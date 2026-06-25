@@ -10,7 +10,7 @@ const columns = [
     title: 'Explore',
     links: [
       { label: 'Challenges', to: '/challenges' },
-      { label: 'Communities', to: '/clubs' },
+      { label: 'Clubs', to: '/clubs' },
       { label: 'Submit a score', to: '/submit' },
       { label: 'Results archive', to: '/archive' },
     ],
@@ -19,6 +19,7 @@ const columns = [
     title: 'For clubs',
     links: [
       { label: 'Create a challenge', to: '/create' },
+      { label: 'Official rules', to: '/official-rules' },
       { label: 'Admin tools', to: '/admin' },
     ],
   },

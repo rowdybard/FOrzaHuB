@@ -198,7 +198,7 @@ function FallbackHero({ stats, allChallenges }) {
             <span className="text-white">GripCafe</span>
           </h1>
           <p className="mt-4 text-xl text-zinc-300">
-            Community-run competitive events for sim racing.
+            Community-run competitive events for sim racing clubs.
           </p>
           {nextEvent && (
             <Link
@@ -539,7 +539,7 @@ function ChallengeCardLite({ challenge }) {
 
 function HowItWorks({ event }) {
   const steps = [
-    { icon: Users, title: 'Join a club', text: 'Find a community or bring your Discord server. Clubs are the home base for events.' },
+    { icon: Users, title: 'Join a club', text: 'Find a racing group or bring your Discord server. Your Discord stays the home base — GripCafe adds event pages, proof review, and leaderboards.' },
     { icon: Flag, title: 'Enter daily events', text: 'Each day features a new challenge format — hot laps, drift, drag, builds, photos.' },
     { icon: Upload, title: 'Submit your proof', text: 'Post your time or score with a clip or screenshot. Every entry is verified.' },
     { icon: Trophy, title: 'Climb the board', text: `Points accumulate all week. Top racer on Saturday wins the ${event?.prize || 'grand'} prize.` },
