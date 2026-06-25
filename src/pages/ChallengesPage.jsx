@@ -159,7 +159,7 @@ function TypeChip({ active, onClick, label, icon: Icon, accent }) {
         'inline-flex shrink-0 items-center gap-1.5 rounded border px-3 py-1.5 text-sm font-medium transition-all',
         active
           ? 'text-white'
-          : 'border-white/[0.1] bg-white/[0.04] text-zinc-400 hover:border-white/20 hover:text-white',
+          : 'border-white/[0.06] bg-white/[0.01] text-zinc-400 hover:border-white/20 hover:text-white',
       )}
       style={
         active
