@@ -264,7 +264,7 @@ function SponsorBar({ sponsors }) {
 function BetaSeasonInfo({ event }) {
   return (
     <section className="container-page mt-16">
-      <div className="relative overflow-hidden rounded-3xl border border-sky-500/20 bg-gradient-to-br from-sky-500/[0.06] via-ink-900/40 to-ink-950 p-5 sm:p-8 lg:p-12">
+      <div className="relative overflow-hidden rounded-3xl border border-sky-500/20 bg-gradient-to-br from-sky-500/[0.08] via-ink-900/80 to-ink-950 p-5 sm:p-8 lg:p-12">
         <div className="absolute inset-0 bg-shimmer opacity-60" />
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
 
