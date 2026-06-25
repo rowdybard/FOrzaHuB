@@ -30,6 +30,17 @@ begin
 end;
 $$;
 
--- Revoke old function signature grant and grant the new one
-revoke execute on function public.set_primary_club(uuid, uuid) from authenticated;
+-- Drop old unsafe two-arg functions and lock down grants
+-- Wrapped in DO blocks to handle cases where they were already dropped
+do $$ begin
+  revoke all on function public.set_primary_club(uuid, uuid) from public, anon, authenticated;
+exception when undefined_function then null; end $$;
+drop function if exists public.set_primary_club(uuid, uuid);
+
+do $$ begin
+  revoke all on function app_private.set_primary_club(uuid, uuid) from public, anon, authenticated;
+exception when undefined_function then null; end $$;
+drop function if exists app_private.set_primary_club(uuid, uuid);
+
+revoke all on function public.set_primary_club(uuid) from public, anon;
 grant execute on function public.set_primary_club(uuid) to authenticated;
