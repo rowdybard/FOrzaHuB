@@ -442,7 +442,7 @@ function ClubStartPanel({ club, enabled, user, signIn, isMember, liveChallenge, 
   ]
 
   return (
-    <section className="mt-5 rounded-xl border border-white/[0.06] bg-ink-850/50 p-4 sm:p-5">
+    <section className="mt-5 card-readable rounded-xl p-4 sm:p-5">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
@@ -457,7 +457,7 @@ function ClubStartPanel({ club, enabled, user, signIn, isMember, liveChallenge, 
               return (
                 <div
                   key={step.label}
-                  className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-ink-900/40 px-3 py-2 text-sm text-zinc-300"
+                  className="flex items-center gap-2 card-readable rounded-lg px-3 py-2 text-sm text-zinc-300"
                 >
                   {step.done ? <Check className="h-4 w-4 text-emerald-400" /> : <Icon className="h-4 w-4 text-zinc-500" />}
                   {step.label}
@@ -516,7 +516,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
   }
 
   return (
-    <section className="mt-6 rounded-xl border border-white/[0.06] bg-ink-850/50 p-4 sm:p-5">
+    <section className="mt-6 card-readable rounded-xl p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
@@ -537,7 +537,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
         </div>
       )}
 
-      <div className="mt-4 divide-y divide-white/[0.05] overflow-hidden rounded-lg border border-white/[0.05] bg-ink-900/40">
+      <div className="mt-4 card-readable divide-y divide-white/[0.05] overflow-hidden rounded-lg">
         {challenges.length === 0 ? (
           <div className="p-4 text-sm text-zinc-500">No events to manage yet.</div>
         ) : (
@@ -566,7 +566,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
                   aria-label="Close now"
                   onClick={() => close(challenge)}
                   disabled={busyId === challenge.id}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-400 transition-colors hover:bg-white/[0.08] hover:text-white disabled:opacity-50"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] card-readable text-zinc-400 transition-colors hover:text-white disabled:opacity-50"
                 >
                   {busyId === challenge.id ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />

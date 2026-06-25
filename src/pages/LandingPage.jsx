@@ -195,7 +195,7 @@ function FallbackHero({ stats, allChallenges }) {
           {nextEvent && (
             <Link
               to={`/c/${nextEvent.slug}`}
-              className="mt-8 inline-flex flex-col items-center gap-1 rounded-2xl border border-white/[0.08] bg-ink-900/60 px-6 py-4 transition-colors hover:border-white/[0.15]"
+              className="mt-8 inline-flex flex-col items-center gap-1 card-readable rounded-2xl px-6 py-4 transition-colors hover:border-white/[0.15]"
             >
               <span className="text-xs font-semibold uppercase tracking-wider text-brand-400">
                 Next event
@@ -231,7 +231,7 @@ function SponsorBar({ sponsors }) {
         <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
           {sponsors.map((s) => (
             <div key={s.id} className="flex items-center gap-3">
-              <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
+              <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.08] card-readable">
                 {s.tier === 'prize' ? (
                   <Gift className="h-4 w-4 text-amber-400" />
                 ) : s.tier === 'organizer' ? (
@@ -279,7 +279,7 @@ function BetaSeasonInfo({ event }) {
               7 events. 1 week. Most points wins the $50 prize.
             </p>
 
-            <div className="mt-6 rounded-2xl border border-white/[0.06] bg-ink-950/40 p-5">
+            <div className="mt-6 card-readable rounded-2xl p-5">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Series Rules</h3>
               <ul className="mt-3 space-y-2 text-sm text-zinc-300">
                 <li className="flex items-start gap-2.5">
@@ -356,7 +356,7 @@ function ScheduleSection({ schedule, event }) {
                 style={{ background: t.accent }}
               />
               <div className="flex items-center justify-between">
-                <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] font-num text-lg font-bold text-white">
+                <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] card-readable font-num text-lg font-bold text-white">
                   {i + 1}
                 </span>
                 <span
@@ -422,7 +422,7 @@ function LeaderboardPreview() {
         }
       />
 
-      <div className="mt-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-ink-850/80">
+      <div className="mt-8 card-readable overflow-hidden rounded-2xl">
         <div className="grid grid-cols-[auto_1fr_auto_auto] gap-2 border-b border-white/[0.06] px-3 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:gap-4 sm:px-5">
           <span className="w-8 text-center">#</span>
           <span>Racer</span>

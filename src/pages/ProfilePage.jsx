@@ -169,7 +169,7 @@ export default function ProfilePage() {
                 <User className="h-3.5 w-3.5" />
                 Account
               </div>
-              <div className="rounded-lg border border-white/[0.06] bg-ink-900/55 p-4">
+              <div className="card-readable rounded-lg p-4">
                 <Nameplate user={previewUser} size={52} />
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -337,7 +337,7 @@ export default function ProfilePage() {
               </div>
 
               <aside className="xl:sticky xl:top-20">
-                <div className="rounded-lg border border-white/[0.07] bg-ink-900/60 p-4">
+                <div className="card-readable rounded-lg p-4">
                   <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/[0.06] pb-3">
                     <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                       Preview

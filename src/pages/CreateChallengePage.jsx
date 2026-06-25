@@ -260,7 +260,7 @@ export default function CreateChallengePage() {
   return (
     <div>
       <Seo title={isEdit ? 'Edit Challenge' : 'Create a Tournament'} description={isEdit ? 'Edit your sim racing tournament settings.' : 'Create a verified sim racing tournament for your club. Time trials, drift, drag, photo contests, and build battles with custom rules and community prizes.'} path="/create" />
-      <div className="border-b border-white/[0.06] bg-ink-900/40">
+      <div className="border-b border-white/[0.06] bg-ink-900/60">
         <div className="container-page flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Link to="/challenges" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white">
@@ -316,7 +316,7 @@ export default function CreateChallengePage() {
                       disabled={!canEditMaterial}
                       className={cn(
                         'relative rounded-xl border p-3.5 text-left transition-all',
-                        !active && 'border-white/[0.06] bg-ink-850/60 hover:border-white/[0.15]',
+                        !active && 'border-white/[0.06] card-readable hover:border-white/[0.15]',
                         !canEditMaterial && 'cursor-not-allowed opacity-60',
                       )}
                       style={
@@ -344,7 +344,7 @@ export default function CreateChallengePage() {
                   )
                 })}
               </div>
-              <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-sm text-zinc-400">
+              <div className="mt-4 card-readable flex items-center gap-2.5 rounded-xl p-3 text-sm text-zinc-400">
                 <Info className="h-4 w-4 shrink-0 text-brand-400" />
                 <span>{t.summary} · Ranking: <span className="text-zinc-200">{t.gallery ? 'Most votes wins' : RANKING[t.sort]}</span></span>
               </div>
@@ -517,7 +517,7 @@ export default function CreateChallengePage() {
             {/* Sponsor (staff only) */}
             {isStaff && (
               <Panel step="6" title="Sponsor">
-                <label className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-ink-900/40 p-3.5">
+                <label className="flex items-center gap-3 card-readable rounded-xl p-3.5">
                   <input
                     type="checkbox"
                     checked={form.sponsored}

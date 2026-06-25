@@ -309,7 +309,7 @@ export default function CreateClubPage() {
             <div className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-500">
               Preview
             </div>
-            <div className="rounded-xl border border-white/[0.07] bg-ink-900/60 p-4">
+            <div className="card-readable rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <ClubMark club={preview} size={52} />
                 <div className="min-w-0">

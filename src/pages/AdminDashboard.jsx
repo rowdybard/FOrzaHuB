@@ -174,7 +174,7 @@ export default function AdminDashboard() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             to="/challenges"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/60 px-3.5 py-2.5 text-sm text-zinc-300 transition-colors hover:text-white"
+            className="inline-flex items-center gap-2 card-readable rounded-xl px-3.5 py-2.5 text-sm text-zinc-300 transition-colors hover:text-white"
           >
             All events
             <ChevronDown className="h-4 w-4 text-zinc-500" />
@@ -225,7 +225,7 @@ export default function AdminDashboard() {
       {isAdmin && <AccessPanel currentUserId={user?.id} />}
 
       {/* Filters */}
-      <div className="no-scrollbar mt-8 flex gap-1.5 overflow-x-auto rounded-xl border border-white/[0.06] bg-ink-900/60 p-1">
+      <div className="no-scrollbar mt-8 flex gap-1.5 overflow-x-auto card-readable rounded-xl p-1">
         {FILTERS.map((f) => (
           <button
             key={f.id}
@@ -311,7 +311,7 @@ function AccessPanel({ currentUserId }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-white/[0.07] bg-ink-900/60 p-5">
+    <section className="mt-6 card-readable rounded-2xl p-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand-400">
@@ -332,7 +332,7 @@ function AccessPanel({ currentUserId }) {
       ) : profiles.length === 0 ? (
         <div className="mt-4 text-sm text-zinc-500">No profiles yet.</div>
       ) : (
-        <div className="mt-4 divide-y divide-white/[0.06] overflow-hidden rounded-xl border border-white/[0.07] bg-ink-950/30">
+        <div className="mt-4 card-readable divide-y divide-white/[0.06] overflow-hidden rounded-xl">
           {profiles.map((p) => (
             <div key={p.id} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center">
               <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -370,7 +370,7 @@ function QueueRow({ submission, active, onClick }) {
         'w-full rounded-xl border p-3.5 text-left transition-all',
         active
           ? 'border-brand-500/40 bg-brand-500/[0.06]'
-          : 'border-white/[0.06] bg-ink-850/60 hover:border-white/[0.12] hover:bg-ink-800',
+          : 'border-white/[0.06] card-readable hover:border-white/[0.12] hover:bg-ink-800',
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -483,7 +483,7 @@ function DetailPanel({ submission, onDecide, actionError, deciding }) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <div className="card-readable rounded-xl p-4">
             <div className="text-xs uppercase tracking-wider text-zinc-500">
               {t.gallery ? 'Entry' : 'Submitted result'}
             </div>

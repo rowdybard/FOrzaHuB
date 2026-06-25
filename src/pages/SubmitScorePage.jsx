@@ -258,7 +258,7 @@ export default function SubmitScorePage() {
                 </p>
               </Link>
             )}
-            <div className="rounded-2xl border border-white/[0.1] bg-white/[0.06] p-5 text-center">
+            <div className="rounded-2xl border border-white/[0.1] bg-black/90 p-5 text-center">
               <p className="text-sm text-zinc-400">
                 {nextEvent
                   ? "Check back when the event goes live, or join the Discord to get notified."
@@ -295,7 +295,7 @@ export default function SubmitScorePage() {
           description="You have an existing submission for this event."
         />
         <div className="container-page py-8">
-          <div className="mx-auto max-w-md rounded-2xl border border-white/[0.08] bg-ink-900/60 p-6 text-center">
+          <div className="mx-auto max-w-md card-readable rounded-2xl p-6 text-center">
             {isPending ? (
               <>
                 <Clock className="mx-auto h-10 w-10 text-amber-400" />
@@ -435,7 +435,7 @@ export default function SubmitScorePage() {
                 </div>
               </div>
 
-              <label className="group mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.05] px-6 py-9 text-center transition-colors hover:border-brand-500/40 hover:bg-white/[0.07]">
+              <label className="group mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.02] px-6 py-9 text-center transition-colors hover:border-brand-500/40 hover:bg-white/[0.04]">
                 <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/[0.08] bg-ink-800 text-brand-400">
                   {isGallery ? <ImageIcon className="h-6 w-6" /> : <Video className="h-6 w-6" />}
                 </span>
@@ -489,7 +489,7 @@ export default function SubmitScorePage() {
               </p>
             </Panel>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/[0.1] bg-white/[0.06] p-4">
+            <label className="flex cursor-pointer items-start gap-3 card-readable rounded-xl p-4">
               <input
                 type="checkbox"
                 checked={form.agree}
@@ -655,7 +655,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
           </p>
         </div>
         <div className="space-y-4 p-6">
-          <div className="rounded-xl border border-white/[0.1] bg-white/[0.06] p-4 text-left">
+          <div className="card-readable rounded-xl p-4 text-left">
             <div className="text-xs text-zinc-500">{club?.name} · {t.label}</div>
             <div className="mt-1 font-semibold text-white">{challenge.title}</div>
             <div className="mt-3 flex items-center justify-between border-t border-white/[0.06] pt-3">

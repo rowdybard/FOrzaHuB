@@ -175,7 +175,7 @@ function FactChip({ icon: Icon, label, value, accent }) {
 
 function FactStrip({ challenge, t }) {
   return (
-    <div className="border-b border-white/[0.06] bg-ink-900/40">
+    <div className="border-b border-white/[0.06] bg-ink-900/60">
       <div className="container-page flex flex-wrap items-center gap-x-4 gap-y-3 py-4 sm:gap-x-8 sm:gap-y-4">
         <FactChip icon={Flag} label="Format" value={t.label} accent={t.accent} />
         <FactChip icon={Car} label="Class" value={challenge.restriction || 'Open'} accent={t.accent} />
@@ -254,7 +254,7 @@ function Rules({ challenge, t }) {
       </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {challenge.rules.map((r, i) => (
-          <div key={i} className="flex items-start gap-2.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3.5 py-3">
+          <div key={i} className="card-readable flex items-start gap-2.5 rounded-lg px-3.5 py-3">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
             <span className="text-sm leading-relaxed text-zinc-300">{r}</span>
           </div>

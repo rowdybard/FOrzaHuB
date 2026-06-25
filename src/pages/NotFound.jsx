@@ -5,7 +5,7 @@ import Button from '../components/ui/Button'
 export default function NotFound() {
   return (
     <div className="container-page flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <span className="grid h-14 w-14 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-brand-400">
+      <span className="card-readable grid h-14 w-14 place-items-center rounded-2xl text-brand-400">
         <Flag className="h-7 w-7" />
       </span>
       <h1 className="mt-6 font-num text-6xl font-extrabold text-white">404</h1>
