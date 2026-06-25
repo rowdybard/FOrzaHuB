@@ -18,7 +18,7 @@ local mock data in `src/data/mock.js`.
 5. Add these Cloudflare Pages environment variables for Production and Preview:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_MAX_PROOF_UPLOAD_MB` (optional, defaults to `50`)
+   - `VITE_MAX_PROOF_UPLOAD_MB` (optional, defaults to `10`)
 
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
 available. A legacy anon public key also works. Do not use or share a
@@ -32,14 +32,32 @@ available. A legacy anon public key also works. Do not use or share a
    - `supabase/migrations/0002_members_and_cosmetics.sql`
    - `supabase/migrations/0003_backend_ready.sql`
    - `supabase/migrations/0004_fix_challenge_rls.sql`
-   - `supabase/migrations/0004_profile_flair.sql`
    - `supabase/migrations/0005_club_beta_limits.sql`
-   - `supabase/migrations/0005_restrict_proof_uploads_to_images.sql`
    - `supabase/migrations/0006_challenge_lifecycle_automation.sql`
    - `supabase/migrations/0007_one_submission_per_user.sql`
    - `supabase/migrations/0008_set_primary_club_rpc.sql`
    - `supabase/migrations/0009_submission_self_service.sql`
    - `supabase/migrations/0010_sponsored_challenges.sql`
+   - `supabase/migrations/0011_fix_lifecycle_rls.sql`
+   - `supabase/migrations/0012_seed_horizon_heatwave.sql`
+   - `supabase/migrations/0013_fix_pi_classes.sql`
+   - `supabase/migrations/0014_migrate_users_to_gripcafe.sql`
+   - `supabase/migrations/0015_strip_pi_numbers.sql`
+   - `supabase/migrations/0016_fix_prizes.sql`
+   - `supabase/migrations/0017_rename_challenges.sql`
+   - `supabase/migrations/0018_fix_set_primary_club_rpc.sql`
+   - `supabase/migrations/0019_series_points.sql`
+   - `supabase/migrations/0020_fix_prizes_again.sql`
+   - `supabase/migrations/0021_fix_set_primary_club_security.sql`
+   - `supabase/migrations/20260603025756_admin_tools_permissions.sql`
+   - `supabase/migrations/20260603030000_profile_flair.sql`
+   - `supabase/migrations/20260603030100_restrict_proof_uploads_to_images.sql`
+   - `supabase/migrations/20260603032723_exclusive_badge_limits.sql`
+   - `supabase/migrations/20260603033503_admin_role_management.sql`
+   - `supabase/migrations/20260609015314_alpha_v01_security_hardening.sql`
+   - `supabase/migrations/sponsored_staff_only.sql`
+   - `supabase/migrations/beta_season_01_data.sql`
+   - `supabase/migrations/beta_season_02_standings.sql`
 3. Optionally run `supabase/seed.sql` for starter clubs and one challenge.
 4. Enable Authentication -> Providers -> Discord.
 5. Add the Supabase callback URL to the Discord app:

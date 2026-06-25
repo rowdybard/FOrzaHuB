@@ -289,10 +289,9 @@ export async function getMyClubMemberships(userId) {
 
 export async function setPrimaryClub(userId, clubId) {
   if (!isSupabaseEnabled) return { ok: true, demo: true }
-  const currentUserId = await requireCurrentUserId()
+  await requireCurrentUserId()
   const { error } = await supabase.rpc('set_primary_club', {
     p_club_id: clubId,
-    p_user_id: currentUserId,
   })
   if (error) throw error
   return { ok: true }
