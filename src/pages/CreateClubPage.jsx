@@ -8,6 +8,7 @@ import Loading from '../components/common/Loading'
 import { createClub, getMyOwnedClub } from '../data/api'
 import { useAuth } from '../hooks/useAuth'
 import { ACCENTS, DEFAULT_ACCENT } from '../lib/cosmetics'
+import { containsBannedWord } from '../lib/moderation'
 import { cn, hexToRgba } from '../lib/utils'
 
 const inputCls =
@@ -115,6 +116,14 @@ export default function CreateClubPage() {
     const discord = cleanDiscordUrl(form.discord)
     if (form.discord.trim() && !discord) {
       setError('Use a valid Discord invite link.')
+      return
+    }
+    if (containsBannedWord(form.name)) {
+      setError('Club name contains language that is not allowed.')
+      return
+    }
+    if (containsBannedWord(form.tag)) {
+      setError('Club tag contains language that is not allowed.')
       return
     }
 

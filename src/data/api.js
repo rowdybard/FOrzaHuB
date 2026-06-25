@@ -8,6 +8,7 @@
 import { supabase, isSupabaseEnabled } from '../lib/supabase'
 import { getType } from '../lib/challengeTypes'
 import { slugify } from '../lib/utils'
+import { containsBannedWord } from '../lib/moderation'
 import * as mock from './mock'
 
 const SELF_SERVICE_BADGES = new Set(['tuner', 'media', 'pace', 'clean', 'bbs'])
@@ -304,6 +305,10 @@ export async function createClub(payload) {
   const tag = payload.tag.trim().toUpperCase()
   const slug = slugify(name)
   if (!slug) throw new Error('Club name is required')
+  if (containsBannedWord(name)) throw new Error('Club name contains language that is not allowed.')
+  if (containsBannedWord(tag)) throw new Error('Club tag contains language that is not allowed.')
+  if (containsBannedWord(payload.tagline || '')) throw new Error('Club tagline contains language that is not allowed.')
+  if (containsBannedWord(payload.about || '')) throw new Error('Club description contains language that is not allowed.')
 
   const { data, error } = await supabase
     .from('clubs')
@@ -446,6 +451,7 @@ export async function createSubmission(payload) {
     return { ok: true, demo: true }
   }
   const userId = await requireCurrentUserId()
+  if (containsBannedWord(payload.gamertag || '')) throw new Error('Gamertag contains language that is not allowed.')
   const { error } = await supabase.from('submissions').insert({
     ...payload,
     user_id: userId,
@@ -817,7 +823,10 @@ export async function updateMyProfile(userId, patch) {
     const preserved = (current?.badges || []).filter((badge) => EXCLUSIVE_BADGES.has(badge))
     row.badges = Array.from(new Set([...preserved, ...requested]))
   }
-  if ('displayName' in patch) row.display_name = patch.displayName
+  if ('displayName' in patch) {
+    if (containsBannedWord(patch.displayName)) throw new Error('Display name contains language that is not allowed.')
+    row.display_name = patch.displayName
+  }
   const { error } = await supabase.from('profiles').update(row).eq('id', currentUserId)
   if (error) throw error
   return { ok: true }

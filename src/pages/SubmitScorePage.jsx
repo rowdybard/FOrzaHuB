@@ -26,6 +26,7 @@ import { useAuth } from '../hooks/useAuth'
 import Loading from '../components/common/Loading'
 import { getType } from '../lib/challengeTypes'
 import { formatDate } from '../lib/utils'
+import { containsBannedWord } from '../lib/moderation'
 
 const inputCls =
   'w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 transition-colors focus:border-brand-500/50 focus:outline-none'
@@ -166,6 +167,10 @@ export default function SubmitScorePage() {
       return
     }
     if (!canSubmit || !challenge) return
+    if (containsBannedWord(form.gamertag)) {
+      setError('Gamertag contains language that is not allowed.')
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
