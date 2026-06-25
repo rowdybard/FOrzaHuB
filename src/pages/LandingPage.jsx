@@ -101,7 +101,8 @@ function EventHero({ event, stats }) {
           </div>
 
           <h1 className="mt-6 animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
-            <span className="text-white">GripCafe Beta Race Series</span>
+            <span className="block text-white">GripCafe</span>
+            <span className="block text-brand-300 text-2xl font-bold sm:text-3xl lg:text-4xl">Beta Race Series</span>
           </h1>
 
           <p className="mt-3 animate-fade-up text-balance text-lg text-zinc-400 [animation-delay:90ms]">
@@ -281,7 +282,8 @@ function BetaSeasonInfo({ event }) {
               Beta Race Series
             </div>
             <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
-              GripCafe Beta Race Series
+              <span className="block text-white">GripCafe</span>
+              <span className="block text-brand-300 text-xl font-bold sm:text-2xl">Beta Race Series</span>
             </h2>
             <p className="mt-2 text-lg text-zinc-300">
               7 events. 1 week. Most points wins the $50 Series Champion Reward.
