@@ -189,16 +189,6 @@
     100% { transform: translateX(-50%); }
   }
 
-  /* Event hub: silver metallic gradient */
-  .bg-heatwave {
-    background-color: #0a0b0d;
-    background-image:
-      radial-gradient(50% 70% at 20% 10%, rgba(200, 200, 210, 0.08), transparent 60%),
-      radial-gradient(45% 55% at 80% 5%, rgba(180, 180, 195, 0.06), transparent 62%),
-      radial-gradient(55% 65% at 70% 100%, rgba(160, 160, 175, 0.05), transparent 60%),
-      radial-gradient(40% 50% at 30% 100%, rgba(220, 220, 230, 0.04), transparent 60%);
-  }
-
   /* Event hub: schedule connector line */
   .schedule-line {
     background: linear-gradient(to bottom, rgba(148, 163, 184, 0.4), rgba(148, 163, 184, 0.05));

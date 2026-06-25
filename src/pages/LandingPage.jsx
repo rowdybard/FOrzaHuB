@@ -87,20 +87,13 @@ function EventHero({ event, stats }) {
     ? 'border-sky-500/30 bg-sky-500/10 text-sky-300'
     : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
   return (
-    <section className="relative overflow-hidden bg-heatwave">
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-30 mask-fade-b" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ink-950/40 to-ink-950" />
 
       <div className="container-page relative py-16 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="animate-fade-up">
-            <span className="inline-flex items-center gap-2 rounded border border-brand-500/25 bg-brand-500/[0.1] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
-              <Flame className="h-3.5 w-3.5" />
-              Beta Race Series
-            </span>
-          </div>
-
-          <h1 className="mt-6 animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
+          <h1 className="animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
             <span className="block text-white">GripCafe</span>
             <span className="block text-brand-300 text-2xl font-bold sm:text-3xl lg:text-4xl">Beta Race Series</span>
           </h1>
@@ -190,7 +183,7 @@ function FallbackHero({ stats, allChallenges }) {
     .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
   const nextEvent = upcoming[0] || null
   return (
-    <section className="relative overflow-hidden bg-heatwave">
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-30 mask-fade-b" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ink-950/40 to-ink-950" />
       <div className="container-page relative py-16 lg:py-24">
@@ -616,7 +609,7 @@ function FAQSection() {
 function EventCTA({ event }) {
   return (
     <section className="container-page mt-24">
-      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-heatwave px-6 py-14 text-center sm:px-10">
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-ink-900/60 px-6 py-14 text-center sm:px-10">
         <div className="absolute inset-0 bg-grid opacity-40 mask-fade-b" />
         <div className="relative mx-auto max-w-2xl">
           <Flame className="mx-auto h-8 w-8 text-brand-400" />
