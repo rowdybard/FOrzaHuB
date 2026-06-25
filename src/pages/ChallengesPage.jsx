@@ -59,7 +59,7 @@ export default function ChallengesPage() {
 
       <div className="container-page py-8">
         {/* Toolbar */}
-        <div className="rounded-2xl border border-white/[0.07] bg-ink-900/50 p-4 backdrop-blur-sm">
+        <div className="rounded-2xl border border-white/[0.07] bg-ink-950/90 p-4 backdrop-blur-sm">
           <div className="flex flex-col gap-4">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
