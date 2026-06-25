@@ -1,11 +1,11 @@
-import { avatarColors, initials, cn } from '../../lib/utils'
+import { avatarColors, initials, cn, hexToRgba } from '../../lib/utils'
 
 export default function Avatar({ name = '', size = 36, className, ring = true }) {
-  const [a, b] = avatarColors(name)
+  const [accent] = avatarColors(name)
   return (
     <span
       className={cn(
-        'inline-grid shrink-0 place-items-center rounded-full font-semibold leading-none text-white',
+        'inline-grid shrink-0 place-items-center rounded-full font-semibold leading-none',
         ring && 'ring-1 ring-white/10',
         className,
       )}
@@ -13,7 +13,9 @@ export default function Avatar({ name = '', size = 36, className, ring = true })
         width: size,
         height: size,
         fontSize: Math.round(size * 0.36),
-        background: `linear-gradient(135deg, ${a}, ${b})`,
+        color: accent,
+        backgroundColor: hexToRgba(accent, 0.1),
+        border: `1px solid ${hexToRgba(accent, 0.2)}`,
       }}
       aria-hidden="true"
     >
