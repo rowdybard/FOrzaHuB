@@ -4,6 +4,7 @@ import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User } from 'lucide
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import Avatar from '../ui/Avatar'
+import Nameplate from '../ui/Nameplate'
 import { cn } from '../../lib/utils'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -161,10 +162,10 @@ function AuthControl() {
       <button
         type="button"
         onClick={() => setMenu((v) => !v)}
-        className="grid place-items-center rounded-full ring-1 ring-white/10 transition-transform hover:scale-105"
+        className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-2 transition-colors hover:bg-white/[0.06]"
         aria-label="Account menu"
       >
-        <Avatar name={name} size={36} ring={false} />
+        <Nameplate user={profile} size={28} showBadges showSub={false} />
       </button>
       {menu && (
         <>
