@@ -171,7 +171,7 @@ export default function AdminDashboard() {
             Verify submissions before they hit the public leaderboard.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             to="/challenges"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/60 px-3.5 py-2.5 text-sm text-zinc-300 transition-colors hover:text-white"

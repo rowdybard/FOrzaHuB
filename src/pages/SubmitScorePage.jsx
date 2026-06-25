@@ -511,13 +511,13 @@ export default function SubmitScorePage() {
               </Button>
             </div>
             {error && (
-              <p className="flex items-center justify-end gap-1.5 text-xs text-rose-400">
+              <p className="flex items-center gap-1.5 text-xs text-rose-400">
                 <CircleAlert className="h-3.5 w-3.5" />
                 {error}
               </p>
             )}
             {!canSubmit ? (
-              <p className="flex items-center justify-end gap-1.5 text-xs text-zinc-500">
+              <p className="flex items-center gap-1.5 text-xs text-zinc-500">
                 <CircleAlert className="h-3.5 w-3.5" />
                 Add your gamertag, result, proof, and confirm the rules to submit.
               </p>

@@ -57,7 +57,7 @@ export default function ClubsPage() {
       </PageHero>
 
       <div className="container-page py-8">
-        <div className="no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto px-1">
+        <div className="no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto rounded-xl border border-white/[0.06] bg-ink-900/60 p-2 px-1">
           {regions.map((r) => (
             <button
               key={r}
@@ -65,8 +65,8 @@ export default function ClubsPage() {
               className={cn(
                 'shrink-0 rounded border px-3.5 py-1.5 text-sm font-medium transition-colors',
                 region === r
-                  ? 'border-white/[0.1] bg-white/[0.06] text-white'
-                  : 'border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/15 hover:text-white',
+                  ? 'border-white/[0.12] bg-white/[0.1] text-white'
+                  : 'border-white/[0.08] bg-white/[0.04] text-zinc-400 hover:border-white/15 hover:text-white',
               )}
             >
               {r}

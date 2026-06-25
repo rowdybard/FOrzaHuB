@@ -153,7 +153,7 @@ function EventHero({ event, stats }) {
             </Button>
           </div>
 
-          <div className="mt-10 flex animate-fade-up items-center justify-center gap-6 text-sm text-zinc-400 [animation-delay:360ms]">
+          <div className="mt-10 flex animate-fade-up flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-zinc-400 [animation-delay:360ms]">
             <span className="inline-flex items-center gap-2">
               <Trophy className="h-4 w-4 text-amber-400" />
               <span className="font-semibold text-white">$50</span> series champion prize
@@ -313,7 +313,7 @@ function BetaSeasonInfo({ event }) {
             </div>
           </div>
 
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 justify-self-center lg:justify-self-end">
             <div className="glow-pulse grid min-h-[10rem] min-w-[10rem] place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5 p-6 sm:min-h-[11rem] sm:min-w-[11rem]">
               <div className="text-center">
                 <Gift className="mx-auto h-10 w-10 text-amber-400 sm:h-12 sm:w-12" />
