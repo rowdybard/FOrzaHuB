@@ -394,12 +394,39 @@ function QueueRow({ submission, active, onClick }) {
   )
 }
 
+function isImageUrl(url) {
+  if (!url) return false
+  const u = url.toLowerCase().split('?')[0]
+  return u.endsWith('.png') || u.endsWith('.jpg') || u.endsWith('.jpeg') || u.endsWith('.webp')
+}
+
 function ProofPreview({ submission }) {
   const t = getType(submission.typeId)
   const Icon = t.icon
   const isMedia = submission.proof?.type === 'video'
+  const proofUrl = submission.proof?.url
+  const isImage = !isMedia && isImageUrl(proofUrl)
 
   if (t.gallery) {
+    if (isImageUrl(proofUrl)) {
+      return (
+        <div className="relative aspect-video overflow-hidden rounded-xl">
+          <img src={proofUrl} alt={submission.title || 'Proof'} className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-950/80 to-transparent p-4">
+            <div className="text-sm font-semibold text-white">{submission.title}</div>
+          </div>
+          <a
+            href={proofUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-ink-950/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-md hover:bg-ink-950/70"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Open
+          </a>
+        </div>
+      )
+    }
     const bg = `linear-gradient(140deg, hsl(${submission.hue || 24} 62% 24%), hsl(${((submission.hue || 24) + 45) % 360} 58% 11%))`
     return (
       <div className="relative aspect-video overflow-hidden rounded-xl" style={{ background: bg }}>
@@ -409,11 +436,28 @@ function ProofPreview({ submission }) {
           <div className="text-sm font-semibold text-white">{submission.title}</div>
         </div>
         <a
-          href={submission.proof?.url || '#'}
+          href={proofUrl || '#'}
           className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-ink-950/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-md hover:bg-ink-950/70"
         >
           <ExternalLink className="h-3.5 w-3.5" />
           Open
+        </a>
+      </div>
+    )
+  }
+
+  if (isImage) {
+    return (
+      <div className="relative aspect-video overflow-hidden rounded-xl">
+        <img src={proofUrl} alt="Proof" className="absolute inset-0 h-full w-full object-cover" />
+        <a
+          href={proofUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-ink-950/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-md hover:bg-ink-950/70"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Open original
         </a>
       </div>
     )
@@ -437,7 +481,9 @@ function ProofPreview({ submission }) {
         {isMedia ? 'Clip · 0:42' : 'Image · 1080p'}
       </div>
       <a
-        href={submission.proof?.url || '#'}
+        href={proofUrl || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
         className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-ink-950/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-md hover:bg-ink-950/70"
       >
         <ExternalLink className="h-3.5 w-3.5" />

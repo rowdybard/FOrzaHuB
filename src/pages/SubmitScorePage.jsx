@@ -156,9 +156,10 @@ export default function SubmitScorePage() {
   }
 
   const resultFilled = isGallery ? form.title.trim() : form.result.trim()
+  const parsedResult = isGallery ? null : parseResult(form.result)
   const hasProof = form.file || form.link.trim()
   const authReady = !!user
-  const canSubmit = authReady && form.gamertag.trim() && resultFilled && hasProof && form.agree && !submitting
+  const canSubmit = authReady && form.gamertag.trim() && resultFilled && (isGallery || parsedResult !== null) && hasProof && form.agree && !submitting && !checkingExisting && !existingSubmission
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -167,6 +168,10 @@ export default function SubmitScorePage() {
       return
     }
     if (!canSubmit || !challenge) return
+    if (!isGallery && parseResult(form.result) == null) {
+      setError('Enter a valid time (e.g. 1:58.420) or score.')
+      return
+    }
     if (containsBannedWord(form.gamertag)) {
       setError('Gamertag contains language that is not allowed.')
       return
@@ -259,7 +264,7 @@ export default function SubmitScorePage() {
                   <p className="mt-0.5 text-sm text-zinc-400">Hosted by {nextEvent.club.name}</p>
                 )}
                 <p className="mt-2 text-sm text-zinc-500">
-                  Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })} EST
+                  Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })}
                 </p>
               </Link>
             )}
@@ -468,7 +473,7 @@ export default function SubmitScorePage() {
                 <span className="h-px flex-1 bg-white/[0.06]" />
               </div>
 
-              <Field label="Link" required>
+              <Field label="Link">
                 <div className="relative">
                   <Link2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
                   <input
