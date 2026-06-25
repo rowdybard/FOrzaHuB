@@ -32,7 +32,7 @@ const rules = [
   },
   {
     title: 'Community rewards',
-    body: 'Sponsored events may offer a community reward such as a gift card. Rewards are distributed at the organizer\'s discretion. No cash payout is offered, and rewards are not guaranteed.',
+    body: 'Sponsored events may offer a community reward such as a gift card. Rewards are subject to eligibility, verification, and event rules. No cash payout is offered.',
   },
   {
     title: 'Void where prohibited',

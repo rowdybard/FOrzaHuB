@@ -105,7 +105,7 @@ function EventHero({ event, stats }) {
           </h1>
 
           <p className="mt-3 animate-fade-up text-balance text-lg text-zinc-400 [animation-delay:90ms]">
-            7 events. 1 week. Most points wins the $50 prize.
+            7 events. 1 week. Most points wins the $50 Series Champion Reward.
           </p>
 
           {event.title && (
@@ -163,8 +163,8 @@ function EventHero({ event, stats }) {
 
           <div className="mt-10 flex animate-fade-up flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-zinc-400 [animation-delay:360ms]">
             <span className="inline-flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-amber-400" />
-              <span className="font-semibold text-white">$50</span> series champion prize
+              <Trophy className="h-4 w-4 text-sky-400" />
+              <span className="font-semibold text-white">$50</span> Series Champion Reward
             </span>
             <span className="text-zinc-600">|</span>
             <span className="inline-flex items-center gap-2">
@@ -241,7 +241,7 @@ function SponsorBar({ sponsors }) {
             <div key={s.id} className="flex items-center gap-3">
               <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.08] card-readable">
                 {s.tier === 'prize' ? (
-                  <Gift className="h-4 w-4 text-amber-400" />
+                  <Gift className="h-4 w-4 text-sky-400" />
                 ) : s.tier === 'organizer' ? (
                   <Flag className="h-4 w-4 text-brand-400" />
                 ) : (
@@ -270,13 +270,13 @@ function SponsorBar({ sponsors }) {
 function BetaSeasonInfo({ event }) {
   return (
     <section className="container-page mt-16">
-      <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.06] via-ink-900/40 to-ink-950 p-5 sm:p-8 lg:p-12">
+      <div className="relative overflow-hidden rounded-3xl border border-sky-500/20 bg-gradient-to-br from-sky-500/[0.06] via-ink-900/40 to-ink-950 p-5 sm:p-8 lg:p-12">
         <div className="absolute inset-0 bg-shimmer opacity-60" />
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
 
         <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
-            <div className="inline-flex items-center gap-2 rounded border border-amber-500/25 bg-amber-500/[0.1] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
+            <div className="inline-flex items-center gap-2 rounded border border-sky-500/25 bg-sky-500/[0.1] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-sky-300">
               <Trophy className="h-3.5 w-3.5" />
               Beta Race Series
             </div>
@@ -284,34 +284,34 @@ function BetaSeasonInfo({ event }) {
               GripCafe Beta Race Series
             </h2>
             <p className="mt-2 text-lg text-zinc-300">
-              7 events. 1 week. Most points wins the $50 prize.
+              7 events. 1 week. Most points wins the $50 Series Champion Reward.
             </p>
 
             <div className="mt-6 card-readable rounded-2xl p-5">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Series Rules</h3>
               <ul className="mt-3 space-y-2 text-sm text-zinc-300">
                 <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
                   Free to enter.
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
                   One approved submission per event.
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
                   Every scoring event gives season points.
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
                   Most total points after all beta events wins.
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
-                  Prize: $50 gift card for the overall champion.
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
+                  Reward: $50 Series Champion Reward for the overall champion.
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-sky-400" />
                   Tiebreakers: most event wins, most podiums, best finish in final event.
                 </li>
               </ul>
@@ -322,11 +322,11 @@ function BetaSeasonInfo({ event }) {
           </div>
 
           <div className="relative shrink-0 justify-self-center lg:justify-self-end">
-            <div className="glow-pulse grid min-h-[10rem] min-w-[10rem] place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5 p-6 sm:min-h-[11rem] sm:min-w-[11rem]">
+            <div className="glow-pulse grid min-h-[10rem] min-w-[10rem] place-items-center rounded-3xl border border-sky-500/30 bg-gradient-to-br from-sky-500/15 to-sky-600/5 p-6 sm:min-h-[11rem] sm:min-w-[11rem]">
               <div className="text-center">
-                <Gift className="mx-auto h-10 w-10 text-amber-400 sm:h-12 sm:w-12" />
+                <Gift className="mx-auto h-10 w-10 text-sky-400 sm:h-12 sm:w-12" />
                 <div className="mt-2 text-2xl font-extrabold leading-tight text-white sm:mt-3 sm:text-3xl">$50</div>
-                <div className="text-xs text-amber-300/70">Champion</div>
+                <div className="text-xs text-sky-300/70">Champion Reward</div>
               </div>
             </div>
           </div>
@@ -401,10 +401,10 @@ function ScheduleSection({ schedule, event }) {
 
         {event.season && (
           <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/25 bg-brand-500/[0.1]">
-            <Medal className="h-10 w-10 text-amber-400" />
+            <Medal className="h-10 w-10 text-sky-400" />
             <h3 className="mt-3 font-bold text-white">Overall Champion</h3>
             <p className="mt-1.5 text-sm text-zinc-400">
-              Most points across all beta events wins the $50 gift card.
+              Most points across all beta events wins the $50 Series Champion Reward.
             </p>
           </div>
         )}
@@ -421,7 +421,7 @@ function LeaderboardPreview() {
       <SectionHeading
         eyebrow="Standings"
         title="Beta Race Series Leaderboard"
-        description="Points accumulate across all beta events. Most points wins the $50 prize."
+        description="Points accumulate across all beta events. Most points wins the $50 Series Champion Reward."
         action={
           <Button to="/challenges" variant="outline" size="sm">
             View all events
@@ -542,7 +542,7 @@ function HowItWorks({ event }) {
     { icon: Users, title: 'Join a club', text: 'Find a racing group or bring your Discord server. Your Discord stays the home base — GripCafe adds event pages, proof review, and leaderboards.' },
     { icon: Flag, title: 'Enter daily events', text: 'Each day features a new challenge format — hot laps, drift, drag, builds, photos.' },
     { icon: Upload, title: 'Submit your proof', text: 'Post your time or score with a clip or screenshot. Every entry is verified.' },
-    { icon: Trophy, title: 'Climb the board', text: `Points accumulate all week. Top racer on Saturday wins the ${event?.prize || 'grand'} prize.` },
+    { icon: Trophy, title: 'Climb the board', text: `Points accumulate all week. Top racer on Saturday wins the ${event?.prize || 'grand'} Champion Reward.` },
   ]
   return (
     <section id="how-it-works" className="container-page scroll-mt-20 mt-24">
@@ -622,7 +622,7 @@ function EventCTA({ event }) {
             Ready for the {event.title}?
           </h2>
           <p className="mt-3 text-zinc-300">
-            Join a club, sharpen your lines, and compete for the $50 Beta Race Series champion prize.
+            Join a club, sharpen your lines, and compete for the $50 Beta Race Series Champion Reward.
             Events kick off Sunday — check each event for opening times.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">

@@ -42,8 +42,16 @@ const toDateInput = (iso) => {
     return ''
   }
 }
+const toTimeInput = (iso) => {
+  try {
+    return new Date(iso).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return '18:00'
+  }
+}
 const todayISO = new Date().toISOString().slice(0, 10)
 const plusDays = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10)
+const DEFAULT_TIME = '18:00'
 
 const RANKING = {
   asc: 'Lowest value wins',
@@ -80,7 +88,9 @@ export default function CreateChallengePage() {
     region: existing?.region || '',
     prize: existing?.prize || '',
     startDate: existing ? toDateInput(existing.startDate) : todayISO,
+    startTime: existing ? toTimeInput(existing.startDate) : DEFAULT_TIME,
     endDate: existing ? toDateInput(existing.endDate) : plusDays(7),
+    endTime: existing ? toTimeInput(existing.endDate) : DEFAULT_TIME,
     rules: existing?.rules?.length ? [...existing.rules] : [''],
     visibility: 'public',
     sponsor: existing?.sponsor || '',
@@ -110,7 +120,9 @@ export default function CreateChallengePage() {
       region: existing.region || '',
       prize: existing.prize || '',
       startDate: toDateInput(existing.startDate) || todayISO,
+      startTime: toTimeInput(existing.startDate) || DEFAULT_TIME,
       endDate: toDateInput(existing.endDate) || plusDays(7),
+      endTime: toTimeInput(existing.endDate) || DEFAULT_TIME,
       rules: existing.rules?.length ? [...existing.rules] : [''],
       visibility: existing.visibility || 'public',
       sponsor: existing.sponsor || '',
@@ -128,7 +140,7 @@ export default function CreateChallengePage() {
   const addPresetRule = (preset) => setForm((f) => ({ ...f, rules: [...f.rules.filter(Boolean), preset] }))
   const removeRule = (i) => setForm((f) => ({ ...f, rules: f.rules.filter((_, idx) => idx !== i) }))
 
-  const startInFuture = new Date(form.startDate).getTime() > Date.now()
+  const startInFuture = new Date(`${form.startDate}T${form.startTime || DEFAULT_TIME}`).getTime() > Date.now()
   const previewChallenge = {
     id: 'preview',
     slug: 'preview',
@@ -137,8 +149,8 @@ export default function CreateChallengePage() {
     clubId: form.clubId,
     club: editorClubList.find((c) => c.id === form.clubId) || null,
     status: startInFuture ? 'upcoming' : 'live',
-    startDate: new Date(form.startDate || todayISO).toISOString(),
-    endDate: new Date(form.endDate || plusDays(7)).toISOString(),
+    startDate: new Date(`${form.startDate || todayISO}T${form.startTime || DEFAULT_TIME}`).toISOString(),
+    endDate: new Date(`${form.endDate || plusDays(7)}T${form.endTime || DEFAULT_TIME}`).toISOString(),
     region: form.region.trim() || 'Festival map',
     restriction: form.restriction.trim() || 'Set a car restriction',
     location: form.location.trim() || 'Pick a location',
@@ -168,7 +180,7 @@ export default function CreateChallengePage() {
         return
       }
 
-      if (new Date(form.endDate).getTime() <= new Date(form.startDate).getTime()) {
+      if (new Date(`${form.endDate}T${form.endTime || DEFAULT_TIME}`).getTime() <= new Date(`${form.startDate}T${form.startTime || DEFAULT_TIME}`).getTime()) {
         throw new Error('Close date must be after the open date.')
       }
 
@@ -185,8 +197,8 @@ export default function CreateChallengePage() {
         location: form.location.trim(),
         region: form.region.trim(),
         prize: form.prize.trim(),
-        start_date: new Date(form.startDate).toISOString(),
-        end_date: new Date(form.endDate).toISOString(),
+        start_date: new Date(`${form.startDate}T${form.startTime || DEFAULT_TIME}`).toISOString(),
+        end_date: new Date(`${form.endDate}T${form.endTime || DEFAULT_TIME}`).toISOString(),
         rules: form.rules.filter(Boolean),
         visibility: form.visibility,
         sponsor: isStaff ? (form.sponsored ? form.sponsor.trim() : null) : null,
@@ -472,22 +484,40 @@ export default function CreateChallengePage() {
             <Panel step="4" title="Schedule & prize">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Opens">
-                  <input
-                    type="date"
-                    value={form.startDate}
-                    onChange={(e) => set('startDate', e.target.value)}
-                    disabled={!canEditMaterial}
-                    className={`${inputCls} [color-scheme:dark]`}
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      value={form.startDate}
+                      onChange={(e) => set('startDate', e.target.value)}
+                      disabled={!canEditMaterial}
+                      className={`${inputCls} [color-scheme:dark]`}
+                    />
+                    <input
+                      type="time"
+                      value={form.startTime}
+                      onChange={(e) => set('startTime', e.target.value)}
+                      disabled={!canEditMaterial}
+                      className={`${inputCls} w-28 shrink-0 [color-scheme:dark]`}
+                    />
+                  </div>
                 </Field>
                 <Field label="Closes">
-                  <input
-                    type="date"
-                    value={form.endDate}
-                    onChange={(e) => set('endDate', e.target.value)}
-                    disabled={!canEditMaterial}
-                    className={`${inputCls} [color-scheme:dark]`}
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      value={form.endDate}
+                      onChange={(e) => set('endDate', e.target.value)}
+                      disabled={!canEditMaterial}
+                      className={`${inputCls} [color-scheme:dark]`}
+                    />
+                    <input
+                      type="time"
+                      value={form.endTime}
+                      onChange={(e) => set('endTime', e.target.value)}
+                      disabled={!canEditMaterial}
+                      className={`${inputCls} w-28 shrink-0 [color-scheme:dark]`}
+                    />
+                  </div>
                 </Field>
               </div>
               <Field label="Prize / reward" hint="Optional">
