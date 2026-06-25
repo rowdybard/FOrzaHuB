@@ -441,9 +441,9 @@ export default function SubmitScorePage() {
                   <span className="ml-1 text-rose-500">*</span>
                 </span>
               </div>
-              <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.1] p-3.5">
-                <div className="flex gap-2.5 text-sm text-amber-200/90">
-                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+              <div className="rounded-xl border border-sky-500/25 bg-sky-500/[0.1] p-3.5">
+                <div className="flex gap-2.5 text-sm text-sky-200/90">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
                   <p>{t.proofHint}</p>
                 </div>
               </div>
@@ -532,7 +532,7 @@ export default function SubmitScorePage() {
             {!canSubmit ? (
               <p className="flex items-center gap-1.5 text-xs text-zinc-500">
                 <CircleAlert className="h-3.5 w-3.5" />
-                Add your gamertag, result, proof, and confirm the rules to submit.
+                {!authReady ? 'Sign in with Discord to submit.' : !form.gamertag.trim() ? 'Add your gamertag to submit.' : !resultFilled ? `Add your ${t.entryLabel.toLowerCase()} to submit.` : !isGallery && parsedResult == null ? 'Enter a valid time or score to submit.' : !hasProof ? 'Add proof (upload or link) to submit.' : !form.agree ? 'Confirm the rules to submit.' : checkingExisting ? 'Checking for existing submissions...' : existingSubmission ? 'You already have a pending submission for this event.' : 'Complete all fields to submit.'}
               </p>
             ) : null}
           </form>
@@ -678,7 +678,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
               </span>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.1] py-2.5 text-sm text-amber-200/90">
+          <div className="flex items-center justify-center gap-2 rounded-xl border border-sky-500/25 bg-sky-500/[0.1] py-2.5 text-sm text-sky-200/90">
             <Clock className="h-4 w-4" />
             Pending verification by a steward
           </div>
