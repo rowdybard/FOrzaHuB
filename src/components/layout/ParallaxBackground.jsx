@@ -53,14 +53,14 @@ export default function ParallaxBackground() {
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(to bottom, transparent 40%, rgba(10,11,13,0.7) 70%, #0a0b0d 90%)',
+            'linear-gradient(to bottom, transparent 40%, rgba(10,11,13,0.49) 70%, #0a0b0d 90%)',
         }}
       />
       {/* Top vignette so navbar is readable */}
       <div
         className="absolute inset-x-0 top-0 h-32"
         style={{
-          background: 'linear-gradient(to bottom, rgba(10,11,13,0.6), transparent)',
+          background: 'linear-gradient(to bottom, rgba(10,11,13,0.42), transparent)',
         }}
       />
     </div>
