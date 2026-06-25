@@ -70,11 +70,9 @@
     backdrop-filter: blur(14px);
   }
 
-  /* Mobile readability: bump sub-12px text to 12px on small screens */
-  @media (max-width: 767px) {
-    [class*="text-\[10px\]"] { font-size: 0.75rem !important; line-height: 1.1rem !important; }
-    [class*="text-\[11px\]"] { font-size: 0.75rem !important; line-height: 1.1rem !important; }
-  }
+  /* Readability: bump sub-12px text to 12px on all screens */
+  [class*="text-[10px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
+  [class*="text-[11px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
 
   .card-hover {
     @apply transition-all duration-300 hover:border-white/[0.16] hover:-translate-y-0.5;
@@ -218,10 +216,6 @@
 /* Boost placeholder text */
 .high-contrast input::placeholder,
 .high-contrast textarea::placeholder { color: #d4d4d8 !important; opacity: 1 !important; }
-
-/* Minimum font size — bump any sub-12px text to 12px */
-.high-contrast [class*="text-[10px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
-.high-contrast [class*="text-[11px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
 
 /* Boost border opacity on cards and common borders */
 .high-contrast .card { border-color: rgba(255, 255, 255, 0.18) !important; }
