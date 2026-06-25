@@ -1,7 +1,11 @@
--- beta_season_01_data.sql
+-- 0023_beta_season_01_data.sql
 -- Master migration 1: Rename finale, set season='beta-1', fix prizes & sponsored flags.
 -- Consolidates: 0021_rename_finale_challenge + 0022_beta_season
--- Run this BEFORE beta_season_02_standings.sql
+-- Run this BEFORE 0024_beta_season_02_standings.sql
+-- NOTE: Disables the sponsored_staff_only trigger temporarily because the
+-- Supabase SQL Editor has no auth context, so is_staff() returns false.
+
+alter table public.challenges disable trigger trg_sponsored_staff_only;
 
 -- ── Step 1: Rename day 7 finale ──────────────────────────────────────────────
 update public.challenges
@@ -55,3 +59,5 @@ update public.challenges
       description = 'Final event of the Beta Race Series. The overall points champion wins the $50 gift card.'
   where season = 'beta-1'
     and slug like 'grand-finale-showdown-%';
+
+alter table public.challenges enable trigger trg_sponsored_staff_only;

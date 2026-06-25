@@ -34,7 +34,7 @@ Copy `.env.example` to `.env.local` when wiring Supabase locally.
 ```text
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
-VITE_MAX_PROOF_UPLOAD_MB=50
+VITE_MAX_PROOF_UPLOAD_MB=10
 ```
 
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when

@@ -54,9 +54,9 @@ supabase/migrations/20260603030100_restrict_proof_uploads_to_images.sql
 supabase/migrations/20260603032723_exclusive_badge_limits.sql
 supabase/migrations/20260603033503_admin_role_management.sql
 supabase/migrations/20260609015314_alpha_v01_security_hardening.sql
-supabase/migrations/sponsored_staff_only.sql
-supabase/migrations/beta_season_01_data.sql
-supabase/migrations/beta_season_02_standings.sql
+supabase/migrations/0022_sponsored_staff_only.sql
+supabase/migrations/0023_beta_season_01_data.sql
+supabase/migrations/0024_beta_season_02_standings.sql
 ```
 
 The final migration hardens RLS, restricts profile updates, adds explicit Data
