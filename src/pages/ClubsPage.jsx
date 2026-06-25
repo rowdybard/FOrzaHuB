@@ -57,7 +57,7 @@ export default function ClubsPage() {
       </PageHero>
 
       <div className="container-page py-8">
-        <div className="no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto rounded-2xl border border-white/[0.07] bg-ink-950/90 p-4 backdrop-blur-sm">
+        <div className="card-readable no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto rounded-2xl p-4">
           {regions.map((r) => (
             <button
               key={r}

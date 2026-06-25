@@ -60,11 +60,18 @@
   }
 
   .card {
-    @apply rounded-2xl border border-white/[0.07] bg-ink-850/80 shadow-card backdrop-blur-sm;
+    @apply rounded-2xl border border-white/[0.1] bg-ink-950/85 shadow-card backdrop-blur-md;
+  }
+
+  .card-readable {
+    background: rgba(7, 9, 13, 0.84);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:border-white/[0.14] hover:bg-ink-800 hover:-translate-y-0.5;
+    @apply transition-all duration-300 hover:border-white/[0.16] hover:-translate-y-0.5;
   }
 
   .hairline {

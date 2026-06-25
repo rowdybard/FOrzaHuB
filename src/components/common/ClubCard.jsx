@@ -7,7 +7,7 @@ export default function ClubCard({ club }) {
   return (
     <Link
       to={`/club/${club.slug}`}
-      className="group flex flex-col rounded-xl border border-white/[0.06] bg-ink-850/50 p-4 transition-all duration-200 hover:border-white/[0.12] hover:bg-ink-800/60"
+      className="card-readable group flex flex-col rounded-xl p-4 transition-all duration-200 hover:border-white/[0.16] hover:-translate-y-0.5"
     >
       <div className="flex items-center gap-3">
         <ClubMark club={club} size={44} />

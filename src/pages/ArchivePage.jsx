@@ -193,7 +193,7 @@ function ArchiveEventCard({ challenge }) {
   const to = `/c/${challenge.slug}`
 
   return (
-    <article className="rounded-xl border border-white/[0.06] bg-ink-850/50 overflow-hidden">
+    <article className="card-readable rounded-xl overflow-hidden">
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
