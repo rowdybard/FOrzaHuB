@@ -338,7 +338,7 @@ function ClubInviteActions({ club, onChanged }) {
           </Button>
         ) : null}
       </div>
-      <p className="max-w-sm truncate text-right font-mono text-[11px] text-zinc-400">
+      <p className="hidden max-w-sm truncate text-right font-mono text-[11px] text-zinc-400 sm:block">
         {inviteUrl}
       </p>
       {error && <p className="max-w-sm text-right text-xs text-rose-300">{error}</p>}

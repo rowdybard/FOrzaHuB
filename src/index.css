@@ -70,6 +70,12 @@
     backdrop-filter: blur(14px);
   }
 
+  /* Mobile readability: bump sub-12px text to 12px on small screens */
+  @media (max-width: 767px) {
+    [class*="text-\[10px\]"] { font-size: 0.75rem !important; line-height: 1.1rem !important; }
+    [class*="text-\[11px\]"] { font-size: 0.75rem !important; line-height: 1.1rem !important; }
+  }
+
   .card-hover {
     @apply transition-all duration-300 hover:border-white/[0.16] hover:-translate-y-0.5;
   }

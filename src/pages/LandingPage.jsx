@@ -14,6 +14,7 @@ import {
   Calendar,
   Flame,
   Medal,
+  BookOpen,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import { TypeBadge, StatusBadge } from '../components/ui/Badge'
@@ -151,6 +152,13 @@ function EventHero({ event, stats }) {
               <Users className="h-4 w-4" />
               Join a Club
             </Button>
+            <a
+              href="#how-it-works"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              <BookOpen className="h-4 w-4" />
+              How It Works
+            </a>
           </div>
 
           <div className="mt-10 flex animate-fade-up flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-zinc-400 [animation-delay:360ms]">
@@ -537,7 +545,7 @@ function HowItWorks({ event }) {
     { icon: Trophy, title: 'Climb the board', text: `Points accumulate all week. Top racer on Saturday wins the ${event?.prize || 'grand'} prize.` },
   ]
   return (
-    <section className="container-page mt-24">
+    <section id="how-it-works" className="container-page scroll-mt-20 mt-24">
       <SectionHeading eyebrow="How it works" title="From sign-up to championship in four steps" />
       <div className="relative mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent lg:block" />

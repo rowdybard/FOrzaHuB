@@ -484,7 +484,7 @@ export default function SubmitScorePage() {
                   className={`${inputCls} resize-none`}
                 />
               </Field>
-              <p className="text-xs leading-relaxed text-zinc-500">
+              <p className="hidden text-xs leading-relaxed text-zinc-500 sm:block">
                 Uploaded proof is stored in the public proofs bucket for V1 and may be viewable by anyone with the file URL.
               </p>
             </Panel>
