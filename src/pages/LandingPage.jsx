@@ -518,7 +518,7 @@ function HowItWorks({ event }) {
                 <span className="relative z-10 grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-ink-850 text-brand-400">
                   <Icon className="h-6 w-6" />
                 </span>
-                <span className="font-num text-4xl font-extrabold text-white/10">0{i + 1}</span>
+                <span className="font-num text-4xl font-extrabold text-white/25">0{i + 1}</span>
               </div>
               <h3 className="mt-4 font-semibold text-white">{s.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{s.text}</p>

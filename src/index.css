@@ -83,7 +83,7 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-brand-300 via-brand-400 to-brand-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-zinc-200 via-zinc-400 to-zinc-500 bg-clip-text text-transparent;
   }
 
   .text-balance {
@@ -176,14 +176,14 @@
     100% { transform: translateX(-50%); }
   }
 
-  /* Event hub: heatwave gradient */
+  /* Event hub: silver metallic gradient */
   .bg-heatwave {
     background-color: #0a0b0d;
     background-image:
-      radial-gradient(50% 70% at 15% 5%, rgba(255, 107, 44, 0.35), transparent 60%),
-      radial-gradient(45% 55% at 85% 0%, rgba(251, 113, 133, 0.20), transparent 62%),
-      radial-gradient(55% 65% at 75% 100%, rgba(251, 191, 36, 0.15), transparent 60%),
-      radial-gradient(40% 50% at 25% 100%, rgba(34, 211, 238, 0.08), transparent 60%);
+      radial-gradient(50% 70% at 20% 10%, rgba(200, 200, 210, 0.08), transparent 60%),
+      radial-gradient(45% 55% at 80% 5%, rgba(180, 180, 195, 0.06), transparent 62%),
+      radial-gradient(55% 65% at 70% 100%, rgba(160, 160, 175, 0.05), transparent 60%),
+      radial-gradient(40% 50% at 30% 100%, rgba(220, 220, 230, 0.04), transparent 60%);
   }
 
   /* Event hub: schedule connector line */

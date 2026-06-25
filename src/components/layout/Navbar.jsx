@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { NavLink, useLocation, Link } from 'react-router-dom'
-import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User, Eye, EyeOff } from 'lucide-react'
+import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User, Moon, Sun } from 'lucide-react'
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import Avatar from '../ui/Avatar'
@@ -27,7 +27,7 @@ function navClass({ isActive }) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [hc, setHc] = useState(() => localStorage.getItem('high-contrast') === 'true')
+  const [hc, setHc] = useState(() => localStorage.getItem('high-contrast') !== 'false')
   const location = useLocation()
   const { enabled, profile } = useAuth()
   const isStaff = !enabled || ['admin', 'steward'].includes(profile?.role)
@@ -79,10 +79,10 @@ export default function Navbar() {
               type="button"
               onClick={toggleHc}
               className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-              aria-label={hc ? 'Disable high contrast' : 'Enable high contrast'}
-              title={hc ? 'High contrast on' : 'High contrast off'}
+              aria-label={hc ? 'Switch to night mode' : 'Switch to high contrast'}
+              title={hc ? 'Night mode' : 'High contrast'}
             >
-              {hc ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {hc ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
             <AuthControl />
             <Button to="/create" size="sm" variant="secondary" className="hidden sm:inline-flex">
