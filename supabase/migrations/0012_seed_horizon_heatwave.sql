@@ -1,5 +1,6 @@
 -- 0012_seed_horizon_heatwave.sql
--- Seeds the 7 Horizon Heatwave daily events as real challenges in the DB.
+-- Seeds the 7 GripCafe Beta Race Series events as real challenges in the DB.
+-- All events belong to season 'beta-1'. $50 prize is for the overall champion only.
 -- Idempotent: uses ON CONFLICT (slug) DO NOTHING so re-running is safe.
 
 -- Create a GripCafe club if none exists yet.
@@ -30,147 +31,154 @@ begin
   end if;
   v_day1 := v_sunday;
 
-  -- Day 1: Opening Hot Lap (Time Trial)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 1: A-Class Festival Circuit (Time Trial)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'opening-hot-lap-' || to_char(v_day1, 'YYYYMMDD'),
     'time_trial',
     'A-Class Festival Circuit',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1,
     v_day1 + interval '24 hours',
     'Festival Circuit',
     'Class A — no assists except ABS',
     'Festival Circuit',
-    '$5 Gift Card + Series points',
+    'Series points',
     'Single flying lap on the festival circuit. Fastest time sets the tone for the week.',
     array['Class A', 'ABS only — no TCS, no STM', 'Clean lap — no rewind', 'Screenshot or video proof required'],
     'public',
     'GripCafe',
-    true
+    false
   ) on conflict (slug) do nothing;
 
-  -- Day 2: Drift After Dark (Drift Score)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 2: S2 Drift Zone Trial (Drift Score)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'drift-after-dark-' || to_char(v_day1 + interval '1 day', 'YYYYMMDD'),
     'drift_score',
     'S2 Drift Zone Trial',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1 + interval '1 day',
     v_day1 + interval '2 days',
     'Festival Circuit',
     'Class S2 — drift tune',
     'Drift Zone — Night',
-    '$5 Gift Card + Series points',
+    'Series points',
     'Highest single drift score under the night sky.',
     array['Class S2', 'Single drift zone run', 'No rewind', 'Screenshot or video proof required'],
     'public',
     'GripCafe',
-    true
+    false
   ) on conflict (slug) do nothing;
 
-  -- Day 3: Quarter Mile Kings (Drag Time)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 3: R-Class Drag Sprint (Drag Time)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'quarter-mile-kings-' || to_char(v_day1 + interval '2 days', 'YYYYMMDD'),
     'drag_time',
     'R-Class Drag Sprint',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1 + interval '2 days',
     v_day1 + interval '3 days',
     'Drag Strip',
     'Class R — drag tune',
     'Quarter Mile Drag Strip',
-    '$5 Gift Card + Series points',
+    'Series points',
     'Standing start to finish. Lowest elapsed time wins.',
     array['Class R', 'Standing start', 'No launch control assists', 'Video proof showing start and finish'],
     'public',
     'GripCafe',
-    true
+    false
   ) on conflict (slug) do nothing;
 
-  -- Day 4: Build Battle Showcase (Build Battle)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 4: B-Class Street Build (Build Battle — showcase event)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'build-battle-showcase-' || to_char(v_day1 + interval '3 days', 'YYYYMMDD'),
     'build_battle',
     'B-Class Street Build',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1 + interval '3 days',
     v_day1 + interval '4 days',
     'Festival Circuit',
     'Class B — street legal',
     'Photo Mode + Share Code',
-    '$5 Gift Card + Series points',
-    'Build a car to the brief. Community vote decides the cleanest build.',
+    'Series points (showcase)',
+    'Build a car to the brief. Community vote decides the cleanest build. Showcase event — participation points only.',
     array['Class B', 'Street legal body kit', 'Submit 3 photos: front, rear, tune sheet', 'Include build share code'],
     'public',
     'GripCafe',
-    true
+    false
   ) on conflict (slug) do nothing;
 
-  -- Day 5: Photo Mode Masters (Photo Contest)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 5: Photo Challenge: Rally Theme (Photo Contest — showcase event)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'photo-mode-masters-' || to_char(v_day1 + interval '4 days', 'YYYYMMDD'),
     'photo_contest',
     'Photo Challenge: Rally Theme',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1 + interval '4 days',
     v_day1 + interval '5 days',
     'Festival Circuit',
     'Any car — any location',
     'Photo Mode',
-    '$5 Gift Card + Series points',
-    'Capture the perfect shot. Most votes takes the day.',
+    'Series points (showcase)',
+    'Capture the perfect shot. Most votes takes the day. Showcase event — participation points only.',
     array['In-game Photo Mode only', 'No external overlays or watermarks', 'One submission per racer', 'PNG, JPG, or WEBP'],
     'public',
     'GripCafe',
-    true
+    false
   ) on conflict (slug) do nothing;
 
-  -- Day 6: Grand Prix Heat (Time Trial)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 6: S1 Road Circuit Trial (Time Trial)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'grand-prix-heat-' || to_char(v_day1 + interval '5 days', 'YYYYMMDD'),
     'time_trial',
     'S1 Road Circuit Trial',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1 + interval '5 days',
     v_day1 + interval '6 days',
     'GP Circuit',
     'Class S1 — GP tune',
     'Grand Prix Circuit',
-    '$5 Gift Card + Series points',
+    'Series points',
     'Three-lap average on the GP circuit. Consistency is king.',
     array['Class S1', '3 consecutive laps', 'No rewind', 'Video proof of full 3-lap run'],
     'public',
     'GripCafe',
-    true
+    false
   ) on conflict (slug) do nothing;
 
-  -- Day 7: Grand Finale Showdown (Time Trial)
-  insert into public.challenges (slug, type_id, title, club_id, status, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
+  -- Day 7: Finale: Clean Lap Challenge (Time Trial — sponsored, $50 champion prize)
+  insert into public.challenges (slug, type_id, title, club_id, status, season, start_date, end_date, region, restriction, location, prize, description, rules, visibility, sponsor, sponsored)
   values (
     'grand-finale-showdown-' || to_char(v_day1 + interval '6 days', 'YYYYMMDD'),
     'time_trial',
-    'R-Class Festival Finale',
+    'Finale: Clean Lap Challenge',
     v_club_id,
     'upcoming',
+    'beta-1',
     v_day1 + interval '6 days',
     v_day1 + interval '7 days',
     'Festival Circuit',
     'Class R — no restrictions',
     'Festival Circuit — Full',
-    '$50 Gift Card',
-    'Winner-takes-all final race. Champion crowned, gift card awarded.',
+    '$50 Gift Card (Beta Season Champion)',
+    'Final event of the Beta Race Series. The overall points champion wins the $50 gift card.',
     array['Class R', 'Single flying lap', 'No assists except ABS', 'Screenshot or video proof required'],
     'public',
     'GripCafe',

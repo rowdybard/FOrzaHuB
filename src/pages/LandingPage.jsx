@@ -39,13 +39,13 @@ export default function LandingPage() {
   const allChallenges = data?.[1] || []
   const stats = data?.[2] || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
 
-  const sponsored = allChallenges
-    .filter((c) => c.sponsored)
+  const betaEvents = allChallenges
+    .filter((c) => c.season === 'beta-1')
     .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
   const live = allChallenges.filter((c) => c.status === 'live')
 
-  const featuredEvent = sponsored[0] || null
-  const eventSchedule = sponsored
+  const featuredEvent = betaEvents[0] || null
+  const eventSchedule = betaEvents
   const eventClub = featuredEvent?.club || clubs[0] || null
   const sponsors = eventClub
     ? [
@@ -60,7 +60,7 @@ export default function LandingPage() {
         <>
           <EventHero event={featuredEvent} stats={stats} />
           {sponsors.length > 0 && <SponsorBar sponsors={sponsors} />}
-          <PrizeShowcase event={featuredEvent} />
+          <BetaSeasonInfo event={featuredEvent} />
           <ScheduleSection schedule={eventSchedule} event={featuredEvent} />
           <LeaderboardPreview />
         </>
@@ -95,7 +95,7 @@ function EventHero({ event, stats }) {
           <div className="animate-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-300">
               <Flame className="h-4 w-4" />
-              {event.sponsor || 'Sponsored'} Community Event
+              Beta Race Series
             </span>
           </div>
 
@@ -258,10 +258,9 @@ function SponsorBar({ sponsors }) {
   )
 }
 
-/* ----------------------------- Prize Showcase ------------------------------ */
+/* --------------------------- Beta Season Info ------------------------------ */
 
-function PrizeShowcase({ event }) {
-  if (!event.prize) return null
+function BetaSeasonInfo({ event }) {
   return (
     <section className="container-page mt-16">
       <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.06] via-ink-900/40 to-ink-950 p-5 sm:p-8 lg:p-12">
@@ -271,34 +270,56 @@ function PrizeShowcase({ event }) {
         <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300">
-              <Gift className="h-3.5 w-3.5" />
-              Grand Prize
+              <Trophy className="h-3.5 w-3.5" />
+              Beta Race Series
             </div>
-            <h2 className="mt-4 text-4xl font-extrabold sm:text-5xl">
-              Win <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">{event.prize}</span>
+            <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
+              GripCafe Beta Race Series
             </h2>
-            {event.description && (
-              <p className="mt-3 max-w-xl text-lg text-zinc-300">
-                {event.description}
+            <p className="mt-2 text-lg text-zinc-300">
+              7 events. 1 week. Most points wins the $50 prize.
+            </p>
+
+            <div className="mt-6 rounded-2xl border border-white/[0.06] bg-ink-950/40 p-5">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Season Rules</h3>
+              <ul className="mt-3 space-y-2 text-sm text-zinc-300">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  Free to enter.
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  One approved submission per event.
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  Every scoring event gives season points.
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  Most total points after all beta events wins.
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  Prize: $50 gift card for the overall champion.
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
+                  Tiebreakers: most event wins, most podiums, best finish in final event.
+                </li>
+              </ul>
+              <p className="mt-4 border-t border-white/[0.06] pt-3 text-xs text-zinc-500">
+                Photo and build events are showcase entries — participation gives season points but they are not ranked by score.
               </p>
-            )}
-            <ul className="mt-6 space-y-2.5">
-              <li className="flex items-center gap-3 text-sm text-zinc-300">
-                <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
-                Proof-backed submissions on every entry
-              </li>
-              <li className="flex items-center gap-3 text-sm text-zinc-300">
-                <CheckCircle2 className="h-[18px] w-[18px] text-amber-400" />
-                Verified by stewards before going live
-              </li>
-            </ul>
+            </div>
           </div>
 
           <div className="relative shrink-0">
-            <div className="glow-pulse grid h-40 w-40 place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5 sm:h-44 sm:w-44">
-              <div className="px-2 text-center">
+            <div className="glow-pulse grid min-h-[10rem] min-w-[10rem] place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5 p-6 sm:min-h-[11rem] sm:min-w-[11rem]">
+              <div className="text-center">
                 <Gift className="mx-auto h-10 w-10 text-amber-400 sm:h-12 sm:w-12" />
-                <div className="mt-2 text-2xl font-extrabold text-white sm:mt-3 sm:text-3xl">{event.prize}</div>
+                <div className="mt-2 text-2xl font-extrabold leading-tight text-white sm:mt-3 sm:text-3xl">$50</div>
+                <div className="text-xs text-amber-300/70">Champion</div>
               </div>
             </div>
           </div>
@@ -316,8 +337,8 @@ function ScheduleSection({ schedule, event }) {
     <section className="container-page mt-20">
       <SectionHeading
         eyebrow="Event Schedule"
-        title="Daily Challenges"
-        description="Each event runs for 24 hours. Submit your proof before the deadline."
+        title="Beta Race Series Events"
+        description="7 events over 1 week. One approved submission per event."
       />
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -371,12 +392,12 @@ function ScheduleSection({ schedule, event }) {
           )
         })}
 
-        {event.prize && (
+        {event.season && (
           <div className="card relative flex flex-col items-center justify-center p-5 text-center border-brand-500/20 bg-brand-500/[0.04]">
             <Medal className="h-10 w-10 text-amber-400" />
             <h3 className="mt-3 font-bold text-white">Overall Champion</h3>
             <p className="mt-1.5 text-sm text-zinc-400">
-              Most points across all events wins the {event.prize} prize.
+              Most points across all beta events wins the $50 gift card.
             </p>
           </div>
         )}
@@ -392,8 +413,8 @@ function LeaderboardPreview() {
     <section className="container-page mt-20">
       <SectionHeading
         eyebrow="Standings"
-        title="Championship Leaderboard"
-        description="Points accumulate across all events. Top racers compete for the grand prize."
+        title="Beta Season Leaderboard"
+        description="Points accumulate across all beta events. Most points wins the $50 prize."
         action={
           <Button to="/challenges" variant="outline" size="sm">
             View all events
@@ -594,8 +615,8 @@ function EventCTA({ event }) {
             Ready for the {event.title}?
           </h2>
           <p className="mt-3 text-zinc-300">
-            Join a club, sharpen your lines, and compete for the {event.prize} prize.
-            Events kick off Sunday at 6 PM.
+            Join a club, sharpen your lines, and compete for the $50 Beta Season champion prize.
+            Events kick off Sunday at 6 PM EST.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Button to="/clubs" size="lg">

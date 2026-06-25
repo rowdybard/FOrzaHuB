@@ -108,16 +108,17 @@ const _eventStart = nextSunday()
 
 export const sponsoredEvent = {
   id: 'evt-1',
-  title: 'Horizon Heatwave',
-  tagline: 'One week. One champion. One $50 gift card.',
+  title: 'GripCafe Beta Race Series',
+  tagline: '7 events. 1 week. Most points wins the $50 prize.',
   description:
-    'A seven-day community showdown across Forza Horizon 6. Daily challenges, cumulative scoring, and a $50 Steam/Xbox gift card for the overall champion. Sponsored by the community, for the community.',
+    'A seven-day community showdown across Forza Horizon 6. Seven events, cumulative season points, and a $50 gift card for the overall champion.',
   startDate: _eventStart,
   endDate: addDays(_eventStart, 6),
   prize: '$50',
   prizeDescription: 'Steam or Xbox gift card (winner\'s choice)',
   prizeValue: 50,
   status: 'upcoming',
+  season: 'beta-1',
   accent: '#ff6b2c',
 }
 
@@ -128,7 +129,7 @@ export const eventSchedule = [
   { day: 4, label: 'Wednesday', date: addDays(_eventStart, 3),  title: 'B-Class Street Build',     typeId: 'build_battle', description: 'Build a car to the brief. Community vote decides the cleanest build.',     status: 'upcoming' },
   { day: 5, label: 'Thursday',  date: addDays(_eventStart, 4),  title: 'Photo Challenge: Rally Theme', typeId: 'photo_contest',description: 'Capture the perfect shot. Most votes takes the day.',                     status: 'upcoming' },
   { day: 6, label: 'Friday',    date: addDays(_eventStart, 5),  title: 'S1 Road Circuit Trial',    typeId: 'time_trial',   description: 'Three-lap average on the GP circuit. Consistency is king.',               status: 'upcoming' },
-  { day: 7, label: 'Saturday',  date: addDays(_eventStart, 6),  title: 'R-Class Festival Finale',  typeId: 'time_trial',   description: 'Winner-takes-all final race. Champion crowned, gift card awarded.',       status: 'upcoming' },
+  { day: 7, label: 'Saturday',  date: addDays(_eventStart, 6),  title: 'Finale: Clean Lap Challenge',  typeId: 'time_trial',   description: 'Winner-takes-all final race. Champion crowned, gift card awarded.',       status: 'upcoming' },
 ]
 
 export const sponsors = [

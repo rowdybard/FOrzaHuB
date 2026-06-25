@@ -40,7 +40,7 @@ async function loadChallenge(slug) {
   if (!challenge) return { challenge: null }
   const [clubChallenges, seriesStandings] = await Promise.all([
     getChallengesByClub(challenge.clubId),
-    challenge.sponsored ? getSeriesStandings(challenge.clubId) : Promise.resolve([]),
+    challenge.season ? getSeriesStandings(challenge.clubId, challenge.season) : Promise.resolve([]),
   ])
   const more = clubChallenges.filter((c) => c.id !== challenge.id)
   return { challenge, more, seriesStandings }
@@ -70,7 +70,7 @@ export default function ChallengePage() {
         <div className="space-y-6">
           <Standings challenge={challenge} t={t} />
           <Rules challenge={challenge} t={t} />
-          {challenge.sponsored && seriesStandings.length > 0 && (
+          {challenge.season && seriesStandings.length > 0 && (
             <SeriesStandingsSection standings={seriesStandings} />
           )}
         </div>
@@ -417,10 +417,10 @@ function SeriesStandingsSection({ standings }) {
     <section>
       <div className="mb-4 flex items-center gap-2.5">
         <Trophy className="h-5 w-5 text-amber-400" />
-        <h2 className="text-xl font-bold">Series Standings</h2>
+        <h2 className="text-xl font-bold">Beta Season Standings</h2>
       </div>
       <p className="mb-4 text-sm text-zinc-400">
-        Points awarded per event: 1st = 50, 2nd = 49, down to 1 point for 50th place.
+        Scoring events: 1st = 50 pts, 2nd = 49, down to 1 pt for 50th. Showcase events (photo/build): 10 participation points each.
       </p>
       <SeriesStandings standings={standings} />
     </section>

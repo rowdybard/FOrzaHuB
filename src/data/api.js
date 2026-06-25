@@ -654,7 +654,7 @@ export async function getFeaturedChallenge() {
   return all.find((c) => c.featured) || all[0] || null
 }
 
-export async function getSeriesStandings(clubId) {
+export async function getSeriesStandings(clubId, season) {
   if (!isSupabaseEnabled) return []
   let query = supabase
     .from('series_standings')
@@ -662,6 +662,7 @@ export async function getSeriesStandings(clubId) {
     .order('total_points', { ascending: false })
     .order('best_finish', { ascending: true })
   if (clubId) query = query.eq('club_id', clubId)
+  if (season) query = query.eq('season', season)
   const { data, error } = await query.limit(50)
   if (error) throw error
   return (data || []).map((row, i) => ({
