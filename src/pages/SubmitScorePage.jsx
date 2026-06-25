@@ -426,6 +426,9 @@ export default function SubmitScorePage() {
                       {t.unit === 'time' ? 'time' : t.unit}
                     </span>
                   </div>
+                  {form.result.trim() && parseResult(form.result) == null && (
+                    <p className="mt-1.5 text-xs text-rose-300">Enter a valid time or score.</p>
+                  )}
                 </Field>
               )}
             </Panel>

@@ -561,10 +561,10 @@ export default function CreateChallengePage() {
                     type="checkbox"
                     checked={form.sponsored}
                     onChange={(e) => set('sponsored', e.target.checked)}
-                    className="h-4 w-4 rounded border-white/20 accent-amber-500"
+                    className="h-4 w-4 rounded border-white/20 accent-brand-500"
                   />
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <Sparkles className="h-4 w-4 text-brand-400" />
                     <span className="text-sm font-medium text-white">This is a sponsored event</span>
                   </div>
                 </label>
