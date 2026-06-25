@@ -12,18 +12,20 @@ import {
   Video,
   ChevronRight,
   CircleAlert,
-  ClipboardCheck,
+  MessagesSquare,
+  Calendar,
 } from 'lucide-react'
 import PageHero from '../components/common/PageHero'
 import Button from '../components/ui/Button'
 import Cover from '../components/ui/Cover'
 import ClubMark from '../components/ui/ClubMark'
 import { TypeBadge } from '../components/ui/Badge'
-import { getSubmittableChallenges, createSubmission, uploadProof, getUserSubmission } from '../data/api'
+import { getSubmittableChallenges, getChallengesWithClubs, createSubmission, uploadProof, getUserSubmission } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
 import Loading from '../components/common/Loading'
 import { getType } from '../lib/challengeTypes'
+import { formatDate } from '../lib/utils'
 
 const inputCls =
   'w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 transition-colors focus:border-brand-500/50 focus:outline-none'
@@ -71,6 +73,7 @@ export default function SubmitScorePage() {
   const { slug } = useParams()
   const { enabled, user, profile, loading: authLoading, signIn } = useAuth()
   const { data: options, loading } = useAsync(() => getSubmittableChallenges(), [])
+  const { data: allChallenges } = useAsync(() => getChallengesWithClubs(), [])
   const list = options || []
 
   const [challengeId, setChallengeId] = useState(null)
@@ -98,9 +101,6 @@ export default function SubmitScorePage() {
   const t = challenge ? getType(challenge.typeId) : null
   const club = challenge?.club || null
   const isGallery = t?.gallery
-
-  // Prerequisite challenge (qualifier), attached by the API.
-  const prereq = challenge?.prereq || null
 
   // Check if user already has a pending/approved submission for the selected challenge
   useEffect(() => {
@@ -226,22 +226,63 @@ export default function SubmitScorePage() {
   }
 
   if (!challenge) {
+    const upcoming = (allChallenges || [])
+      .filter((c) => c.status === 'upcoming')
+      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+    const nextEvent = upcoming[0] || null
     return (
-      <Centered
-        title="No open events yet"
-        body="Join a club first, then come back when a live event is accepting proof."
-        action={
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button to="/clubs">Find a club</Button>
-            <Button to="/challenges" variant="secondary">View events</Button>
+      <div>
+        <Seo title="Submit Your Score" description="Submit your Forza Horizon tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
+        <PageHero
+          eyebrow="Submit"
+          title="No live events right now"
+          description="Events open and close throughout the week. Here's what's coming up."
+        />
+        <div className="container-page py-8">
+          <div className="mx-auto max-w-lg space-y-6">
+            {nextEvent && (
+              <Link
+                to={`/c/${nextEvent.slug}`}
+                className="block rounded-2xl border border-white/[0.08] bg-ink-900/60 p-5 transition-colors hover:border-white/[0.15]"
+              >
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-400">
+                  <Calendar className="h-3.5 w-3.5" />
+                  Next event
+                </div>
+                <h2 className="mt-2 text-lg font-bold text-white">{nextEvent.title}</h2>
+                {nextEvent.club && (
+                  <p className="mt-0.5 text-sm text-zinc-400">Hosted by {nextEvent.club.name}</p>
+                )}
+                <p className="mt-2 text-sm text-zinc-500">
+                  Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })} EST
+                </p>
+              </Link>
+            )}
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 text-center">
+              <p className="text-sm text-zinc-400">
+                {nextEvent
+                  ? "Check back when the event goes live, or join the Discord to get notified."
+                  : "No events scheduled yet. Join the Discord to get notified when events open."}
+              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Button
+                  href="https://discord.gg/GJw3XRuCXr"
+                  variant="secondary"
+                >
+                  <MessagesSquare className="h-4 w-4" />
+                  Join Discord
+                </Button>
+                <Button to="/challenges" variant="ghost">Browse all events</Button>
+              </div>
+            </div>
           </div>
-        }
-      />
+        </div>
+      </div>
     )
   }
 
   if (submitted) {
-    return <SuccessView challenge={challenge} club={club} t={t} form={form} prereq={prereq} onReset={() => setSubmitted(false)} />
+    return <SuccessView challenge={challenge} club={club} t={t} form={form} onReset={() => setSubmitted(false)} />
   }
 
   if (existingSubmission) {
@@ -294,29 +335,6 @@ export default function SubmitScorePage() {
       <div className="container-page py-8">
         <div className="grid items-start gap-8 lg:grid-cols-[1fr_340px]">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Prereq gate banner */}
-            {prereq && (
-              <div className="flex items-start gap-3 rounded-xl border border-sky-500/25 bg-sky-500/[0.06] p-4">
-                <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-400" />
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-sky-200">Qualifier event</div>
-                  <p className="mt-0.5 text-sm text-sky-200/70">
-                    This event has a qualifier. Ask your club admin for details.
-                  </p>
-                  {prereq.slug && (
-                    <Link
-                      to={`/c/${prereq.slug}`}
-                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-sky-300 hover:text-sky-200"
-                    >
-                      <ClipboardCheck className="h-3.5 w-3.5" />
-                      {prereq.title}
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Challenge + identity */}
             <Panel title="Your entry" step="1">
               <Field label="Challenge" required>
@@ -623,7 +641,7 @@ function Checklist({ t }) {
   )
 }
 
-function SuccessView({ challenge, club, t, form, prereq, onReset }) {
+function SuccessView({ challenge, club, t, form, onReset }) {
   return (
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="card w-full max-w-md overflow-hidden text-center">

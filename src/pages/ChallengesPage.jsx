@@ -50,7 +50,7 @@ export default function ChallengesPage() {
 
   return (
     <div>
-      <Seo title="Forza Horizon Tournaments & Challenges" description="Browse live and upcoming Forza Horizon tournaments. Time trials, drift battles, drag races, photo contests, and build battles with verified proof and real prizes." path="/challenges" />
+      <Seo title="Forza Horizon Tournaments & Challenges" description="Browse live and upcoming Forza Horizon tournaments. Time trials, drift battles, drag races, photo contests, and build battles with verified proof and community prizes." path="/challenges" />
       <PageHero
         eyebrow="Challenges"
         title="Club events"

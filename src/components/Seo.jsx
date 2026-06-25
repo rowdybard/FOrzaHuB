@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async'
 
 const SITE_URL = 'https://gripcafe.com'
 const DEFAULT_DESC =
-  'Host competitive Forza Horizon events with verified proof, public leaderboards, and real prizes. Build your racing community with scheduled tournaments, club management, and championship scoring.'
+  'Host competitive Forza Horizon events with verified proof, public leaderboards, and community prizes. Build your racing community with scheduled tournaments, club management, and championship scoring.'
 
 export default function Seo({ title, description, path, image }) {
   const fullTitle = title

@@ -40,7 +40,7 @@ export default function Footer() {
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-zinc-400">
               The sponsored community event hub for Forza Horizon 6. Weekly events,
-              real prizes, proof-backed leaderboards, and a championship worth competing for.
+              community prizes, proof-backed leaderboards, and a championship worth competing for.
             </p>
             <div className="mt-5 flex items-center gap-2">
               <a

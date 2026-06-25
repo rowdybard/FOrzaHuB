@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { NavLink, useLocation, Link } from 'react-router-dom'
-import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User, Moon, Sun } from 'lucide-react'
+import { Menu, X, MessagesSquare, Plus, ShieldCheck, LogOut, User } from 'lucide-react'
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import Avatar from '../ui/Avatar'
@@ -27,18 +27,10 @@ function navClass({ isActive }) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [hc, setHc] = useState(() => localStorage.getItem('high-contrast') !== 'false')
   const location = useLocation()
   const { enabled, profile } = useAuth()
   const isStaff = !enabled || ['admin', 'steward'].includes(profile?.role)
   const visibleLinks = isStaff ? [...links, ...staffLinks] : links
-
-  const toggleHc = () => {
-    const next = !hc
-    setHc(next)
-    document.documentElement.classList.toggle('high-contrast', next)
-    localStorage.setItem('high-contrast', String(next))
-  }
 
   useEffect(() => {
     setOpen(false)
@@ -75,15 +67,6 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleHc}
-              className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-              aria-label={hc ? 'Switch to night mode' : 'Switch to high contrast'}
-              title={hc ? 'Night mode' : 'High contrast'}
-            >
-              {hc ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            </button>
             <AuthControl />
             <Button to="/create" size="sm" variant="secondary" className="hidden sm:inline-flex">
               <Plus className="h-4 w-4" />
@@ -136,6 +119,7 @@ export default function Navbar() {
                 New
               </Button>
             </div>
+            <MobileAuthControl onNavigate={() => setOpen(false)} />
           </div>
         </div>
       )}
@@ -213,6 +197,58 @@ function AuthControl() {
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+function MobileAuthControl({ onNavigate }) {
+  const { enabled, user, profile, loading, signIn, signOut } = useAuth()
+
+  if (!enabled || loading) return null
+
+  if (!user) {
+    return (
+      <div className="mt-3 border-t border-white/[0.06] pt-3">
+        <Button variant="secondary" size="md" className="w-full" onClick={signIn}>
+          <MessagesSquare className="h-4 w-4" />
+          Sign in with Discord
+        </Button>
+      </div>
+    )
+  }
+
+  const name = profile?.name || user.user_metadata?.full_name || 'Racer'
+
+  return (
+    <div className="mt-3 border-t border-white/[0.06] pt-3">
+      <div className="flex items-center gap-3 rounded-xl bg-white/[0.03] px-3 py-2.5">
+        <Avatar name={name} size={32} ring={false} />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-semibold text-white">{name}</div>
+          <div className="truncate text-xs text-zinc-500">Signed in with Discord</div>
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <Link
+          to="/me"
+          onClick={onNavigate}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+        >
+          <User className="h-4 w-4" />
+          Profile
+        </Link>
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate?.()
+            signOut()
+          }}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+        >
+          <LogOut className="h-4 w-4" />
+          Sign out
+        </button>
+      </div>
     </div>
   )
 }

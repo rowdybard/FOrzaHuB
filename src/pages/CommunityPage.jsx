@@ -327,9 +327,9 @@ function ClubInviteActions({ club, onChanged }) {
             Joined
           </Button>
         ) : enabled && atClubLimit ? (
-          <Button type="button" disabled>
+          <Button type="button" disabled title="You can join up to 5 clubs. Leave one to join another.">
             <UserPlus className="h-4 w-4" />
-            Club limit reached
+            Club limit (5/5)
           </Button>
         ) : enabled ? (
           <Button type="button" onClick={join} disabled={busy}>

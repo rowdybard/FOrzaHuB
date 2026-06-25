@@ -65,7 +65,7 @@ export default function LandingPage() {
           <LeaderboardPreview />
         </>
       ) : (
-        <FallbackHero stats={stats} />
+        <FallbackHero stats={stats} allChallenges={allChallenges} />
       )}
       <StatsBar stats={stats} />
       {live.length > 0 && <LiveChallenges challenges={live} />}
@@ -118,6 +118,7 @@ function EventHero({ event, stats }) {
             <span className="font-medium text-white">
               {formatDate(event.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
+            <span className="text-xs text-zinc-500">EST</span>
             <span className={`ml-2 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusCls}`}>
               {event.status === 'live' && (
                 <span className="relative flex h-1.5 w-1.5">
@@ -175,7 +176,11 @@ function EventHero({ event, stats }) {
   )
 }
 
-function FallbackHero({ stats }) {
+function FallbackHero({ stats, allChallenges }) {
+  const upcoming = (allChallenges || [])
+    .filter((c) => c.status === 'upcoming')
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+  const nextEvent = upcoming[0] || null
   return (
     <section className="relative overflow-hidden bg-heatwave">
       <div className="absolute inset-0 bg-grid opacity-30 mask-fade-b" />
@@ -188,6 +193,20 @@ function FallbackHero({ stats }) {
           <p className="mt-4 text-xl text-zinc-300">
             Community-run competitive events for Forza Horizon.
           </p>
+          {nextEvent && (
+            <Link
+              to={`/c/${nextEvent.slug}`}
+              className="mt-8 inline-flex flex-col items-center gap-1 rounded-2xl border border-white/[0.08] bg-ink-900/60 px-6 py-4 transition-colors hover:border-white/[0.15]"
+            >
+              <span className="text-xs font-semibold uppercase tracking-wider text-brand-400">
+                Next event
+              </span>
+              <span className="text-lg font-bold text-white">{nextEvent.title}</span>
+              <span className="text-sm text-zinc-400">
+                Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })} EST
+              </span>
+            </Link>
+          )}
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button to="/challenges" size="lg">
               <Flag className="h-4 w-4" />
@@ -207,38 +226,30 @@ function FallbackHero({ stats }) {
 /* ------------------------------ Sponsor Bar -------------------------------- */
 
 function SponsorBar({ sponsors }) {
-  const tierLabels = {
-    organizer: 'Organized by',
-    prize: 'Prize Sponsored by',
-    supporter: 'Supported by',
-  }
-  const tierColors = {
-    organizer: 'text-zinc-400',
-    prize: 'text-amber-400',
-    supporter: 'text-sky-400',
-  }
-
   return (
-    <section className="border-y border-white/[0.06] bg-ink-900/60 py-6">
+    <section className="border-y border-white/[0.06] bg-ink-900/60 py-5">
       <div className="container-page">
         <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
           {sponsors.map((s) => (
             <div key={s.id} className="flex items-center gap-3">
-              <div className="text-right">
-                <div className={`text-[10px] font-semibold uppercase tracking-wider ${tierColors[s.tier]}`}>
-                  {tierLabels[s.tier]}
-                </div>
-                <div className="text-sm font-bold text-white">{s.name}</div>
-              </div>
-              <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
+              <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
                 {s.tier === 'prize' ? (
-                  <Gift className="h-5 w-5 text-amber-400" />
+                  <Gift className="h-4 w-4 text-amber-400" />
                 ) : s.tier === 'organizer' ? (
-                  <Flag className="h-5 w-5 text-brand-400" />
+                  <Flag className="h-4 w-4 text-brand-400" />
                 ) : (
-                  <ShieldCheck className="h-5 w-5 text-sky-400" />
+                  <ShieldCheck className="h-4 w-4 text-sky-400" />
                 )}
               </span>
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                  {s.tier === 'organizer' ? 'Hosted by' : s.tier === 'prize' ? 'Prizes by' : 'Supported by'}
+                </div>
+                <div className="text-sm font-bold text-white">{s.name}</div>
+                {s.blurb && (
+                  <div className="text-xs text-zinc-500">{s.blurb}</div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -283,11 +294,11 @@ function PrizeShowcase({ event }) {
             </ul>
           </div>
 
-          <div className="relative">
-            <div className="glow-pulse grid h-44 w-44 place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5">
-              <div className="text-center">
-                <Gift className="mx-auto h-12 w-12 text-amber-400" />
-                <div className="mt-3 text-3xl font-extrabold text-white">{event.prize}</div>
+          <div className="relative shrink-0">
+            <div className="glow-pulse grid h-40 w-40 place-items-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-600/5 sm:h-44 sm:w-44">
+              <div className="px-2 text-center">
+                <Gift className="mx-auto h-10 w-10 text-amber-400 sm:h-12 sm:w-12" />
+                <div className="mt-2 text-2xl font-extrabold text-white sm:mt-3 sm:text-3xl">{event.prize}</div>
               </div>
             </div>
           </div>
@@ -547,12 +558,12 @@ function FAQSection() {
       a: 'Players submit their time or score with a screenshot or video. Each submission is reviewed by club staff before it\'s approved. Only verified entries appear on the leaderboard, and every result links back to its proof.',
     },
     {
-      q: 'Can I win real prizes playing Forza Horizon?',
-      a: 'Yes. Sponsored events on GripCafe offer real prizes like Steam and Xbox gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify for prize payouts.',
+      q: 'Can I win community prizes playing Forza Horizon?',
+      a: 'Yes. Sponsored events on GripCafe offer community prizes like Steam and Xbox gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify.',
     },
     {
       q: 'Is GripCafe free to use?',
-      a: 'Yes. Creating an account, joining clubs, and entering challenges is completely free. Clubs can run unlimited tournaments at no cost.',
+      a: 'Yes. Creating an account, joining clubs, and entering challenges is completely free. Clubs can run free-to-enter events at no cost.',
     },
   ]
   return (

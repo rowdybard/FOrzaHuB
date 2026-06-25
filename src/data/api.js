@@ -638,7 +638,6 @@ export async function getSubmittableChallenges() {
     filtered.map(async (c) => ({
       ...c,
       club: byId.get(c.clubId) || null,
-      prereq: await getPrerequisite(c),
     })),
   )
 }
