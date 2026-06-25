@@ -77,6 +77,7 @@ export default function ChallengePage() {
 
         <aside className="space-y-4 lg:sticky lg:top-20">
           <EventDetails challenge={challenge} club={club} t={t} isLive={isLive} />
+          {challenge.season === 'beta-1' && <SeriesPrizeCard />}
           {challenge.sponsored && <SponsorMiniCard challenge={challenge} />}
           <OrganizerCard club={club} />
         </aside>
@@ -412,12 +413,29 @@ function OrganizerCard({ club }) {
   )
 }
 
+function SeriesPrizeCard() {
+  return (
+    <div className="card overflow-hidden border-amber-500/20 bg-amber-500/[0.04]">
+      <div className="flex items-center gap-2 border-b border-amber-500/10 p-5">
+        <Gift className="h-4 w-4 text-amber-400" />
+        <h3 className="text-sm font-semibold text-white">$50 Series Champion Prize</h3>
+      </div>
+      <div className="p-5">
+        <p className="text-sm text-zinc-400">
+          Awarded to the overall points leader after the final event.
+        </p>
+        <p className="mt-2 text-xs font-medium text-emerald-400">Free to enter.</p>
+      </div>
+    </div>
+  )
+}
+
 function SeriesStandingsSection({ standings }) {
   return (
     <section>
       <div className="mb-4 flex items-center gap-2.5">
         <Trophy className="h-5 w-5 text-amber-400" />
-        <h2 className="text-xl font-bold">Beta Season Standings</h2>
+        <h2 className="text-xl font-bold">Beta Race Series Standings</h2>
       </div>
       <p className="mb-4 text-sm text-zinc-400">
         Scoring events: 1st = 50 pts, 2nd = 49, down to 1 pt for 50th. Showcase events (photo/build): 10 participation points each.

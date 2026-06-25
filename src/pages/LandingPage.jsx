@@ -100,12 +100,16 @@ function EventHero({ event, stats }) {
           </div>
 
           <h1 className="mt-6 animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
-            <span className="text-gradient">{event.title}</span>
+            <span className="text-gradient">GripCafe Beta Race Series</span>
           </h1>
 
-          {event.description && (
-            <p className="mt-4 animate-fade-up text-balance text-xl text-zinc-300 [animation-delay:120ms]">
-              {event.description}
+          <p className="mt-3 animate-fade-up text-balance text-lg text-zinc-400 [animation-delay:90ms]">
+            7 events. 1 week. Most points wins the $50 prize.
+          </p>
+
+          {event.title && (
+            <p className="mt-2 animate-fade-up text-balance text-base text-zinc-500 [animation-delay:120ms]">
+              Next event: <span className="font-semibold text-zinc-300">{event.title}</span>
             </p>
           )}
 
@@ -118,7 +122,6 @@ function EventHero({ event, stats }) {
             <span className="font-medium text-white">
               {formatDate(event.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
-            <span className="text-xs text-zinc-500">EST</span>
             <span className={`ml-2 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusCls}`}>
               {event.status === 'live' && (
                 <span className="relative flex h-1.5 w-1.5">
@@ -151,15 +154,11 @@ function EventHero({ event, stats }) {
           </div>
 
           <div className="mt-10 flex animate-fade-up items-center justify-center gap-6 text-sm text-zinc-400 [animation-delay:360ms]">
-            {event.prize && (
-              <>
-                <span className="inline-flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-amber-400" />
-                  <span className="font-semibold text-white">{event.prize}</span> prize
-                </span>
-                <span className="text-zinc-600">|</span>
-              </>
-            )}
+            <span className="inline-flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-amber-400" />
+              <span className="font-semibold text-white">$50</span> series champion prize
+            </span>
+            <span className="text-zinc-600">|</span>
             <span className="inline-flex items-center gap-2">
               <Calendar className="h-4 w-4 text-brand-400" />
               <span className="font-semibold text-white">{formatNumber(stats.challenges)}</span> events
@@ -203,7 +202,7 @@ function FallbackHero({ stats, allChallenges }) {
               </span>
               <span className="text-lg font-bold text-white">{nextEvent.title}</span>
               <span className="text-sm text-zinc-400">
-                Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })} EST
+                Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })}
               </span>
             </Link>
           )}
@@ -258,7 +257,7 @@ function SponsorBar({ sponsors }) {
   )
 }
 
-/* --------------------------- Beta Season Info ------------------------------ */
+/* --------------------------- Beta Race Series Info ------------------------- */
 
 function BetaSeasonInfo({ event }) {
   return (
@@ -281,7 +280,7 @@ function BetaSeasonInfo({ event }) {
             </p>
 
             <div className="mt-6 rounded-2xl border border-white/[0.06] bg-ink-950/40 p-5">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Season Rules</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Series Rules</h3>
               <ul className="mt-3 space-y-2 text-sm text-zinc-300">
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="mt-0.5 h-[18px] w-[18px] shrink-0 text-amber-400" />
@@ -413,7 +412,7 @@ function LeaderboardPreview() {
     <section className="container-page mt-20">
       <SectionHeading
         eyebrow="Standings"
-        title="Beta Season Leaderboard"
+        title="Beta Race Series Leaderboard"
         description="Points accumulate across all beta events. Most points wins the $50 prize."
         action={
           <Button to="/challenges" variant="outline" size="sm">
@@ -615,8 +614,8 @@ function EventCTA({ event }) {
             Ready for the {event.title}?
           </h2>
           <p className="mt-3 text-zinc-300">
-            Join a club, sharpen your lines, and compete for the $50 Beta Season champion prize.
-            Events kick off Sunday at 6 PM EST.
+            Join a club, sharpen your lines, and compete for the $50 Beta Race Series champion prize.
+            Events kick off Sunday — check each event for opening times.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Button to="/clubs" size="lg">

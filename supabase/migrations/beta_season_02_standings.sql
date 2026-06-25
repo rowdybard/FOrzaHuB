@@ -1,9 +1,14 @@
--- 0023_beta_series_standings.sql
--- Rewrite series_standings view to filter by season instead of sponsored.
--- Photo/build events are showcase entries: participation gives a flat 10 points
--- (not ranked by score). Timed/score events are ranked normally.
+-- beta_season_02_standings.sql
+-- Master migration 2: Rewrite series_standings view for season-based scoring.
+-- Consolidates: 0023_beta_series_standings
+-- Run this AFTER beta_season_01_data.sql
 
-create or replace view public.series_standings
+-- Series standings now filter by season (not sponsored = true).
+-- Photo/build events are showcase entries: flat 10 participation points.
+-- Timed/score events are ranked: 1st=50, 2nd=49, ... 50th=1.
+
+drop view if exists public.series_standings;
+create view public.series_standings
 with (security_invoker = true) as
   with ranked as (
     select
@@ -12,8 +17,6 @@ with (security_invoker = true) as
       c.type_id,
       c.club_id,
       c.season,
-      -- Rank within each challenge: asc for time-based, desc for score-based
-      -- Photo/build events get rank 1 for everyone (participation-only)
       row_number() over (
         partition by s.challenge_id
         order by
@@ -21,7 +24,6 @@ with (security_invoker = true) as
           case when c.type_id = 'drift_score' then s.value end desc nulls last,
           s.created_at asc
       ) as rank,
-      -- Whether this is a showcase event (photo/build)
       (c.type_id in ('photo_contest', 'build_battle')) as is_showcase
     from public.submissions s
     join public.challenges c on c.id = s.challenge_id
@@ -37,8 +39,6 @@ with (security_invoker = true) as
     p.avatar_url,
     p.platform,
     count(*) as events_entered,
-    -- Showcase events: flat 10 participation points
-    -- Ranked events: max(1, 50 - (rank - 1)) → 1st=50, 2nd=49, ... 50th=1
     sum(
       case when r.is_showcase then 10
            else greatest(1, 50 - (r.rank - 1))

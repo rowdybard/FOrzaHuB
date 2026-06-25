@@ -660,7 +660,7 @@ function StandingsCard({ standings, season }) {
       <div className="flex items-center gap-2 border-b border-white/[0.06] p-5">
         <Trophy className="h-4 w-4 text-zinc-400" />
         <h3 className="text-sm font-semibold">
-          Season standings{season ? ` — ${season}` : ''}
+          Club activity standings{season ? ` — ${season}` : ''}
         </h3>
       </div>
       <div className="divide-y divide-white/[0.05]">
@@ -682,7 +682,7 @@ function StandingsCard({ standings, season }) {
         ))}
       </div>
       <div className="border-t border-white/[0.06] px-5 py-2.5 text-center text-xs text-zinc-500">
-        Points from verified results this season
+        Points from verified results in this club
       </div>
     </div>
   )
