@@ -187,8 +187,8 @@ export default function CreateChallengePage() {
         end_date: new Date(form.endDate).toISOString(),
         rules: form.rules.filter(Boolean),
         visibility: form.visibility,
-        sponsor: form.sponsored ? form.sponsor.trim() : null,
-        sponsored: form.sponsored,
+        sponsor: isStaff ? (form.sponsored ? form.sponsor.trim() : null) : null,
+        sponsored: isStaff ? form.sponsored : false,
         status: startInFuture ? 'upcoming' : 'live',
         created_by: user?.id || null,
       }
@@ -514,8 +514,8 @@ export default function CreateChallengePage() {
               </div>
             </Panel>
 
-            {/* Sponsor (staff/owners only) */}
-            {canEditMaterial && (
+            {/* Sponsor (staff only) */}
+            {isStaff && (
               <Panel step="6" title="Sponsor">
                 <label className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-ink-900/40 p-3.5">
                   <input
