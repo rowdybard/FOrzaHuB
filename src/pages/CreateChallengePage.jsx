@@ -628,7 +628,7 @@ function Field({ label, required, hint, children }) {
           {label}
           {required && <span className="ml-1 text-brand-400">*</span>}
         </span>
-        {hint && <span className="text-xs text-zinc-500">{hint}</span>}
+        {hint && <span className="text-xs text-zinc-400">{hint}</span>}
       </div>
       {children}
     </label>
@@ -652,7 +652,7 @@ function VisibilityOption({ active, onClick, disabled, icon: Icon, title, desc }
       </span>
       <span>
         <span className="block text-sm font-semibold text-white">{title}</span>
-        <span className="mt-0.5 block text-xs text-zinc-500">{desc}</span>
+        <span className="mt-0.5 block text-xs text-zinc-400">{desc}</span>
       </span>
     </button>
   )

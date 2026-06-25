@@ -75,7 +75,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/[0.06] pt-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/[0.06] pt-6 text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-2xl leading-relaxed">
             GripCafe is an unofficial, fan-made community project. Not affiliated with,
             endorsed by, or sponsored by any game publisher or developer. All trademarks belong to their respective owners.

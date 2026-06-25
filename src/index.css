@@ -70,9 +70,11 @@
     backdrop-filter: blur(14px);
   }
 
-  /* Readability: bump sub-12px text to 12px on all screens */
-  [class*="text-[10px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
-  [class*="text-[11px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
+  /* Mobile readability: bump sub-12px text to 12px on small screens */
+  @media (max-width: 767px) {
+    [class*="text-[10px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
+    [class*="text-[11px]"] { font-size: 0.75rem !important; line-height: 1.25rem !important; }
+  }
 
   .card-hover {
     @apply transition-all duration-300 hover:border-white/[0.16] hover:-translate-y-0.5;

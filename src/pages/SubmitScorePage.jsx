@@ -263,7 +263,7 @@ export default function SubmitScorePage() {
                 {nextEvent.club && (
                   <p className="mt-0.5 text-sm text-zinc-400">Hosted by {nextEvent.club.name}</p>
                 )}
-                <p className="mt-2 text-sm text-zinc-500">
+                <p className="mt-2 text-sm text-zinc-400">
                   Opens {formatDate(nextEvent.startDate, { month: 'short', day: 'numeric' })}
                 </p>
               </Link>
@@ -378,7 +378,7 @@ export default function SubmitScorePage() {
                   </select>
                 </Field>
                 {profile?.tag && (
-                  <p className="-mt-2 text-xs text-zinc-500 sm:col-span-2">
+                  <p className="-mt-2 text-xs text-zinc-400 sm:col-span-2">
                     Signed in as {profile.tag}. Use the gamertag field for the name shown in proof.
                   </p>
                 )}
@@ -427,7 +427,7 @@ export default function SubmitScorePage() {
                     </span>
                   </div>
                   {form.result.trim() && parseResult(form.result) == null && (
-                    <p className="mt-1.5 text-xs text-rose-300">Enter a valid time or score.</p>
+                    <p className="mt-1.5 text-sm text-rose-300">Enter a valid time or score.</p>
                   )}
                 </Field>
               )}
@@ -455,7 +455,7 @@ export default function SubmitScorePage() {
                 <span className="mt-3 text-sm font-medium text-white">
                   {form.fileName || (isGallery ? 'Upload your photo' : 'Upload your screenshot')}
                 </span>
-                <span className="mt-1 text-xs text-zinc-500">
+                <span className="mt-1 text-sm text-zinc-400">
                   PNG, JPG, or WEBP. Max {MAX_PROOF_MB}MB.
                 </span>
                 <input
@@ -497,7 +497,7 @@ export default function SubmitScorePage() {
                   className={`${inputCls} resize-none`}
                 />
               </Field>
-              <p className="hidden text-xs leading-relaxed text-zinc-500 sm:block">
+              <p className="text-sm leading-relaxed text-zinc-400">
                 Uploaded proof is stored in the public proofs bucket for V1 and may be viewable by anyone with the file URL.
               </p>
             </Panel>
@@ -524,13 +524,13 @@ export default function SubmitScorePage() {
               </Button>
             </div>
             {error && (
-              <p className="flex items-center gap-1.5 text-xs text-rose-400">
+              <p className="flex items-center gap-1.5 text-sm text-rose-400">
                 <CircleAlert className="h-3.5 w-3.5" />
                 {error}
               </p>
             )}
             {!canSubmit ? (
-              <p className="flex items-center gap-1.5 text-xs text-zinc-500">
+              <p className="flex items-center gap-1.5 text-sm text-zinc-400">
                 <CircleAlert className="h-3.5 w-3.5" />
                 {!authReady ? 'Sign in with Discord to submit.' : !form.gamertag.trim() ? 'Add your gamertag to submit.' : !resultFilled ? `Add your ${t.entryLabel.toLowerCase()} to submit.` : !isGallery && parsedResult == null ? 'Enter a valid time or score to submit.' : !hasProof ? 'Add proof (upload or link) to submit.' : !form.agree ? 'Confirm the rules to submit.' : checkingExisting ? 'Checking for existing submissions...' : existingSubmission ? 'You already have a pending submission for this event.' : 'Complete all fields to submit.'}
               </p>
@@ -581,7 +581,7 @@ function Field({ label, required, hint, children, className = '' }) {
           {label}
           {required && <span className="ml-1 text-rose-500">*</span>}
         </span>
-        {hint && <span className="text-xs text-zinc-500">{hint}</span>}
+        {hint && <span className="text-xs text-zinc-400">{hint}</span>}
       </div>
       {children}
     </label>
@@ -688,7 +688,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
             </Button>
             <Button onClick={onReset}>Submit another</Button>
           </div>
-          <Link to="/me" className="block text-center text-xs text-brand-400 hover:text-brand-300">
+          <Link to="/me" className="block text-center text-sm text-brand-400 hover:text-brand-300">
             Track your submissions →
           </Link>
         </div>

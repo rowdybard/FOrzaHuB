@@ -77,7 +77,7 @@ export default function ChallengeCard({ challenge, club: clubProp }) {
 
       {/* Club */}
       {club && (
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-500">
+        <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
           <ClubMark club={club} size={16} />
           <span className="truncate">{club.name}</span>
           {challenge.sponsored && (
@@ -97,7 +97,7 @@ export default function ChallengeCard({ challenge, club: clubProp }) {
             {formatNumber(challenge.participants)}
           </span>
           {top && (
-            <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
+            <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
               <Trophy className="h-3 w-3" style={{ color: t.accent }} />
               <span className="font-medium text-zinc-300">{top.user?.tag}</span>
             </span>

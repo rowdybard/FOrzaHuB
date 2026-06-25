@@ -278,7 +278,7 @@ export default function AdminDashboard() {
               deciding={decidingId === selected.id}
             />
           ) : (
-            <div className="card grid min-h-[400px] place-items-center p-10 text-center text-sm text-zinc-500">
+            <div className="card grid min-h-[400px] place-items-center p-10 text-center text-sm text-zinc-400">
               Select a submission to review
             </div>
           )}
@@ -381,7 +381,7 @@ function QueueRow({ submission, active, onClick }) {
         <Avatar name={submission.user.name} size={32} />
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-medium text-white">{submission.user.tag}</div>
-          <div className="truncate text-xs text-zinc-500">{submission.challengeTitle}</div>
+          <div className="truncate text-xs text-zinc-400">{submission.challengeTitle}</div>
         </div>
         <div className="text-right">
           <div className="font-num text-sm font-bold tabular-nums text-white">
@@ -525,19 +525,19 @@ function DetailPanel({ submission, onDecide, actionError, deciding }) {
                 <span className="truncate font-semibold text-white">{submission.user.tag}</span>
                 <span className="text-sm">{submission.user.country}</span>
               </div>
-              <div className="text-xs text-zinc-500">{submission.user.name} · {submission.user.platform}</div>
+              <div className="text-xs text-zinc-400">{submission.user.name} · {submission.user.platform}</div>
             </div>
           </div>
 
           <div className="card-readable rounded-xl p-4">
-            <div className="text-xs uppercase tracking-wider text-zinc-500">
+            <div className="text-xs uppercase tracking-wider text-zinc-400">
               {t.gallery ? 'Entry' : 'Submitted result'}
             </div>
             <div className="mt-1 font-num text-2xl font-extrabold text-white">
               {t.gallery ? submission.title : formatMetric(submission.typeId, submission.value)}
             </div>
               {submission.shareCode && (
-              <div className="mt-2 text-xs text-zinc-500">Share code: <span className="font-num text-zinc-300">{submission.shareCode}</span></div>
+              <div className="mt-2 text-xs text-zinc-400">Share code: <span className="font-num text-zinc-300">{submission.shareCode}</span></div>
             )}
           </div>
 

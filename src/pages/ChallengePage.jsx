@@ -166,7 +166,7 @@ function FactChip({ icon: Icon, label, value, accent }) {
         <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{label}</div>
+        <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400">{label}</div>
         <div className="truncate text-sm font-medium text-white">{value}</div>
       </div>
     </div>
@@ -272,7 +272,7 @@ function EventDetails({ challenge, club, t, isLive }) {
       <div className="border-b border-white/[0.06] p-5">
         {challenge.status === 'live' && (
           <>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Closes in
             </div>
             <Countdown to={challenge.endDate} variant="blocks" />
@@ -280,7 +280,7 @@ function EventDetails({ challenge, club, t, isLive }) {
         )}
         {challenge.status === 'upcoming' && (
           <>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Opens in
             </div>
             <Countdown to={challenge.startDate} variant="blocks" />
@@ -301,7 +301,7 @@ function EventDetails({ challenge, club, t, isLive }) {
               <Trophy className="h-5 w-5" />
             </span>
             <div>
-              <div className="text-xs text-zinc-500">Winner</div>
+              <div className="text-xs text-zinc-400">Winner</div>
               <div className="font-semibold text-white">{challenge.winner?.tag}</div>
             </div>
           </div>
@@ -376,7 +376,7 @@ function SponsorMiniCard({ challenge }) {
           <span className="font-medium text-white">{challenge.prize || 'Community prize'}</span>
         </div>
       </div>
-      <p className="mt-3 text-xs text-zinc-500">Free to enter. Winner selected by challenge rules.</p>
+      <p className="mt-3 text-xs text-zinc-400">Free to enter. Winner selected by challenge rules.</p>
     </div>
   )
 }
