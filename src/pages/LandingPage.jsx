@@ -100,7 +100,7 @@ function EventHero({ event, stats }) {
           </div>
 
           <h1 className="mt-6 animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
-            <span className="text-gradient">GripCafe Beta Race Series</span>
+            <span className="text-white">GripCafe Beta Race Series</span>
           </h1>
 
           <p className="mt-3 animate-fade-up text-balance text-lg text-zinc-400 [animation-delay:90ms]">
@@ -187,7 +187,7 @@ function FallbackHero({ stats, allChallenges }) {
       <div className="container-page relative py-16 lg:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="text-gradient">GripCafe</span>
+            <span className="text-white">GripCafe</span>
           </h1>
           <p className="mt-4 text-xl text-zinc-300">
             Community-run competitive events for Forza Horizon.

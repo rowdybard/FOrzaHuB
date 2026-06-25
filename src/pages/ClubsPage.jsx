@@ -63,7 +63,7 @@ export default function ClubsPage() {
               key={r}
               onClick={() => setRegion(r)}
               className={cn(
-                'shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
+                'shrink-0 rounded border px-3.5 py-1.5 text-sm font-medium transition-colors',
                 region === r
                   ? 'border-white/[0.1] bg-white/[0.06] text-white'
                   : 'border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/15 hover:text-white',

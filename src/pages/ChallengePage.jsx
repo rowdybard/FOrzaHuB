@@ -297,7 +297,7 @@ function EventDetails({ challenge, club, t, isLive }) {
         )}
         {challenge.status === 'closed' && (
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-amber-300 to-yellow-500 text-ink-950">
+            <span className="grid h-10 w-10 place-items-center rounded-xl border border-amber-500/20 bg-amber-500/[0.04] text-amber-400">
               <Trophy className="h-5 w-5" />
             </span>
             <div>

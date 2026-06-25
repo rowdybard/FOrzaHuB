@@ -156,7 +156,7 @@ function TypeChip({ active, onClick, label, icon: Icon, accent }) {
     <button
       onClick={onClick}
       className={cn(
-        'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all',
+        'inline-flex shrink-0 items-center gap-1.5 rounded border px-3 py-1.5 text-sm font-medium transition-all',
         active
           ? 'text-white'
           : 'border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:border-white/20 hover:text-white',

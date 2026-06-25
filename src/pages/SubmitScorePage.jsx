@@ -550,7 +550,7 @@ function Panel({ title, step, children }) {
   return (
     <section className="card p-6">
       <div className="mb-5 flex items-center gap-3">
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-500/15 font-num text-sm font-bold text-brand-300">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-500/15 font-num text-sm font-bold text-brand-300">
           {step}
         </span>
         <h2 className="text-base font-bold">{title}</h2>
@@ -646,7 +646,7 @@ function SuccessView({ challenge, club, t, form, onReset }) {
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="card w-full max-w-md overflow-hidden text-center">
         <div className="relative border-b border-white/[0.06] bg-emerald-500/[0.06] px-6 py-10">
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-400">
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
             <CheckCircle2 className="h-8 w-8" />
           </span>
           <h1 className="mt-5 text-2xl font-bold">Submitted for review</h1>

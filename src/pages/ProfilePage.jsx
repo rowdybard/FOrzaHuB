@@ -342,7 +342,7 @@ export default function ProfilePage() {
                     <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                       Preview
                     </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                    <span className="inline-flex items-center gap-1.5 rounded border border-white/[0.08] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                       <Hash className="h-3 w-3" />
                       Live
                     </span>
@@ -423,7 +423,7 @@ function BadgeChip({ id, active, locked, onClick }) {
       onClick={onClick}
       disabled={locked}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+        'inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm font-medium transition-colors',
         locked && 'cursor-default opacity-90',
         active
           ? 'text-white'

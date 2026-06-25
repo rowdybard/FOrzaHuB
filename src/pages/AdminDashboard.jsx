@@ -48,7 +48,7 @@ function StatusPill({ status }) {
   const m = STATUS_META[status]
   const Icon = m.icon
   return (
-    <span className={cn('inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold', m.cls)}>
+    <span className={cn('inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px] font-semibold', m.cls)}>
       <Icon className="h-3 w-3" />
       {m.label}
     </span>
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
             {f.label}
             <span
               className={cn(
-                'rounded-full px-1.5 py-0.5 text-[11px] font-num',
+                'rounded px-1.5 py-0.5 text-[11px] font-num',
                 filter === f.id ? 'bg-brand-500/20 text-brand-300' : 'bg-white/[0.06] text-zinc-500',
               )}
             >
@@ -424,7 +424,7 @@ function ProofPreview({ submission }) {
       <Cover typeId={submission.typeId} className="absolute inset-0" iconSize="h-44 w-44" />
       <div className="absolute inset-0 grid place-items-center">
         {isMedia ? (
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-ink-950/60 text-white ring-1 ring-white/20 backdrop-blur-md transition-transform hover:scale-105">
+          <span className="grid h-14 w-14 place-items-center rounded-xl bg-ink-950/60 text-white ring-1 ring-white/20 backdrop-blur-md transition-transform hover:scale-105">
             <Play className="h-6 w-6 translate-x-0.5" fill="currentColor" />
           </span>
         ) : (

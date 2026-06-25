@@ -426,7 +426,7 @@ export default function CreateChallengePage() {
                 <div className="space-y-2">
                   {form.rules.map((rule, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/[0.06] font-num text-xs font-semibold text-zinc-400">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/[0.06] font-num text-xs font-semibold text-zinc-400">
                         {i + 1}
                       </span>
                       <input
@@ -568,7 +568,7 @@ function Panel({ step, title, subtitle, children }) {
   return (
     <section className="card p-6">
       <div className="mb-5 flex items-center gap-3">
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-500/15 font-num text-sm font-bold text-brand-300">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-500/15 font-num text-sm font-bold text-brand-300">
           {step}
         </span>
         <div>
@@ -624,7 +624,7 @@ function PublishedView({ isEdit, title }) {
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="card w-full max-w-md overflow-hidden text-center">
         <div className="border-b border-white/[0.06] bg-brand-500/[0.06] px-6 py-10">
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-brand-500/15 text-brand-300">
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-brand-500/15 text-brand-300">
             <PartyPopper className="h-8 w-8" />
           </span>
           <h1 className="mt-5 text-2xl font-bold">{isEdit ? 'Challenge updated' : 'Challenge published'}</h1>

@@ -6,9 +6,9 @@ import { getType, formatMetric, formatGap, unitSuffix } from '../../lib/challeng
 
 function Rank({ rank }) {
   const medal = {
-    1: 'bg-gradient-to-br from-amber-300 to-yellow-500 text-ink-950 shadow-[0_4px_12px_-4px_rgba(251,191,36,0.7)]',
-    2: 'bg-gradient-to-br from-zinc-200 to-zinc-400 text-ink-950',
-    3: 'bg-gradient-to-br from-orange-400 to-amber-700 text-ink-950',
+    1: 'border border-amber-500/30 bg-amber-500/15 text-amber-300',
+    2: 'border border-zinc-400/30 bg-zinc-400/15 text-zinc-200',
+    3: 'border border-orange-500/30 bg-orange-500/15 text-orange-300',
   }
   if (rank <= 3) {
     return (

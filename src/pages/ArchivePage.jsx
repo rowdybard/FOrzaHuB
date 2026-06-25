@@ -169,7 +169,7 @@ export default function ArchivePage() {
               <section key={group.season}>
                 <div className="mb-5 flex items-center gap-3">
                   <h2 className="text-xl font-bold">{group.season}</h2>
-                  <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-xs text-zinc-400">
+                  <span className="rounded border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-xs text-zinc-400">
                     {group.items.length} {group.items.length === 1 ? 'event' : 'events'}
                   </span>
                 </div>
@@ -246,7 +246,7 @@ function Chip({ active, onClick, label, icon: Icon }) {
     <button
       onClick={onClick}
       className={cn(
-        'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+        'inline-flex shrink-0 items-center gap-1.5 rounded border px-3 py-1.5 text-sm font-medium transition-colors',
         active
           ? 'border-brand-500/30 bg-brand-500/10 text-brand-300'
           : 'border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/15 hover:text-white',
