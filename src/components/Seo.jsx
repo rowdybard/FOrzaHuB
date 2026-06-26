@@ -10,7 +10,7 @@ export default function Seo({ title, description, path, image }) {
     : 'GripCafe — Run Verified Tournaments for Your Sim Racing Community'
   const desc = description || DEFAULT_DESC
   const url = path ? `${SITE_URL}${path}` : SITE_URL
-  const img = image || '/background.png'
+  const img = image || '/og-image.png'
 
   return (
     <Helmet>

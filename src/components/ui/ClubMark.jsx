@@ -1,6 +1,7 @@
 import { cn, hexToRgba } from '../../lib/utils'
 
 export default function ClubMark({ club, size = 40, className }) {
+  if (!club) return null
   const accent = club.accent || '#94a3b8'
   return (
     <span
