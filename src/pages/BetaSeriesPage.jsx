@@ -32,6 +32,7 @@ export default function BetaSeriesPage() {
   const { data } = useAsync(
     () => Promise.all([getClubs(), getChallengesWithClubs(), getSiteStats()]),
     [],
+    'beta-series',
   )
   const clubs = data?.[0] || []
   const allChallenges = data?.[1] || []

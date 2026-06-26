@@ -242,7 +242,7 @@ export default function SubmitScorePage() {
     const nextEvent = upcoming[0] || null
     return (
       <div>
-        <Seo title="Submit Your Score" description="Submit your sim racing tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
+        <Seo title="Submit Your Score" description="Submit your Forza Horizon 6 tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
         <PageHero
           eyebrow="Submit"
           title="No live events right now"

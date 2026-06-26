@@ -8,11 +8,10 @@
 /*.css     /:splat.css     200
 /*.js      /:splat.js      200
 /*.json    /:splat.json    200
-/*.xml     /:splat.xml     200
 /*.txt     /:splat.txt     200
 /*.webmanifest  /:splat.webmanifest  200
 /*.woff    /:splat.woff    200
 /*.woff2   /:splat.woff2   200
 
-# Cloudflare Pages SPA fallback — every other route serves the app shell.
+# SPA fallback — only used when Pages Function is not invoked
 /*    /index.html   200

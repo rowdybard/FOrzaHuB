@@ -2,12 +2,12 @@ import { Helmet } from 'react-helmet-async'
 
 const SITE_URL = 'https://gripcafe.com'
 const DEFAULT_DESC =
-  'Host competitive sim racing events with verified proof, public leaderboards, and community prizes. Build your racing community with scheduled tournaments, club management, and championship scoring.'
+  'Run a Forza Horizon 6 tournament for your Discord community. Time trials, drift, drag, build battles, and photo contests with verified proof and public leaderboards.'
 
 export default function Seo({ title, description, path, image }) {
   const fullTitle = title
     ? `${title} — GripCafe`
-    : 'GripCafe — Run Verified Tournaments for Your Sim Racing Community'
+    : 'Forza Horizon 6 Clubs, Community Challenges & Leaderboards — GripCafe'
   const desc = description || DEFAULT_DESC
   const url = path ? `${SITE_URL}${path}` : SITE_URL
   const img = image ? `${SITE_URL}${image}` : `${SITE_URL}/og-image.png`

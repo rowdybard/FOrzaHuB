@@ -57,6 +57,7 @@ export default function LandingPage() {
   const { data } = useAsync(
     () => Promise.all([getChallengesWithClubs(), getSiteStats()]),
     [],
+    'landing',
   )
   const allChallenges = data?.[0] || []
   const stats = data?.[1] || { clubs: 0, challenges: 0, submissions: 0, racers: 0, isLaunch: true }
@@ -95,13 +96,16 @@ function Hero({ stats, allChallenges }) {
       <div className="container-page relative py-16 lg:py-24">
         <div className="mx-auto max-w-3xl rounded-3xl border border-white/[0.08] bg-ink-900/60 p-6 text-center backdrop-blur-md sm:p-10 lg:p-12">
           <h1 className="animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
-            <span className="block text-white">GripCafe</span>
+            <span className="block text-white">Forza Horizon 6 Clubs, Community Challenges & Leaderboards</span>
           </h1>
           <p className="mt-4 animate-fade-up text-balance text-xl text-zinc-300 [animation-delay:90ms]">
-            Community-run competitive events for sim racing clubs.
+            Run a Forza Horizon 6 tournament for your Discord community.
           </p>
           <p className="mt-2 animate-fade-up text-balance text-base text-zinc-500 [animation-delay:120ms]">
-            Verified proof, public leaderboards, and championship scoring.
+            Time trials, drift, drag, build battles, and photo contests with verified proof and public leaderboards.
+          </p>
+          <p className="mt-3 animate-fade-up text-balance text-xs text-zinc-600 [animation-delay:135ms]">
+            GripCafe is an unofficial community project and is not affiliated with Microsoft, Xbox, Turn 10, Playground Games, or Forza.
           </p>
 
           {nextEvent && (
@@ -326,8 +330,8 @@ function HowItWorks() {
 function FAQSection() {
   const faqs = [
     {
-      q: 'How do I run a sim racing tournament?',
-      a: 'Create a free GripCafe account, start or join a club, then use the Create Challenge page to set up a tournament. Choose a format like time trial, drift, drag, or photo contest, set the rules and schedule, and share the invite link with your community.',
+      q: 'How do I run a Forza Horizon 6 tournament?',
+      a: 'Create a free GripCafe account, start or join a club, then use the Create Challenge page to set up a tournament. Choose a format like time trial, drift, drag, or photo contest, set the rules and schedule, and share the invite link with your Discord community.',
     },
     {
       q: 'What is a verified gaming competition?',
@@ -338,8 +342,8 @@ function FAQSection() {
       a: 'Players submit their time or score with a screenshot or video. Each submission is reviewed by club staff before it\'s approved. Only verified entries appear on the leaderboard, and every result links back to its proof.',
     },
     {
-      q: 'Can I win community prizes in sim racing?',
-      a: 'Yes. Sponsored events on GripCafe offer community prizes like Steam gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify.',
+      q: 'Can I win community prizes in Forza Horizon 6?',
+      a: 'Yes. Sponsored events on GripCafe offer community prizes like Steam and Xbox gift cards. Join a club, enter sponsored challenges, and climb the championship leaderboard to qualify.',
     },
     {
       q: 'Is GripCafe free to use?',

@@ -45,7 +45,7 @@ export default function OfficialRulesPage() {
     <div>
       <Seo
         title="Official Rules"
-        description="Official rules for GripCafe free-to-enter sim racing challenges. Proof requirements, steward review, and community reward terms."
+        description="Official rules for GripCafe free-to-enter Forza Horizon 6 community challenges. Proof requirements, steward review, and community reward terms."
         path="/official-rules"
       />
       <PageHero

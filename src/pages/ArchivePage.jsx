@@ -40,7 +40,7 @@ function computeRecords(events) {
 }
 
 export default function ArchivePage() {
-  const { data, loading } = useAsync(() => loadArchive(), [])
+  const { data, loading } = useAsync(() => loadArchive(), [], 'archive')
   const events = data || []
   const records = useMemo(() => computeRecords(events), [events])
   const seasons = useMemo(() => Array.from(new Set(events.map((c) => c.season).filter(Boolean))), [events])
@@ -70,7 +70,7 @@ export default function ArchivePage() {
 
   return (
     <div>
-      <Seo title="Tournament Results Archive" description="Browse completed sim racing tournaments with podium finishes, records, and verified results. See past champions and leaderboard standings." path="/archive" />
+      <Seo title="Completed FH6 Tournaments — Results Archive" description="Browse completed Forza Horizon 6 tournaments with podium finishes, records, and verified results. See past champions and leaderboard standings." path="/archive" />
       <PageHero
         eyebrow="Archive"
         title="Results archive"

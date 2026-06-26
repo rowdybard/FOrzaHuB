@@ -10,7 +10,11 @@ pnpm-debug.log*
 node_modules
 dist
 dist-ssr
+dist-server
 *.local
+
+# Cloudflare Pages Functions local dev
+.dev.vars
 
 # Editor / OS
 .vscode/*

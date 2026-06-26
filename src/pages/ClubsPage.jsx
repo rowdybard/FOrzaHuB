@@ -30,7 +30,7 @@ function BringYourClubCard() {
 }
 
 export default function ClubsPage() {
-  const { data, loading } = useAsync(() => getClubs(), [])
+  const { data, loading } = useAsync(() => getClubs(), [], 'clubs')
   const clubs = data || []
   const regions = useMemo(
     () => ['All', ...Array.from(new Set(clubs.map((c) => c.region)))],
@@ -42,7 +42,7 @@ export default function ClubsPage() {
 
   return (
     <div>
-      <Seo title="Sim Racing Clubs" description="Join sim racing clubs running verified tournaments on GripCafe. Find a club, or bring your Discord server and start competing." path="/clubs" />
+      <Seo title="Forza Horizon 6 Community Clubs" description="Join Forza Horizon 6 clubs running verified community tournaments on GripCafe. Find a club, or bring your Discord server and start competing." path="/clubs" />
       <PageHero
         eyebrow="Clubs"
         title="Clubs"

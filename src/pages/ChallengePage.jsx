@@ -48,7 +48,7 @@ async function loadChallenge(slug) {
 
 export default function ChallengePage() {
   const { slug } = useParams()
-  const { data, loading } = useAsync(() => loadChallenge(slug), [slug])
+  const { data, loading } = useAsync(() => loadChallenge(slug), [slug], `challenge:${slug}`)
 
   if (loading) return <Loading label="Loading challenge…" className="min-h-[60vh]" />
   if (!data?.challenge) return <NotFound />
@@ -66,7 +66,7 @@ export default function ChallengePage() {
 
   return (
     <>
-      <Seo title={`${challenge.title} — ${t.label}`} description={`${challenge.title}: ${challenge.description || t.label + ' challenge on GripCafe'}. ${challenge.restriction || ''} ${challenge.location ? 'at ' + challenge.location : ''}.`} path={`/c/${challenge.slug}`} />
+      <Seo title={`${challenge.title} — ${t.label}`} description={`${challenge.title}: ${challenge.description || t.label + ' challenge on GripCafe'}. ${challenge.restriction || ''} ${challenge.location ? 'at ' + challenge.location : ''}. Forza Horizon 6 community event.`} path={`/c/${challenge.slug}`} />
       <ChallengeHeader challenge={challenge} club={club} t={t} />
       <FactStrip challenge={challenge} t={t} />
 

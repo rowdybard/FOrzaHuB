@@ -1,14 +1,27 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSSRData } from './ssr-context'
 
 /**
  * Run an async function on mount (and when `deps` change). Returns
  * `{ data, loading, error, reload }`.
  *
+ * When SSR data is available (via SSRDataContext), it is used immediately
+ * without a client-side fetch. A `ssrKey` can be passed as the third argument
+ * to look up pre-loaded data.
+ *
  * Usage:
- *   const { data: challenges, loading } = useAsync(() => getChallenges(), [])
+ *   const { data: challenges, loading } = useAsync(() => getChallenges(), [], 'challenges')
  */
-export function useAsync(fn, deps = []) {
-  const [state, setState] = useState({ data: null, loading: true, error: null })
+export function useAsync(fn, deps = [], ssrKey) {
+  const ssrData = useSSRData(ssrKey)
+  const ssrConsumed = useRef(false)
+
+  const [state, setState] = useState(() => {
+    if (ssrData !== undefined) {
+      return { data: ssrData, loading: false, error: null }
+    }
+    return { data: null, loading: true, error: null }
+  })
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const run = useCallback(fn, deps)
@@ -31,7 +44,14 @@ export function useAsync(fn, deps = []) {
     }
   }, [run])
 
-  useEffect(load, [load])
+  useEffect(() => {
+    // If we have SSR data, don't fetch on mount — but allow manual reload
+    if (ssrData !== undefined && !ssrConsumed.current) {
+      ssrConsumed.current = true
+      return
+    }
+    load()
+  }, [load, ssrData])
 
   return { ...state, reload: load }
 }

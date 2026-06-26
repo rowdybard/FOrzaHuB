@@ -20,7 +20,7 @@ const STATUSES = [
 ]
 
 export default function ChallengesPage() {
-  const { data: challenges, loading } = useAsync(() => getChallengesWithClubs(), [])
+  const { data: challenges, loading } = useAsync(() => getChallengesWithClubs(), [], 'challenges')
   const [type, setType] = useState('all')
   const [status, setStatus] = useState('all')
   const [q, setQ] = useState('')
@@ -50,7 +50,7 @@ export default function ChallengesPage() {
 
   return (
     <div>
-      <Seo title="Sim Racing Tournaments & Challenges" description="Browse live and upcoming sim racing tournaments. Time trials, drift battles, drag races, photo contests, and build battles with verified proof and community prizes." path="/challenges" />
+      <Seo title="Forza Horizon 6 Community Challenges & Tournaments" description="Browse live and upcoming Forza Horizon 6 community challenges. Time trials, drift battles, drag races, photo contests, and build battles with verified proof and community prizes." path="/challenges" />
       <PageHero
         eyebrow="Challenges"
         title="Club events"

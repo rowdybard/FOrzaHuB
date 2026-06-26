@@ -75,7 +75,7 @@ function clubStandings(cs) {
 export default function CommunityPage() {
   const { slug } = useParams()
   const { enabled, user, profile, signIn } = useAuth()
-  const { data, loading, reload } = useAsync(() => loadCommunity(slug), [slug])
+  const { data, loading, reload } = useAsync(() => loadCommunity(slug), [slug], `club:${slug}`)
 
   if (loading) return <Loading label="Loading club…" className="min-h-[60vh]" />
   if (!data?.club) return <NotFound />
