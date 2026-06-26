@@ -1,2 +1,18 @@
-# Cloudflare Pages SPA fallback — every route serves the app shell.
+# Static assets — serve directly, 404 if missing (don't fall through to SPA)
+/assets/*  /assets/:splat  200
+/*.png     /:splat.png     200
+/*.jpg     /:splat.jpg     200
+/*.webp    /:splat.webp    200
+/*.svg     /:splat.svg     200
+/*.ico     /:splat.ico     200
+/*.css     /:splat.css     200
+/*.js      /:splat.js      200
+/*.json    /:splat.json    200
+/*.xml     /:splat.xml     200
+/*.txt     /:splat.txt     200
+/*.webmanifest  /:splat.webmanifest  200
+/*.woff    /:splat.woff    200
+/*.woff2   /:splat.woff2   200
+
+# Cloudflare Pages SPA fallback — every other route serves the app shell.
 /*    /index.html   200

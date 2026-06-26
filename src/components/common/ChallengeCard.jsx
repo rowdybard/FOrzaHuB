@@ -1,10 +1,40 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Users, Clock, Trophy, Hourglass, MapPin } from 'lucide-react'
 import { StatusBadge } from '../ui/Badge'
 import ClubMark from '../ui/ClubMark'
 import Countdown from './Countdown'
 import { getType } from '../../lib/challengeTypes'
-import { formatNumber } from '../../lib/utils'
+import { formatNumber, getCountdown } from '../../lib/utils'
+
+function LiveCountdown({ endDate }) {
+  const [c, setC] = useState(() => getCountdown(endDate))
+  useEffect(() => {
+    setC(getCountdown(endDate))
+    const id = setInterval(() => setC(getCountdown(endDate)), 1000)
+    return () => clearInterval(id)
+  }, [endDate])
+  if (c.ended) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs text-amber-300/80">
+        <Hourglass className="h-3 w-3" />
+        Closing
+      </span>
+    )
+  }
+  const parts =
+    c.days > 0
+      ? `${c.days}d ${c.hours}h ${String(c.minutes).padStart(2, '0')}m`
+      : c.hours > 0
+        ? `${c.hours}h ${String(c.minutes).padStart(2, '0')}m ${String(c.seconds).padStart(2, '0')}s`
+        : `${c.minutes}m ${String(c.seconds).padStart(2, '0')}s`
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+      <Clock className="h-3 w-3 text-emerald-400" />
+      <span className="font-num tabular-nums">{parts}</span> left
+    </span>
+  )
+}
 
 function Deadline({ challenge }) {
   const now = Date.now()
@@ -13,12 +43,7 @@ function Deadline({ challenge }) {
   const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
 
   if (effectiveStatus === 'live') {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
-        <Clock className="h-3 w-3 text-emerald-400" />
-        <Countdown to={challenge.endDate} /> left
-      </span>
-    )
+    return <LiveCountdown endDate={challenge.endDate} />
   }
   if (effectiveStatus === 'upcoming') {
     return (

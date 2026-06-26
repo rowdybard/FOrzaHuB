@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -7,6 +8,7 @@ import {
   Clock,
   Upload,
   Rocket,
+  Hourglass,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import { StatusBadge } from '../components/ui/Badge'
@@ -19,8 +21,37 @@ import {
 } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { getType } from '../lib/challengeTypes'
-import { formatNumber, hexToRgba } from '../lib/utils'
+import { formatNumber, hexToRgba, getCountdown } from '../lib/utils'
 import Seo from '../components/Seo'
+
+function LiveCountdown({ endDate }) {
+  const [c, setC] = useState(() => getCountdown(endDate))
+  useEffect(() => {
+    setC(getCountdown(endDate))
+    const id = setInterval(() => setC(getCountdown(endDate)), 1000)
+    return () => clearInterval(id)
+  }, [endDate])
+  if (c.ended) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-amber-300/80">
+        <Hourglass className="h-3.5 w-3.5" />
+        Closing
+      </span>
+    )
+  }
+  const parts =
+    c.days > 0
+      ? `${c.days}d ${c.hours}h ${String(c.minutes).padStart(2, '0')}m`
+      : c.hours > 0
+        ? `${c.hours}h ${String(c.minutes).padStart(2, '0')}m ${String(c.seconds).padStart(2, '0')}s`
+        : `${c.minutes}m ${String(c.seconds).padStart(2, '0')}s`
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+      <Clock className="h-3.5 w-3.5 text-brand-400" />
+      <span className="font-num tabular-nums">{parts}</span> left
+    </span>
+  )
+}
 
 export default function LandingPage() {
   const { data } = useAsync(
@@ -239,10 +270,7 @@ function ChallengeCardLite({ challenge }) {
           {formatNumber(challenge.participants)} racers
         </span>
         {effectiveStatus === 'live' ? (
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-brand-400" />
-            <Countdown to={challenge.endDate} /> left
-          </span>
+          <LiveCountdown endDate={challenge.endDate} />
         ) : effectiveStatus === 'upcoming' ? (
           <span className="inline-flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5 text-sky-400" />
