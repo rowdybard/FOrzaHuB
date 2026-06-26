@@ -58,11 +58,10 @@ available. A legacy anon public key also works. Do not use or share a
    - `supabase/migrations/0022_sponsored_staff_only.sql`
    - `supabase/migrations/0023_beta_season_01_data.sql`
    - `supabase/migrations/0024_beta_season_02_standings.sql`
-3. Optionally run `supabase/seed.sql` for starter clubs and one challenge.
-4. Enable Authentication -> Providers -> Discord.
-5. Add the Supabase callback URL to the Discord app:
+3. Enable Authentication -> Providers -> Discord.
+4. Add the Supabase callback URL to the Discord app:
    - `https://<project-ref>.supabase.co/auth/v1/callback`
-6. In Supabase Authentication -> URL Configuration, set:
+5. In Supabase Authentication -> URL Configuration, set:
    - Site URL: `https://gripcafe.com`
    - Redirect URLs: `https://gripcafe.com`, `https://*.pages.dev` (preview), and `http://localhost:5173`
 

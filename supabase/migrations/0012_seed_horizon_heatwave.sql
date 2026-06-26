@@ -5,7 +5,7 @@
 
 -- Create a GripCafe club if none exists yet.
 insert into public.clubs (slug, name, tag, region, members, verified, accent, tagline, about, discord)
-select 'gripcafe', 'GripCafe', 'GC', 'Global', 0, true, '#ff6b2c',
+select 'gripcafe', 'GripCafe', 'GC', 'Global', 0, true, '#06b6d4',
         'Community-run event platform',
         'GripCafe is a community hub for Forza Horizon competitive events — time trials, drift scores, drag races, photo contests, and build battles.',
         'https://discord.gg/GJw3XRuCXr'
