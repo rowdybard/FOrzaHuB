@@ -15,6 +15,7 @@ import {
   ChevronDown,
   CheckCircle2,
   UserCog,
+  Trash2,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Avatar from '../components/ui/Avatar'
@@ -23,7 +24,7 @@ import StatTile from '../components/ui/StatTile'
 import { TypeBadge } from '../components/ui/Badge'
 import EmptyState from '../components/common/EmptyState'
 import Loading from '../components/common/Loading'
-import { getProfiles, getReviewQueue, reviewSubmission, updateProfileRole } from '../data/api'
+import { getProfiles, getReviewQueue, reviewSubmission, updateProfileRole, getChallengesWithClubs, deleteChallenge } from '../data/api'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
 import { getType, formatMetric } from '../lib/challengeTypes'
@@ -223,6 +224,7 @@ export default function AdminDashboard() {
       </div>
 
       {isAdmin && <AccessPanel currentUserId={user?.id} />}
+      {isStaff && <EventManagementPanel />}
 
       {/* Filters */}
       <div className="no-scrollbar mt-8 flex gap-1.5 overflow-x-auto card-readable rounded-xl p-1">
@@ -352,6 +354,96 @@ function AccessPanel({ currentUserId }) {
                 <option value="steward" className="bg-ink-900">Steward</option>
                 <option value="admin" className="bg-ink-900">Admin</option>
               </select>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function EventManagementPanel() {
+  const { data, loading, error, reload } = useAsync(() => getChallengesWithClubs(), [])
+  const [busyId, setBusyId] = useState(null)
+  const [message, setMessage] = useState('')
+  const challenges = data || []
+
+  const remove = async (challenge) => {
+    const label = challenge.title || 'this event'
+    if (!window.confirm(`Delete "${label}"? This will also remove all submissions for it. This cannot be undone.`)) return
+    setBusyId(challenge.id)
+    setMessage('')
+    try {
+      await deleteChallenge(challenge.id)
+      setMessage(`Deleted "${label}".`)
+      reload()
+    } catch (err) {
+      console.error('[admin] deleteChallenge failed', err)
+      setMessage(err?.message || 'Could not delete this event.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <section className="mt-6 card-readable rounded-2xl p-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand-400">
+            <Trash2 className="h-3.5 w-3.5" />
+            Event Management
+          </div>
+          <h2 className="mt-1 text-lg font-bold text-white">All events across all clubs</h2>
+        </div>
+        {message && <p className="text-sm text-zinc-400">{message}</p>}
+      </div>
+
+      {loading ? (
+        <div className="mt-4 text-sm text-zinc-500">Loading events...</div>
+      ) : error ? (
+        <div className="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/[0.06] px-3 py-2 text-sm text-rose-200">
+          Could not load events.
+        </div>
+      ) : challenges.length === 0 ? (
+        <div className="mt-4 text-sm text-zinc-500">No events exist yet.</div>
+      ) : (
+        <div className="mt-4 card-readable divide-y divide-white/[0.06] overflow-hidden rounded-xl">
+          {challenges.map((c) => (
+            <div key={c.id} className="flex items-center gap-3 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium text-white">{c.title}</div>
+                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                  <span className="capitalize">{c.status}</span>
+                  <span className="text-zinc-600">·</span>
+                  <span className="truncate">{c.club?.name || 'No club'}</span>
+                  {c.season && (
+                    <>
+                      <span className="text-zinc-600">·</span>
+                      <span>{c.season}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <Link
+                to={`/c/${c.slug}`}
+                className="shrink-0 text-xs font-medium text-zinc-400 hover:text-white"
+              >
+                View
+              </Link>
+              <button
+                type="button"
+                title="Delete event"
+                aria-label="Delete event"
+                onClick={() => remove(c)}
+                disabled={busyId === c.id}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-rose-500/15 bg-rose-500/[0.05] text-rose-300/80 transition-colors hover:bg-rose-500/15 disabled:opacity-50"
+              >
+                {busyId === c.id ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </button>
             </div>
           ))}
         </div>
