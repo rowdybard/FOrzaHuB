@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import LandingPage from './pages/LandingPage'
+import BetaSeriesPage from './pages/BetaSeriesPage'
 import ChallengesPage from './pages/ChallengesPage'
 import ChallengePage from './pages/ChallengePage'
 import ClubsPage from './pages/ClubsPage'
@@ -19,6 +20,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/beta-series" element={<BetaSeriesPage />} />
         <Route path="/challenges" element={<ChallengesPage />} />
         <Route path="/archive" element={<ArchivePage />} />
         <Route path="/c/:slug" element={<ChallengePage />} />
