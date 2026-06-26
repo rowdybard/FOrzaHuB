@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build:ssr": "vite build --config vite.config.ssr.js",
-    "build": "npm run build:ssr && vite build",
+    "build": "npm run build:ssr && vite build && node scripts/extract-assets.js",
     "preview": "vite preview"
   },
   "dependencies": {
