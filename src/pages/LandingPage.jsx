@@ -92,7 +92,7 @@ function EventHero({ event, stats }) {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ink-950/40 to-ink-950" />
 
       <div className="container-page relative py-16 lg:py-24">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-3xl rounded-3xl border border-white/[0.08] bg-ink-900/60 p-6 text-center backdrop-blur-md sm:p-10 lg:p-12">
           <h1 className="animate-fade-up text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl [animation-delay:60ms]">
             <span className="block text-white">GripCafe</span>
             <span className="block text-brand-300 text-2xl font-bold sm:text-3xl lg:text-4xl">Beta Race Series</span>
