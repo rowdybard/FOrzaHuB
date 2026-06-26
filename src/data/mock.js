@@ -119,7 +119,7 @@ export const sponsoredEvent = {
   prizeValue: 50,
   status: 'upcoming',
   season: 'beta-1',
-  accent: '#ff6b2c',
+  accent: '#06b6d4',
 }
 
 export const eventSchedule = [
@@ -139,7 +139,7 @@ export const sponsors = [
 ]
 
 export const eventLeaderboard = [
-  { rank: 1, tag: 'Rowdybard',  club: 'GC', points: 0, events: 0, accent: '#ff6b2c' },
+  { rank: 1, tag: 'Rowdybard',  club: 'GC', points: 0, events: 0, accent: '#06b6d4' },
   { rank: 2, tag: 'PurpleCone', club: 'GC', points: 0, events: 0, accent: '#a855f7' },
 ]
 

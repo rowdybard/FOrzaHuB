@@ -76,7 +76,7 @@ function normClub(row) {
     region: row.region,
     members: row.members ?? 0,
     verified: !!row.verified,
-    accent: row.accent || '#ff6b2c',
+    accent: row.accent || '#06b6d4',
     tagline: row.tagline || '',
     about: row.about || '',
     discord: cleanExternalUrl(row.discord),

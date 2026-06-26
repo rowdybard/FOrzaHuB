@@ -16,7 +16,7 @@ import {
 // Curated accent palette - a hand-picked set keeps nameplates tasteful.
 // (No free hex picker on purpose.)
 export const ACCENTS = [
-  '#ff6b2c', // brand orange
+  '#06b6d4', // brand cyan
   '#ef4444', // red
   '#f43f5e', // rose
   '#ec4899', // magenta
@@ -56,10 +56,10 @@ export const PLATE_FRAMES = [
 // Badge registry. `auto` badges are derived from role/membership and can't be
 // toggled by the user; the rest are selectable cosmetics.
 export const BADGES = {
-  member: { label: 'Club Member', icon: Flag, color: '#ff6b2c', auto: true },
+  member: { label: 'Club Member', icon: Flag, color: '#06b6d4', auto: true },
   owner: { label: 'Owner', icon: Crown, color: '#fbbf24', auto: true },
   steward: { label: 'Steward', icon: ShieldCheck, color: '#38bdf8', auto: true },
-  verified: { label: 'Verified', icon: BadgeCheck, color: '#ff6b2c', auto: true, exclusive: true },
+  verified: { label: 'Verified', icon: BadgeCheck, color: '#06b6d4', auto: true, exclusive: true },
   founder: { label: 'Founder', icon: Rocket, color: '#f472b6', exclusive: true },
   veteran: { label: 'Veteran', icon: Star, color: '#a855f7', exclusive: true },
   champion: { label: 'Champion', icon: Trophy, color: '#fbbf24', exclusive: true },
