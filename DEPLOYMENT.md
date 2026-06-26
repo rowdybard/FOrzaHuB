@@ -20,6 +20,10 @@ local mock data in `src/data/mock.js`.
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_MAX_PROOF_UPLOAD_MB` (optional, defaults to `10`)
 
+Proof uploads are image-only (PNG, JPG/JPEG, WEBP). Video proof is link-only.
+The V1 proofs Storage bucket is public — uploaded files may be viewable by
+anyone with the file URL.
+
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
 available. A legacy anon public key also works. Do not use or share a
 `service_role` key or `sb_secret_...` key in this app.

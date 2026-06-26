@@ -108,7 +108,7 @@ function EventHero({ event, stats }) {
             </p>
           )}
 
-          <div className="mt-6 flex animate-fade-up items-center justify-center gap-3 text-sm text-zinc-400 [animation-delay:180ms]">
+          <div className="mt-6 flex animate-fade-up flex-wrap items-center justify-center gap-2 text-sm text-zinc-400 sm:gap-3 [animation-delay:180ms]">
             <Calendar className="h-4 w-4 text-brand-400" />
             <span className="font-medium text-white">
               {formatDate(event.startDate, { month: 'short', day: 'numeric' })}
@@ -155,7 +155,7 @@ function EventHero({ event, stats }) {
             </a>
           </div>
 
-          <div className="mt-10 flex animate-fade-up flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-zinc-400 [animation-delay:360ms]">
+          <div className="mt-10 flex animate-fade-up flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-zinc-400 sm:gap-x-6 [animation-delay:360ms]">
             <span className="inline-flex items-center gap-2">
               <Trophy className="h-4 w-4 text-sky-400" />
               <span className="font-semibold text-white">$50</span> Series Champion Reward

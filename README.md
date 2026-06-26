@@ -37,6 +37,10 @@ VITE_SUPABASE_ANON_KEY=...
 VITE_MAX_PROOF_UPLOAD_MB=10
 ```
 
+Proof uploads are image-only (PNG, JPG/JPEG, WEBP). Video proof is link-only.
+The V1 proofs Storage bucket is public — uploaded files may be viewable by
+anyone with the file URL.
+
 Use Supabase's browser-safe publishable key (`sb_publishable_...`) when
 available. A legacy anon public key also works. Never put a `service_role` or
 `sb_secret_...` key in this frontend.

@@ -12,7 +12,7 @@ const U = {
     country: '🏁',
     platform: 'PC',
     role: 'admin',
-    accent: '#ff6b2c',
+    accent: '#06b6d4',
     nameGradient: true,
     nameEffect: 'glow',
     plateFrame: 'carbon',
@@ -56,7 +56,7 @@ export const clubs = [
     region: 'Global',
     members: 2,
     verified: true,
-    accent: '#ff6b2c',
+    accent: '#06b6d4',
     tagline: 'The home base. More clubs coming.',
     about:
       'The founding club for GripCafe. Rowdybard and PurpleCone are here. Challenges, leaderboards and verified proof.',

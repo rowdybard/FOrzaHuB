@@ -164,9 +164,9 @@ function TypeChip({ active, onClick, label, icon: Icon, accent }) {
       style={
         active
           ? {
-              color: accent || '#ff6b2c',
-              backgroundColor: hexToRgba(accent || '#ff6b2c', 0.12),
-              borderColor: hexToRgba(accent || '#ff6b2c', 0.3),
+              color: accent || '#06b6d4',
+              backgroundColor: hexToRgba(accent || '#06b6d4', 0.12),
+              borderColor: hexToRgba(accent || '#06b6d4', 0.3),
             }
           : undefined
       }
