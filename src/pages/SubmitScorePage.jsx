@@ -550,7 +550,7 @@ export default function SubmitScorePage() {
 function Centered({ title, body, action }) {
   return (
     <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
-      <div className="max-w-md">
+      <div className="max-w-md rounded-3xl border border-white/[0.08] bg-ink-900/60 p-8 backdrop-blur-md sm:p-10">
         <h1 className="text-2xl font-extrabold">{title}</h1>
         {body && <p className="mt-2 text-zinc-400">{body}</p>}
         {action && <div className="mt-6 flex justify-center">{action}</div>}

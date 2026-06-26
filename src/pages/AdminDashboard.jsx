@@ -120,7 +120,7 @@ export default function AdminDashboard() {
   if (enabled && !user) {
     return (
       <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
-        <div className="max-w-md">
+        <div className="max-w-md rounded-3xl border border-white/[0.08] bg-ink-900/60 p-8 backdrop-blur-md sm:p-10">
           <ShieldCheck className="mx-auto h-8 w-8 text-brand-400" />
           <h1 className="mt-4 text-2xl font-extrabold">Staff sign in required</h1>
           <p className="mt-2 text-zinc-400">Sign in with Discord to access the review queue.</p>
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
   if (enabled && user && !isStaff) {
     return (
       <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
-        <div className="max-w-md">
+        <div className="max-w-md rounded-3xl border border-white/[0.08] bg-ink-900/60 p-8 backdrop-blur-md sm:p-10">
           <ShieldCheck className="mx-auto h-8 w-8 text-zinc-500" />
           <h1 className="mt-4 text-2xl font-extrabold">Staff access only</h1>
           <p className="mt-2 text-zinc-400">Your account is signed in, but it is not a steward or admin.</p>
