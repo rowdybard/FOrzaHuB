@@ -1,0 +1,16 @@
+{
+  "name": "GripCafe",
+  "short_name": "GripCafe",
+  "description": "Community-run competitive events for sim racing clubs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0b0d",
+  "theme_color": "#0a0b0d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

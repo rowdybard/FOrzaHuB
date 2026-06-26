@@ -56,7 +56,11 @@ export default function ChallengePage() {
   const challenge = data.challenge
   const club = challenge.club
   const t = getType(challenge.typeId)
-  const isLive = challenge.status === 'live'
+  const _now = Date.now()
+  const _ended = new Date(challenge.endDate).getTime() <= _now
+  const _started = new Date(challenge.startDate).getTime() <= _now
+  const effectiveStatus = _ended ? 'closed' : !_started ? 'upcoming' : challenge.status
+  const isLive = effectiveStatus === 'live'
   const more = data.more || []
   const seriesStandings = data.seriesStandings || []
 
@@ -108,6 +112,10 @@ export default function ChallengePage() {
 /* --------------------------------- Header --------------------------------- */
 
 function ChallengeHeader({ challenge, club, t }) {
+  const now = Date.now()
+  const ended = new Date(challenge.endDate).getTime() <= now
+  const started = new Date(challenge.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
   return (
     <section className="relative">
       <Cover typeId={challenge.typeId} className="min-h-[320px] sm:min-h-[380px]" iconSize="h-80 w-80">
@@ -120,7 +128,7 @@ function ChallengeHeader({ challenge, club, t }) {
 
           <div className="flex flex-wrap items-center gap-2">
             <TypeBadge typeId={challenge.typeId} />
-            <StatusBadge status={challenge.status} />
+            <StatusBadge status={effectiveStatus} />
           </div>
 
           <h1 className="mt-4 max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
@@ -192,6 +200,10 @@ function FactStrip({ challenge, t }) {
 /* -------------------------------- Standings ------------------------------- */
 
 function Standings({ challenge, t }) {
+  const now = Date.now()
+  const ended = new Date(challenge.endDate).getTime() <= now
+  const started = new Date(challenge.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
   const count = t.gallery ? challenge.gallery?.length || 0 : challenge.entries?.length || 0
   const hasEntries = count > 0
 
@@ -213,9 +225,9 @@ function Standings({ challenge, t }) {
       {!hasEntries ? (
         <EmptyState
           icon={t.gallery ? Vote : Flag}
-          title={challenge.status === 'upcoming' ? 'Event hasn\'t started yet' : 'No entries yet'}
+          title={effectiveStatus === 'upcoming' ? 'Event hasn\'t started yet' : 'No entries yet'}
           description={
-            challenge.status === 'upcoming'
+            effectiveStatus === 'upcoming'
               ? 'Submissions open when the challenge goes live. Get your car dialed in.'
               : 'Be the first to put a result on the board.'
           }
@@ -267,10 +279,14 @@ function Rules({ challenge, t }) {
 /* ------------------------------ Event details ----------------------------- */
 
 function EventDetails({ challenge, club, t, isLive }) {
+  const now = Date.now()
+  const ended = new Date(challenge.endDate).getTime() <= now
+  const started = new Date(challenge.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
   return (
     <div className="card overflow-hidden">
       <div className="border-b border-white/[0.06] p-5">
-        {challenge.status === 'live' && (
+        {effectiveStatus === 'live' && (
           <>
             <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Closes in
@@ -278,7 +294,7 @@ function EventDetails({ challenge, club, t, isLive }) {
             <Countdown to={challenge.endDate} variant="blocks" />
           </>
         )}
-        {challenge.status === 'upcoming' && (
+        {effectiveStatus === 'upcoming' && (
           <>
             <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Opens in
@@ -286,7 +302,7 @@ function EventDetails({ challenge, club, t, isLive }) {
             <Countdown to={challenge.startDate} variant="blocks" />
           </>
         )}
-        {challenge.status === 'reviewing' && (
+        {effectiveStatus === 'reviewing' && (
           <div className="flex items-center gap-3 text-amber-300">
             <Hourglass className="h-5 w-5" />
             <div>
@@ -295,7 +311,7 @@ function EventDetails({ challenge, club, t, isLive }) {
             </div>
           </div>
         )}
-        {challenge.status === 'closed' && (
+        {effectiveStatus === 'closed' && (
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl border border-amber-500/25 bg-amber-500/[0.1] text-amber-400">
               <Trophy className="h-5 w-5" />
@@ -314,7 +330,7 @@ function EventDetails({ challenge, club, t, isLive }) {
             <Upload className="h-4 w-4" />
             {t.gallery ? 'Submit your entry' : 'Submit your score'}
           </Button>
-        ) : challenge.status === 'upcoming' ? (
+        ) : effectiveStatus === 'upcoming' ? (
           <Button size="lg" variant="secondary" className="w-full" disabled>
             Submissions open soon
           </Button>

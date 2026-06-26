@@ -83,10 +83,14 @@ export default function BetaSeriesPage() {
 /* ------------------------------- Event Hero ------------------------------- */
 
 function EventHero({ event, stats }) {
-  const statusLabel = event.status === 'live' ? 'Live Now' : event.status === 'upcoming' ? 'Upcoming' : event.status === 'closed' ? 'Completed' : 'Reviewing'
-  const statusCls = event.status === 'live'
+  const now = Date.now()
+  const ended = new Date(event.endDate).getTime() <= now
+  const started = new Date(event.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : event.status
+  const statusLabel = effectiveStatus === 'live' ? 'Live Now' : effectiveStatus === 'upcoming' ? 'Upcoming' : effectiveStatus === 'closed' ? 'Completed' : 'Reviewing'
+  const statusCls = effectiveStatus === 'live'
     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-    : event.status === 'upcoming'
+    : effectiveStatus === 'upcoming'
     ? 'border-sky-500/30 bg-sky-500/10 text-sky-300'
     : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
   return (
@@ -121,7 +125,7 @@ function EventHero({ event, stats }) {
               {formatDate(event.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
             <span className={`ml-2 inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-xs font-semibold uppercase tracking-wide ${statusCls}`}>
-              {event.status === 'live' && (
+              {effectiveStatus === 'live' && (
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -131,7 +135,7 @@ function EventHero({ event, stats }) {
             </span>
           </div>
 
-          {event.status === 'upcoming' && (
+          {effectiveStatus === 'upcoming' && (
             <div className="mt-8 animate-fade-up [animation-delay:240ms]">
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
                 Event starts in
@@ -303,6 +307,10 @@ function ScheduleSection({ schedule, event }) {
         {schedule.map((c, i) => {
           const t = getType(c.typeId)
           const Icon = t.icon
+          const now = Date.now()
+          const ended = new Date(c.endDate).getTime() <= now
+          const started = new Date(c.startDate).getTime() <= now
+          const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : c.status
           return (
             <Link
               key={c.id}
@@ -344,7 +352,7 @@ function ScheduleSection({ schedule, event }) {
 
               <div className="mt-4 flex items-center justify-between">
                 <TypeBadge typeId={c.typeId} size="sm" />
-                <StatusBadge status={c.status} />
+                <StatusBadge status={effectiveStatus} />
               </div>
             </Link>
           )

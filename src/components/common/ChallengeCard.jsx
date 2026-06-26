@@ -7,7 +7,12 @@ import { getType } from '../../lib/challengeTypes'
 import { formatNumber } from '../../lib/utils'
 
 function Deadline({ challenge }) {
-  if (challenge.status === 'live') {
+  const now = Date.now()
+  const ended = new Date(challenge.endDate).getTime() <= now
+  const started = new Date(challenge.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
+
+  if (effectiveStatus === 'live') {
     return (
       <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
         <Clock className="h-3 w-3 text-emerald-400" />
@@ -15,7 +20,7 @@ function Deadline({ challenge }) {
       </span>
     )
   }
-  if (challenge.status === 'upcoming') {
+  if (effectiveStatus === 'upcoming') {
     return (
       <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
         <Clock className="h-3 w-3 text-sky-400" />
@@ -23,7 +28,7 @@ function Deadline({ challenge }) {
       </span>
     )
   }
-  if (challenge.status === 'reviewing') {
+  if (effectiveStatus === 'reviewing') {
     return (
       <span className="inline-flex items-center gap-1 text-xs text-amber-300/80">
         <Hourglass className="h-3 w-3" />
@@ -45,6 +50,11 @@ export default function ChallengeCard({ challenge, club: clubProp }) {
   const t = getType(challenge.typeId)
   const top = t.gallery ? challenge.gallery?.[0] : challenge.entries?.[0]
 
+  const now = Date.now()
+  const ended = new Date(challenge.endDate).getTime() <= now
+  const started = new Date(challenge.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
+
   return (
     <Link
       to={to}
@@ -55,7 +65,7 @@ export default function ChallengeCard({ challenge, club: clubProp }) {
         <span className="text-xs font-medium text-zinc-500">
           {t.label}
         </span>
-        <StatusBadge status={challenge.status} size="sm" />
+        <StatusBadge status={effectiveStatus} size="sm" />
       </div>
 
       {/* Title */}

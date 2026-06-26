@@ -107,7 +107,11 @@ function Hero({ stats, allChallenges }) {
 /* ----------------------------- Beta Promo Card ----------------------------- */
 
 function BetaPromo({ event, stats }) {
-  const statusLabel = event.status === 'live' ? 'Live Now' : event.status === 'upcoming' ? 'Upcoming' : event.status === 'closed' ? 'Completed' : 'Reviewing'
+  const now = Date.now()
+  const ended = new Date(event.endDate).getTime() <= now
+  const started = new Date(event.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : event.status
+  const statusLabel = effectiveStatus === 'live' ? 'Live Now' : effectiveStatus === 'upcoming' ? 'Upcoming' : effectiveStatus === 'closed' ? 'Completed' : 'Reviewing'
   return (
     <section className="container-page mt-16">
       <Link
@@ -129,11 +133,11 @@ function BetaPromo({ event, stats }) {
             <p className="mt-2 text-sm text-zinc-400">
               {event.title && <>Next event: <span className="font-semibold text-zinc-300">{event.title}</span></>}
               {event.title && ' · '}
-              <span className={`inline-flex items-center gap-1.5 font-medium ${event.status === 'live' ? 'text-emerald-300' : 'text-sky-300'}`}>
+              <span className={`inline-flex items-center gap-1.5 font-medium ${effectiveStatus === 'live' ? 'text-emerald-300' : 'text-sky-300'}`}>
                 {statusLabel}
               </span>
             </p>
-            {event.status === 'upcoming' && (
+            {effectiveStatus === 'upcoming' && (
               <p className="mt-1 text-sm text-zinc-500">
                 Starts {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </p>
@@ -141,7 +145,7 @@ function BetaPromo({ event, stats }) {
           </div>
 
           <div className="flex shrink-0 flex-col items-center gap-3">
-            {event.status === 'upcoming' && (
+            {effectiveStatus === 'upcoming' && (
               <Countdown to={event.startDate} variant="blocks" />
             )}
             <span className="inline-flex items-center gap-2 rounded-xl border border-sky-500/25 bg-sky-500/[0.1] px-4 py-2 text-sm font-semibold text-sky-300 transition-colors group-hover:bg-sky-500/20">
@@ -210,6 +214,10 @@ function LiveChallenges({ challenges }) {
 function ChallengeCardLite({ challenge }) {
   const t = getType(challenge.typeId)
   const Icon = t.icon
+  const now = Date.now()
+  const ended = new Date(challenge.endDate).getTime() <= now
+  const started = new Date(challenge.startDate).getTime() <= now
+  const effectiveStatus = ended ? 'closed' : !started ? 'upcoming' : challenge.status
   return (
     <Link
       to={`/c/${challenge.slug}`}
@@ -222,7 +230,7 @@ function ChallengeCardLite({ challenge }) {
         >
           <Icon className="h-5 w-5" />
         </span>
-        <StatusBadge status={challenge.status} />
+        <StatusBadge status={effectiveStatus} />
       </div>
       <h3 className="mt-4 font-semibold text-white group-hover:text-brand-300">{challenge.title}</h3>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
@@ -230,10 +238,22 @@ function ChallengeCardLite({ challenge }) {
           <Users className="h-3.5 w-3.5" />
           {formatNumber(challenge.participants)} racers
         </span>
-        <span className="inline-flex items-center gap-1.5">
-          <Clock className="h-3.5 w-3.5 text-brand-400" />
-          <Countdown to={challenge.endDate} /> left
-        </span>
+        {effectiveStatus === 'live' ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 text-brand-400" />
+            <Countdown to={challenge.endDate} /> left
+          </span>
+        ) : effectiveStatus === 'upcoming' ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 text-sky-400" />
+            in <Countdown to={challenge.startDate} />
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-zinc-500">
+            <Trophy className="h-3.5 w-3.5" />
+            Final
+          </span>
+        )}
       </div>
     </Link>
   )

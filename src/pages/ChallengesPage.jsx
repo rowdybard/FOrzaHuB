@@ -67,6 +67,7 @@ export default function ChallengesPage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search challenges, tracks or car classes…"
+                aria-label="Search challenges"
                 className="w-full rounded-xl border border-white/[0.08] bg-ink-900/60 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-zinc-500 focus:border-brand-500/50 focus:outline-none"
               />
             </div>
