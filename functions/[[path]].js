@@ -25,7 +25,7 @@ import {
   isNoindexRoute,
   SITE_URL,
 } from '../dist-server/entry-server.js'
-import ssrAssets from '../dist-server/ssr-assets.json' with { type: 'json' }
+import ssrAssets from '../dist-server/ssr-assets.js'
 
 // Routes that should be server-rendered with pre-fetched data
 const SSR_ROUTES = new Set(['/', '/beta-series', '/challenges', '/archive', '/clubs', '/official-rules'])
