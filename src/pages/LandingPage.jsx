@@ -317,7 +317,7 @@ function BetaSeasonInfo({ event }) {
           </div>
 
           <div className="relative shrink-0 justify-self-center lg:justify-self-end">
-            <div className="glow-pulse grid min-h-[10rem] min-w-[10rem] place-items-center rounded-3xl border border-sky-500/30 bg-gradient-to-br from-sky-500/15 to-sky-600/5 p-6 sm:min-h-[11rem] sm:min-w-[11rem]">
+            <div className="glow-pulse grid min-h-[9rem] min-w-[9rem] place-items-center rounded-3xl border border-sky-500/30 bg-gradient-to-br from-sky-500/15 to-sky-600/5 p-5 sm:min-h-[11rem] sm:min-w-[11rem] sm:p-6">
               <div className="text-center">
                 <Gift className="mx-auto h-10 w-10 text-sky-400 sm:h-12 sm:w-12" />
                 <div className="mt-2 text-2xl font-extrabold leading-tight text-white sm:mt-3 sm:text-3xl">$50</div>
@@ -426,7 +426,7 @@ function LeaderboardPreview() {
       />
 
       <div className="mt-8 card-readable overflow-hidden rounded-2xl">
-        <div className="grid grid-cols-[auto_1fr_auto_auto] gap-2 border-b border-white/[0.06] px-3 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:gap-4 sm:px-5">
+        <div className="grid grid-cols-[auto_1fr_auto] gap-2 border-b border-white/[0.06] px-3 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:grid-cols-[auto_1fr_auto_auto] sm:gap-4 sm:px-5">
           <span className="w-8 text-center">#</span>
           <span>Racer</span>
           <span className="hidden text-right sm:inline">Events</span>
@@ -516,7 +516,7 @@ function ChallengeCardLite({ challenge }) {
         <StatusBadge status={challenge.status} />
       </div>
       <h3 className="mt-4 font-semibold text-white group-hover:text-brand-300">{challenge.title}</h3>
-      <div className="mt-3 flex items-center justify-between text-xs text-zinc-400">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
         <span className="inline-flex items-center gap-1.5">
           <Users className="h-3.5 w-3.5" />
           {formatNumber(challenge.participants)} racers

@@ -90,7 +90,7 @@ export default function ChallengeCard({ challenge, club: clubProp }) {
       )}
 
       {/* Footer: racers + leader + deadline */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/[0.05] pt-3">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.05] pt-3">
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
             <Users className="h-3 w-3" />

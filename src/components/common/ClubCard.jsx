@@ -18,7 +18,7 @@ export default function ClubCard({ club }) {
             </h3>
             {club.verified && <ShieldCheck className="h-4 w-4 shrink-0 text-brand-400" />}
           </div>
-          <div className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
+          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
             <span className="chip">[{club.tag}]</span>
             <span>{club.region}</span>
           </div>
