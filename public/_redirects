@@ -12,6 +12,3 @@
 /*.webmanifest  /:splat.webmanifest  200
 /*.woff    /:splat.woff    200
 /*.woff2   /:splat.woff2   200
-
-# SPA fallback — only used when Pages Function is not invoked
-/*    /index.html   200

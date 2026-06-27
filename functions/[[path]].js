@@ -68,6 +68,21 @@ async function handleRequest({ request, env, next }, isHead) {
   const url = new URL(request.url)
   const pathname = url.pathname
 
+  // 301 redirect trailing-slash paths to canonical (no trailing slash)
+  // e.g. /challenges/ -> /challenges, /clubs/ -> /clubs
+  if (pathname.length > 1 && pathname.endsWith('/') && !pathname.startsWith('/c/') && !pathname.startsWith('/club/')) {
+    const canonical = pathname.replace(/\/+$/, '') || '/'
+    const redirectUrl = new URL(canonical, url.origin)
+    redirectUrl.search = url.search
+    return new Response(null, {
+      status: 301,
+      headers: {
+        'Location': redirectUrl.toString(),
+        'Cache-Control': 'public, max-age=86400',
+      },
+    })
+  }
+
   // Skip SSR for static assets
   if (/\.(js|css|png|jpg|jpeg|webp|svg|ico|woff|woff2|webmanifest|xml|txt|map)$/.test(pathname)) {
     return next()
@@ -229,6 +244,8 @@ async function renderSSRResponse(pathname, ssrData, env, opts = {}, isHead = fal
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': cacheControl,
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
   })
 }
@@ -268,6 +285,8 @@ async function render404(isHead = false) {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'private, no-store',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
   })
 }

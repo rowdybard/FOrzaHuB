@@ -264,7 +264,9 @@ function ClubInviteActions({ club, onChanged }) {
   const currentMembership = memberships.find((membership) => membership.id === club.id)
   const isMember = !!currentMembership
   const atClubLimit = memberships.length >= 5 && !isMember
-  const inviteUrl = `${window.location.origin}/club/${club.slug}`
+  const inviteUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/club/${club.slug}`
+    : `/club/${club.slug}`
 
   const copyInvite = async () => {
     setError('')
@@ -350,7 +352,9 @@ function ClubStartPanel({ club, enabled, user, signIn, isMember, liveChallenge, 
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
-  const inviteUrl = `${window.location.origin}/club/${club.slug}`
+  const inviteUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/club/${club.slug}`
+    : `/club/${club.slug}`
 
   const copyInvite = async () => {
     setError('')
