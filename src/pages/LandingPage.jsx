@@ -295,10 +295,10 @@ function ChallengeCardLite({ challenge }) {
 
 function HowItWorks() {
   const steps = [
-    { icon: Users, title: 'Join a club', text: 'Find a racing group or bring your Discord server. Your Discord stays the home base — GripCafe adds event pages, proof review, and leaderboards.' },
-    { icon: Flag, title: 'Enter daily events', text: 'Each day features a new challenge format — hot laps, drift, drag, builds, photos.' },
-    { icon: Upload, title: 'Submit your proof', text: 'Post your time or score with a clip or screenshot. Every entry is verified.' },
-    { icon: Trophy, title: 'Climb the board', text: 'Points accumulate all week. Top racer wins the Champion Reward.' },
+    { icon: Users, title: 'Join a club', text: 'Bring your Discord — we handle the rest.' },
+    { icon: Flag, title: 'Enter events', text: 'Hot laps, drift, drag, builds, photos.' },
+    { icon: Upload, title: 'Submit proof', text: 'Clip or screenshot. Verified by staff.' },
+    { icon: Trophy, title: 'Climb the board', text: 'Points all week. Top racer wins.' },
   ]
   return (
     <section id="how-it-works" className="container-page scroll-mt-20 mt-24">
