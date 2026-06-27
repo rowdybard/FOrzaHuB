@@ -89,14 +89,14 @@ async function handleRequest({ request, env, next }, isHead) {
   if (pathname.startsWith('/c/')) {
     const slug = pathname.slice(3)
     if (!slug || slug.includes('/')) {
-      return render404(isHead)
+      return await render404(isHead)
     }
     if (!enabled) return renderSSRResponse(pathname, {}, env, {}, isHead)
 
     const supabase = createServerClient(supabaseUrl, supabaseKey)
     try {
       const challenge = await fetchChallengeBySlug(supabase, slug)
-      if (!challenge) return render404(isHead)
+      if (!challenge) return await render404(isHead)
 
       const [clubChallenges, seriesStandings] = await Promise.all([
         fetchChallengesByClub(supabase, challenge.clubId),
@@ -118,14 +118,14 @@ async function handleRequest({ request, env, next }, isHead) {
   if (pathname.startsWith('/club/')) {
     const slug = pathname.slice(6)
     if (!slug || slug.includes('/')) {
-      return render404(isHead)
+      return await render404(isHead)
     }
     if (!enabled) return renderSSRResponse(pathname, {}, env, {}, isHead)
 
     const supabase = createServerClient(supabaseUrl, supabaseKey)
     try {
       const club = await fetchClubBySlug(supabase, slug)
-      if (!club) return render404(isHead)
+      if (!club) return await render404(isHead)
 
       const [all, members] = await Promise.all([
         fetchChallengesByClub(supabase, club.id),
@@ -188,7 +188,7 @@ async function handleRequest({ request, env, next }, isHead) {
 
   // Unknown route — 404
   if (!VALID_STATIC_ROUTES.has(pathname) && !pathname.startsWith('/c/') && !pathname.startsWith('/club/')) {
-    return render404(isHead)
+    return await render404(isHead)
   }
 
   // Fallback: serve SSR shell for any remaining valid static routes
@@ -204,7 +204,7 @@ async function renderSSRResponse(pathname, ssrData, env, opts = {}, isHead = fal
   let appHtml = ''
 
   try {
-    appHtml = renderApp({ url: pathname, ssrData, helmetContext })
+    appHtml = await renderApp({ url: pathname, ssrData, helmetContext })
   } catch (err) {
     console.error('[SSR] render error:', err)
     return serveSpaShell(env, pathname, isHead)
@@ -233,12 +233,12 @@ async function renderSSRResponse(pathname, ssrData, env, opts = {}, isHead = fal
   })
 }
 
-function render404(isHead = false) {
+async function render404(isHead = false) {
   const helmetContext = {}
   let appHtml = ''
 
   try {
-    appHtml = renderApp({ url: '/__not_found__', ssrData: {}, helmetContext })
+    appHtml = await renderApp({ url: '/__not_found__', ssrData: {}, helmetContext })
   } catch (err) {
     console.error('[SSR] 404 render error:', err)
     return new Response(isHead ? null : 'Not Found', {
