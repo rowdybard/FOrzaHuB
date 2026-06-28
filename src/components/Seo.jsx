@@ -4,7 +4,7 @@ const SITE_URL = 'https://gripcafe.com'
 const DEFAULT_DESC =
   'Run a Forza Horizon 6 tournament for your Discord community. Time trials, drift, drag, build battles, and photo contests with verified proof and public leaderboards.'
 
-export default function Seo({ title, description, path, image }) {
+export default function Seo({ title, description, path, image, ogType = 'website' }) {
   const fullTitle = title
     ? `${title} — GripCafe`
     : 'Forza Horizon 6 Clubs, Community Challenges & Leaderboards — GripCafe'
@@ -18,7 +18,7 @@ export default function Seo({ title, description, path, image }) {
       <meta name="description" content={desc} />
       <link rel="canonical" href={url} />
 
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content={ogType} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={desc} />
       <meta property="og:url" content={url} />

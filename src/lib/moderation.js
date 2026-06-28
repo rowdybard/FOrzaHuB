@@ -86,13 +86,31 @@ function normalizeLight(str) {
 
 export function containsBannedWord(text) {
   if (!text || typeof text !== 'string') return false
-  const normalized = normalize(text)
   const light = normalizeLight(text)
 
-  for (const word of BANNED_WORDS) {
-    const normWord = normalize(word)
-    if (normalized.includes(normWord) || light.includes(word)) {
-      return true
+  // Multi-word / special-char banned terms (e.g. "trailer trash", "k.k.k"):
+  // substring match on light text — low Scunthorpe risk for these distinctive
+  // sequences, and word-splitting would break them.
+  for (const banned of BANNED_WORDS) {
+    if (banned.includes(' ') || banned.includes('.')) {
+      const lightBanned = normalizeLight(banned)
+      if (lightBanned && light.includes(lightBanned)) return true
+    }
+  }
+
+  // Single-word banned terms: split text into words and check exact equality
+  // on both light and normalized forms. This fixes Scunthorpe false positives
+  // (e.g. "grape" no longer matches "rape") while still catching leet-speak
+  // obfuscations like "r4p3" → normalize → "rape".
+  const words = text.toLowerCase().split(/[^a-z0-9@!$#]+/i).filter(Boolean)
+  for (const w of words) {
+    const lightW = normalizeLight(w)
+    const normW = normalize(w)
+    for (const banned of BANNED_WORDS) {
+      if (banned.includes(' ') || banned.includes('.')) continue
+      if (lightW === banned) return true
+      const normBanned = normalize(banned)
+      if (normBanned.length >= 3 && normW === normBanned) return true
     }
   }
   return false

@@ -9,6 +9,29 @@ import { getType } from '../lib/challengeTypes'
 /*  Normalizers (mirrors src/data/api.js)                                     */
 /* -------------------------------------------------------------------------- */
 
+// Mirror of cleanExternalUrl in src/data/api.js — only allow https(s) Discord
+// links so SSR output matches the sanitized client render.
+function cleanExternalUrl(value) {
+  const raw = typeof value === 'string' ? value.trim() : ''
+  if (!raw) return ''
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+  try {
+    const url = new URL(withProtocol)
+    const host = url.hostname.toLowerCase().replace(/^www\./, '')
+    const isDiscord =
+      host === 'discord.gg' ||
+      host === 'discord.com' ||
+      host.endsWith('.discord.com') ||
+      host === 'discordapp.com' ||
+      host.endsWith('.discordapp.com')
+    return (url.protocol === 'https:' || url.protocol === 'http:') && isDiscord
+      ? url.toString()
+      : ''
+  } catch {
+    return ''
+  }
+}
+
 function normClub(row) {
   return {
     id: row.id,
@@ -21,7 +44,7 @@ function normClub(row) {
     accent: row.accent || '#06b6d4',
     tagline: row.tagline || '',
     about: row.about || '',
-    discord: row.discord || '',
+    discord: cleanExternalUrl(row.discord),
     founded: row.founded || '',
     ownerId: row.owner_id || null,
     stats: { challenges: 0, podiums: 0, submissions: 0 },

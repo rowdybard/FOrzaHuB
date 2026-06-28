@@ -335,7 +335,7 @@ export default function SubmitScorePage() {
 
   return (
     <div>
-      <Seo title="Submit Your Score" description="Submit your sim racing tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
+      <Seo title="Submit Your Score" description="Submit your Forza Horizon 6 tournament result with screenshot or video proof. Every entry is verified by club staff before appearing on the leaderboard." path="/submit" />
       <PageHero
         eyebrow="Submit"
         title={isGallery ? 'Submit your entry' : 'Submit your result'}

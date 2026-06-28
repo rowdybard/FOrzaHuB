@@ -193,7 +193,11 @@ export default function AdminDashboard() {
                   const proof = i.proof?.url || ''
                   const date = i.submittedAt || ''
                   rows.push([challenge, user, result, status, proof, date]
-                    .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+                    .map((v) => {
+                      let s = String(v ?? '')
+                      if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
+                      return `"${s.replace(/"/g, '""')}"`
+                    })
                     .join(','))
                 })
                 const blob = new Blob([rows.join('\n')], { type: 'text/csv' })

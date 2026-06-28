@@ -92,14 +92,6 @@ export default function MySubmissions({ submissions, onWithdraw }) {
 
               {isPending && (
                 <div className="flex shrink-0 items-center gap-2">
-                  <Button
-                    to={`/submit/${sub.challengeSlug || ''}?edit=${sub.id}`}
-                    size="sm"
-                    variant="ghost"
-                    title="Edit submission"
-                  >
-                    <Edit3 className="h-3.5 w-3.5" />
-                  </Button>
                   {confirmId === sub.id ? (
                     <div className="flex items-center gap-1">
                       <button

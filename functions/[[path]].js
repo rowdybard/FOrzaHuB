@@ -46,6 +46,24 @@ function getEnv(env) {
   return { url, key, enabled: Boolean(url && key) }
 }
 
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' https: data:",
+    "connect-src 'self' https://*.supabase.co https://www.google-analytics.com",
+    "object-src 'none'",
+    "frame-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; '),
+}
+
 // Static routes that are always valid SPA routes
 const VALID_STATIC_ROUTES = new Set([
   '/', '/beta-series', '/challenges', '/archive', '/clubs', '/clubs/new',
@@ -79,6 +97,7 @@ async function handleRequest({ request, env, next }, isHead) {
       headers: {
         'Location': redirectUrl.toString(),
         'Cache-Control': 'public, max-age=86400',
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       },
     })
   }
@@ -244,8 +263,7 @@ async function renderSSRResponse(pathname, ssrData, env, opts = {}, isHead = fal
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': cacheControl,
-      'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      ...SECURITY_HEADERS,
     },
   })
 }
@@ -285,8 +303,7 @@ async function render404(isHead = false) {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'private, no-store',
-      'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      ...SECURITY_HEADERS,
     },
   })
 }
@@ -298,15 +315,22 @@ async function serveSpaShell(env, pathname, isHead = false) {
       if (isHead) {
         return new Response(null, {
           status: response.status,
-          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+          headers: { 'Content-Type': 'text/html; charset=utf-8', ...SECURITY_HEADERS },
         })
       }
-      return response
+      // Clone the asset response and add security headers
+      const newHeaders = new Headers(response.headers)
+      Object.entries(SECURITY_HEADERS).forEach(([k, v]) => newHeaders.set(k, v))
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders,
+      })
     }
   } catch {}
   return new Response(isHead ? null : 'Internal Server Error', {
     status: 500,
-    headers: { 'Content-Type': 'text/plain' },
+    headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS },
   })
 }
 
@@ -347,7 +371,7 @@ function buildHtmlDocument({ appHtml, routeMeta, ssrData, isPrivate }) {
     .join('\n    ')
 
   return `<!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark high-contrast">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -128,12 +128,13 @@ function normChallenge(row) {
   }
 }
 
-function normSubmission(row, { profile, challengeTitle } = {}) {
+function normSubmission(row, { profile, challengeTitle, challengeSlug } = {}) {
   const user = profile ? normProfile(profile) : normProfile(row.profiles)
   return {
     id: row.id,
     challengeId: row.challenge_id,
     challengeTitle: challengeTitle || row.challenge_title || '',
+    challengeSlug: challengeSlug || row.challenges?.slug || '',
     typeId: row.type_id || row.challenges?.type_id,
     user,
     value: row.value,
@@ -515,6 +516,7 @@ export async function getMySubmissions() {
     normSubmission(row, {
       profile: row.profiles,
       challengeTitle: row.challenges?.title || '',
+      challengeSlug: row.challenges?.slug || '',
     }),
   )
 }

@@ -66,7 +66,7 @@ export default function ChallengePage() {
 
   return (
     <>
-      <Seo title={`${challenge.title} — ${t.label}`} description={`${challenge.title}: ${challenge.description || t.label + ' challenge on GripCafe'}. ${challenge.restriction || ''} ${challenge.location ? 'at ' + challenge.location : ''}. Forza Horizon 6 community event.`} path={`/c/${challenge.slug}`} />
+      <Seo title={`${challenge.title} — ${t.label}`} description={`${challenge.title}: ${challenge.description || t.label + ' challenge on GripCafe'}. ${challenge.restriction || ''} ${challenge.location ? 'at ' + challenge.location : ''}. Forza Horizon 6 community event.`} path={`/c/${challenge.slug}`} ogType="article" />
       <ChallengeHeader challenge={challenge} club={club} t={t} />
       <FactStrip challenge={challenge} t={t} />
 
@@ -317,8 +317,8 @@ function EventDetails({ challenge, club, t, isLive }) {
               <Trophy className="h-5 w-5" />
             </span>
             <div>
-              <div className="text-xs text-zinc-400">Winner</div>
-              <div className="font-semibold text-white">{challenge.winner?.tag}</div>
+              <div className="text-xs text-zinc-400">{winner ? 'Winner' : 'Results'}</div>
+              <div className="font-semibold text-white">{winner?.tag || 'No entries'}</div>
             </div>
           </div>
         )}

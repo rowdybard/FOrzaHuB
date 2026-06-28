@@ -50,7 +50,7 @@ export function useAsync(fn, deps = [], ssrKey) {
       ssrConsumed.current = true
       return
     }
-    load()
+    return load()
   }, [load, ssrData])
 
   return { ...state, reload: load }

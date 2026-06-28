@@ -563,7 +563,7 @@ function AdminTools({ club, challenges, isStaff, onChanged }) {
               >
                 <Edit3 className="h-4 w-4" />
               </Button>
-              {(challenge.status === 'live' || challenge.status === 'upcoming') && (
+              {isStaff && (challenge.status === 'live' || challenge.status === 'upcoming') && (
                 <button
                   type="button"
                   title="Close now"
